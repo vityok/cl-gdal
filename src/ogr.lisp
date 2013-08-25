@@ -1,30 +1,5 @@
 ;;; -*- package: OGR; Syntax: Common-lisp; Base: 10 -*-
 
-;; Copyright (c) 2013, Victor Anyakin <anyakinvictor@yahoo.com>
-;; All rights reserved.
-
-;; Redistribution and use in source and binary forms, with or without
-;; modification, are permitted provided that the following conditions are met:
-;;     * Redistributions of source code must retain the above copyright
-;;       notice, this list of conditions and the following disclaimer.
-;;     * Redistributions in binary form must reproduce the above copyright
-;;       notice, this list of conditions and the following disclaimer in the
-;;       documentation and/or other materials provided with the distribution.
-;;     * Neither the name of the organization nor the
-;;       names of its contributors may be used to endorse or promote products
-;;       derived from this software without specific prior written permission.
-
-;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-;; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-;; WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-;; DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-;; DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-;; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-;; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-;; ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 (in-package :ogr)
 
 ;; --------------------------------------------------------
@@ -155,18 +130,18 @@ by the application.}"
 the future ... avoid coding applications based on the assumption that
 all field types can be known. "
 
-  :OFTInteger			    ; Simple 32bit integer
-  :OFTIntegerList		    ; List of 32bit integers
-  :OFTReal			    ; Double Precision floating point
-  :OFTRealList			    ; List of doubles
-  :OFTString			    ; String of ASCII chars
-  :OFTStringList		    ; Array of strings
-  :OFTWideString		    ; deprecated
-  :OFTWideStringList		    ; deprecated
-  :OFTBinary			    ; Raw Binary data
-  :OFTDate			    ; Date
-  :OFTTime			    ; Time
-  :OFTDateTime)			    ; Date and Time
+  (:OFTInteger 0)		     ; Simple 32bit integer
+  (:OFTIntegerList 1)		     ; List of 32bit integers
+  (:OFTReal 2)			     ; Double Precision floating point
+  (:OFTRealList 3)		     ; List of doubles
+  (:OFTString 4)		     ; String of ASCII chars
+  (:OFTStringList 5)		     ; Array of strings
+  (:OFTWideString 6)		     ; deprecated
+  (:OFTWideStringList 7)	     ; deprecated
+  (:OFTBinary 8)		     ; Raw Binary data
+  (:OFTDate 9)			     ; Date
+  (:OFTTime 10)			     ; Time
+  (:OFTDateTime 11))		     ; Date and Time
 
 ;; --------------------------------------------------------
 
@@ -258,23 +233,28 @@ be modified.}"
   "List of well known binary geometry types. These are used within the
 BLOBs but are also returned from OGRGeometry::getGeometryType() to
 identify the type of a geometry object."
-  :wkbUnknown		; unknown type, non-standard
-  :wkbPoint		; 0-dimensional geometric object, standard WKB
-  :wkbLineString ; 1-dimensional geometric object with linear interpolation between Points, standard WKB
-  :wkbPolygon ; planar 2-dimensional geometric object defined by 1 exterior boundary and 0 or more interior boundaries, standard WKB
-  :wkbMultiPoint      ; GeometryCollection of Points, standard WKB
-  :wkbMultiLineString ; GeometryCollection of LineStrings, standard WKB
-  :wkbMultiPolygon    ; GeometryCollection of Polygons, standard WKB
-  :wkbGeometryCollection ; geometric object that is a collection of 1 or more geometric objects, standard WKB
-  :wkbNone		 ; non-standard, for pure attribute records
-  :wkbLinearRing	 ; non-standard, just for createGeometry()
-  :wkbPoint25D		 ; 2.5D extension as per 99-402
-  :wkbLineString25D	 ; 2.5D extension as per 99-402
-  :wkbPolygon25D	 ; 2.5D extension as per 99-402
-  :wkbMultiPoint25D	 ; 2.5D extension as per 99-402
-  :wkbMultiLineString25D ; 2.5D extension as per 99-402
-  :wkbMultiPolygon25D	 ; 2.5D extension as per 99-402
-  :wkbGeometryCollection25D)		; 2.5D extension as per 99-402
+  (:wkbUnknown 0)	; unknown type, non-standard
+  (:wkbPoint 1)		; 0-dimensional geometric object, standard WKB
+  (:wkbLineString 2)	; 1-dimensional geometric object with linear
+					; interpolation between Points, standard WKB
+  (:wkbPolygon 3) ; planar 2-dimensional geometric object defined by 1
+					; exterior boundary and 0 or more interior
+					; boundaries, standard WKB
+  (:wkbMultiPoint 4)      ; GeometryCollection of Points, standard WKB
+  (:wkbMultiLineString 5) ; GeometryCollection of LineStrings, standard WKB
+  (:wkbMultiPolygon 6)	; GeometryCollection of Polygons, standard WKB
+  (:wkbGeometryCollection 7)   ; geometric object that is a collection
+					; of 1 or more geometric objects,
+					; standard WKB
+  (:wkbNone 100)	    ; non-standard, for pure attribute records
+  (:wkbLinearRing 101)	    ; non-standard, just for createGeometry()
+  (:wkbPoint25D #x80000001) ; 2.5D extension as per 99-402
+  (:wkbLineString25D #x80000002)	; 2.5D extension as per 99-402
+  (:wkbPolygon25D #x80000003)		; 2.5D extension as per 99-402
+  (:wkbMultiPoint25D #x80000004)	; 2.5D extension as per 99-402
+  (:wkbMultiLineString25D #x80000005)	; 2.5D extension as per 99-402
+  (:wkbMultiPolygon25D #x80000006)	; 2.5D extension as per 99-402
+  (:wkbGeometryCollection25D #x80000007)) ; 2.5D extension as per 99-402
 
 ;; --------------------------------------------------------
 
