@@ -7,6 +7,8 @@
 (cffi:defcfun ("OGRRegisterAll" ogr-register-all) :void
   "Register all drivers.")
 
+(export 'ogr-register-all)
+
 ;; --------------------------------------------------------
 
 (cffi:defctype data-source-h (:pointer :void)
@@ -18,6 +20,14 @@
   (psz-name :string)
   (p-update :int)
   (path-driver-list :pointer)) ;; OGRSFDriverH
+
+(export 'ogr-open)
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_DS_GetLayerCount" OGR-DS-Get-Layer-Count) :int
+  ( ds :pointer ))
+(export 'ogr-ds-get-layer-count)
 
 ;; --------------------------------------------------------
 
@@ -36,7 +46,16 @@ This function is the same as the C++ method OGRDataSource::GetLayerByName().
 @return{an handle to the layer, or NULL if the layer is not found or
 an error occurs.}"
   (hDS :pointer)
-  (pszLayerName :pointer))
+  (pszLayerName :string))
+
+(export 'ogr-ds-get-layer-by-name)
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_DS_GetLayer" OGR-DS-Get-Layer) :pointer ; OGRLayerH
+  (hDS :pointer)			; OGRDataSourceH
+  (i :int))
+(export 'ogr-ds-get-layer)
 
 ;; --------------------------------------------------------
 
@@ -51,6 +70,8 @@ This function is the same as the C++ method OGRLayer::ResetReading().
 @argument[hLayer]{handle to the layer on which features are read.}"
 
   (hLayer :pointer))			; OGRLayerH
+
+(export 'ogr-l-reset-reading)
 
 ;; --------------------------------------------------------
 
@@ -78,6 +99,8 @@ Parameters:	hLayer 	handle to the layer from which feature are read.
 
   (hLayer :pointer))			; OGRLayerH
 
+(export 'ogr-l-get-next-feature)
+
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_L_GetLayerDefn" OGR-L-Get-Layer-Defn) :pointer
@@ -91,7 +114,9 @@ This function is the same as the C++ method OGRLayer::GetLayerDefn().
 Parameters:	hLayer 	handle to the layer to get the schema information.
 
 @return{OGRFeatureDefnH an handle to the feature definition.}"
-  (hLayer :pointer))			;
+  (hLayer :pointer))
+
+(export 'OGR-L-Get-Layer-Defn)			;
 
 ;; --------------------------------------------------------
 
@@ -104,6 +129,8 @@ Parameters:	hDefn 	handle to the feature definition to get the fields count from
 
 @return{count of fields.}"
   (hDefn :pointer))			; OGRFeatureDefnH
+
+(export 'OGR-FD-Get-Field-Count)
 
 ;; --------------------------------------------------------
 
@@ -122,6 +149,8 @@ or NULL if invalid index. This object should not be modified or freed
 by the application.}"
   (hDefn :pointer)			; OGRFeatureDefnH
   (iField :int))
+
+(export 'OGR-FD-Get-Field-Defn)
 
 ;; --------------------------------------------------------
 
@@ -145,7 +174,7 @@ all field types can be known. "
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_Fld_GetType" OGR_Fld_GetType) :int
+(cffi:defcfun ("OGR_Fld_GetType" OGR-Fld-Get-Type) :int
 
   "Fetch type of this field.
 
@@ -154,6 +183,8 @@ Parameters:	hDefn 	handle to the field definition to get type from.
 
 @return{OGRFieldType field type.}"
   (hDefn :pointer))			; OGRFieldDefnH
+
+(export 'OGR-Fld-Get-Type)
 
 ;; --------------------------------------------------------
 
@@ -172,6 +203,8 @@ Parameters:	hFeat 	handle to the feature that owned the field.
 @return{the field value.}"
   (hFeat :pointer)			; OGRFeatureH
   (iField :int))
+
+(export 'OGR-F-Get-Field-As-Integer)
 
 ;; --------------------------------------------------------
 
@@ -194,6 +227,8 @@ the field value."
   (hFeat :pointer)			; OGRFeatureH
   (iField :int))
 
+(export 'OGR-F-Get-Field-As-Double)
+
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_F_GetFieldAsString" OGR-F-Get-Field-As-String) :string 	
@@ -214,9 +249,11 @@ modified, or freed. Its lifetime may be very brief.}"
   (hFeat :pointer)			; OGRFeatureH
   (iField :int))
 
+(export 'OGR-F-Get-Field-As-String)
+
 ;; --------------------------------------------------------
 
-(cffi:defcfun  ("OGR_F_GetGeometryRef" OGR_F_GetGeometryRef) :pointer ; OGRGeometryH	
+(cffi:defcfun  ("OGR_F_GetGeometryRef" OGR-F-Get-Geometry-Ref) :pointer ; OGRGeometryH	
 
   "Fetch an handle to feature geometry.
 
@@ -226,6 +263,8 @@ Parameters:	hFeat 	handle to the feature to get geometry from.
 @return{an handle to internal feature geometry. This object should not
 be modified.}"
   (hFeat :pointer))			; OGRFeatureH
+
+(export 'OGR-F-Get-Geometry-Ref)
 
 ;; --------------------------------------------------------
 
@@ -258,7 +297,7 @@ identify the type of a geometry object."
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetGeometryType" OGR-G-Get-Geometry-Type) :int ; OGRwkbGeometryType
+(cffi:defcfun ("OGR_G_GetGeometryType" %OGR-G-Get-Geometry-Type) :int ; OGRwkbGeometryType
 
   "Fetch geometry type.
 
@@ -271,6 +310,12 @@ Parameters:	hGeom 	handle on the geometry to get type from.
 
 @return{the geometry type code.}"
   (hGeom :pointer))			; OGRGeometryH
+
+(defun OGR-G-Get-Geometry-Type (hGeom)
+  (cffi:foreign-enum-keyword 'OGR-wkb-Geometry-Type
+			     (%OGR-G-Get-Geometry-Type hGeom)))
+
+(export 'OGR-G-Get-Geometry-Type)
 
 ;; --------------------------------------------------------
 
@@ -288,6 +333,8 @@ This function is the same as the C++ method OGRFeature::DestroyFeature().
 Parameters:	hFeat 	handle to the feature to destroy."
   (hFeat :pointer))			; OGRFeatureH
 
+(export 'OGR-F-Destroy)
+
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_DS_Destroy" OGR-DS-Destroy) :void
@@ -297,5 +344,48 @@ Parameters:	hFeat 	handle to the feature to destroy."
 This method is the same as the C++ method OGRDataSource::DestroyDataSource().
 @argument[hDataSource]{handle to allocated datasource object.}"
   (hDataSource :pointer))		; OGRDataSourceH
+
+(export 'OGR-DS-Destroy)
+
+;; --------------------------------------------------------
+
+(defconstant +wkb25DBit+ #x80000000)
+
+(defun wkbFlatten (x)
+  "The wkbFlatten() macro is used above to convert the type for a
+wkbPoint25D (a point with a z coordinate) into the base 2D geometry
+type code (wkbPoint). For each 2D geometry type there is a
+corresponding 2.5D type code. The 2D and 2.5D geometry cases are
+handled by the same C++ class, so our code will handle 2D or 3D cases
+properly."
+
+  ;; #define wkbFlatten(x)  ((OGRwkbGeometryType) ((x) & (~wkb25DBit)))
+
+  (let ((%x (if (keywordp x)
+		(cffi:foreign-enum-value 'OGR-wkb-Geometry-Type x)
+		x)))
+    (cffi:foreign-enum-keyword 'OGR-wkb-Geometry-Type
+			       (logand %x (lognot +wkb25DBit+)))))
+(export 'wkbFlatten)
+
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_G_GetX" ogr-g-getx) :double
+  (geom :pointer)
+  (i :int))
+(export 'ogr-g-getx)
+
+(cffi:defcfun ("OGR_G_GetY" ogr-g-gety) :double
+  (geom :pointer)
+  (i :int))
+(export 'ogr-g-gety)
+
+(cffi:defcfun ("OGR_G_GetZ" ogr-g-getz) :double
+  (geom :pointer)
+  (i :int))
+(export 'ogr-g-getz)
+
+
 
 ;; EOF
