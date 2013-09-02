@@ -11,54 +11,6 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defctype data-source-h (:pointer :void)
-  "OGRDataSourceH")
-
-;; --------------------------------------------------------
-
-(cffi:defcfun  ("OGROpen" ogr-open) :pointer
-  (psz-name :string)
-  (p-update :int)
-  (path-driver-list :pointer)) ;; OGRSFDriverH
-
-(export 'ogr-open)
-
-;; --------------------------------------------------------
-
-(cffi:defcfun ("OGR_DS_GetLayerCount" OGR-DS-Get-Layer-Count) :int
-  ( ds :pointer ))
-(export 'ogr-ds-get-layer-count)
-
-;; --------------------------------------------------------
-
-(cffi:defcfun  ("OGR_DS_GetLayerByName" ogr-ds-get-layer-by-name) :pointer ; OGRLayerH
-  "Fetch a layer by name.
-
-The returned layer remains owned by the OGRDataSource and should not
-be deleted by the application.
-
-This function is the same as the C++ method OGRDataSource::GetLayerByName().
-
-@argument[hDS]{handle to the data source from which to get the layer.}
-
-@argument[pszLayerName]{Layer the layer name of the layer to fetch.}
-
-@return{an handle to the layer, or NULL if the layer is not found or
-an error occurs.}"
-  (hDS :pointer)
-  (pszLayerName :string))
-
-(export 'ogr-ds-get-layer-by-name)
-
-;; --------------------------------------------------------
-
-(cffi:defcfun ("OGR_DS_GetLayer" OGR-DS-Get-Layer) :pointer ; OGRLayerH
-  (hDS :pointer)			; OGRDataSourceH
-  (i :int))
-(export 'ogr-ds-get-layer)
-
-;; --------------------------------------------------------
-
 (cffi:defcfun ("OGR_L_ResetReading" ogr-l-reset-reading) :void
 
   "Reset feature reading to start on the first feature.
@@ -337,18 +289,6 @@ Parameters:	hFeat 	handle to the feature to destroy."
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_Destroy" OGR-DS-Destroy) :void
-
-  "Closes opened datasource and releases allocated resources.
-
-This method is the same as the C++ method OGRDataSource::DestroyDataSource().
-@argument[hDataSource]{handle to allocated datasource object.}"
-  (hDataSource :pointer))		; OGRDataSourceH
-
-(export 'OGR-DS-Destroy)
-
-;; --------------------------------------------------------
-
 (defconstant +wkb25DBit+ #x80000000)
 
 (defun wkbFlatten (x)
@@ -358,8 +298,6 @@ type code (wkbPoint). For each 2D geometry type there is a
 corresponding 2.5D type code. The 2D and 2.5D geometry cases are
 handled by the same C++ class, so our code will handle 2D or 3D cases
 properly."
-
-  ;; #define wkbFlatten(x)  ((OGRwkbGeometryType) ((x) & (~wkb25DBit)))
 
   (let ((%x (if (keywordp x)
 		(cffi:foreign-enum-value 'OGR-wkb-Geometry-Type x)
