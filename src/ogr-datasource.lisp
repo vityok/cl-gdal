@@ -10,24 +10,6 @@
   "OGRDataSourceH")
 
 ;; --------------------------------------------------------
-(defclass ogr-class ()
-  ((pointer
-    :type (or null cffi:foreign-pointer)
-    :initarg :pointer
-    :accessor pointer
-    :initform nil)))
-
-(defclass data-source (ogr-class)
-  ())
-
-(defclass layer (ogr-class)
-  ((data-source
-    :type (or null data-source)
-    :initarg :data-source
-    :accessor data-source
-    :initform nil)))
-
-;; --------------------------------------------------------
 
 (cffi:defcfun  ("OGROpen" ogr-open) :pointer ; OGRDataSourceH
   (psz-name :string)
@@ -126,4 +108,62 @@ This method is the same as the C++ method OGRDataSource::DestroyDataSource().
 
 ;; --------------------------------------------------------
 
+const char * 	OGR_DS_GetName (OGRDataSourceH)
+ 	Returns the name of the data source. 
+int 	OGR_DS_GetLayerCount (OGRDataSourceH)
+ 	Get the number of layers in this data source. 
+
+OGRErr 	OGR_DS_DeleteLayer (OGRDataSourceH, int)
+ 	Delete the indicated layer from the datasource. 
+
+OGRSFDriverH 	OGR_DS_GetDriver (OGRDataSourceH)
+ 	Returns the driver that the dataset was opened with. 
+
+OGRLayerH 	OGR_DS_CreateLayer (OGRDataSourceH, const char *, OGRSpatialReferenceH, OGRwkbGeometryType, char **)
+ 	This function attempts to create a new layer on the data source with the indicated name, coordinate system, geometry type. 
+
+OGRLayerH 	OGR_DS_CopyLayer (OGRDataSourceH, OGRLayerH, const char *, char **)
+ 	Duplicate an existing layer. 
+
+int 	OGR_DS_TestCapability (OGRDataSourceH, const char *)
+ 	Test if capability is available. 
+
+OGRLayerH 	OGR_DS_ExecuteSQL (OGRDataSourceH, const char *, OGRGeometryH, const char *)
+ 	Execute an SQL statement against the data store. 
+
+void 	OGR_DS_ReleaseResultSet (OGRDataSourceH, OGRLayerH)
+ 	Release results of OGR_DS_ExecuteSQL(). 
+
+OGRErr 	OGR_DS_SyncToDisk (OGRDataSourceH)
+ 	Flush pending changes to disk.
+
+OGRErr 	OGRReleaseDataSource (OGRDataSourceH)
+ 	Drop a reference to this datasource, and if the reference count drops to zero close (destroy) the datasource. 
+
+void 	OGRRegisterDriver (OGRSFDriverH)
+ 	Add a driver to the list of registered drivers. 
+
+void 	OGRDeregisterDriver (OGRSFDriverH)
+ 	Remove the passed driver from the list of registered drivers. 
+
+int 	OGRGetDriverCount (void)
+ 	Fetch the number of registered drivers. 
+
+OGRSFDriverH 	OGRGetDriver (int)
+ 	Fetch the indicated driver. 
+
+OGRSFDriverH 	OGRGetDriverByName (const char *)
+ 	Fetch the indicated driver. 
+
+int 	OGRGetOpenDSCount (void)
+ 	Return the number of opened datasources. 
+
+OGRDataSourceH 	OGRGetOpenDS (int iDS)
+ 	Return the iDS th datasource opened. 
+
+ void 	OGRRegisterAll (void)
+ 	Register all drivers. 
+
+void 	OGRCleanupAll (void)
+ 	Cleanup all OGR related resources.
 ;; EOF

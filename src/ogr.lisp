@@ -1,6 +1,44 @@
 ;;; -*- package: OGR; Syntax: Common-lisp; Base: 10 -*-
 
+;; based on the auto-generated documentation at:
+;; http://www.gdal.org/ogr/ogr__api_8h.html
+
 (in-package :ogr)
+
+;; --------------------------------------------------------
+
+(defclass ogr-class ()
+  ((pointer
+    :type (or null cffi:foreign-pointer)
+    :initarg :pointer
+    :accessor pointer
+    :initform nil)))
+
+(defclass data-source (ogr-class)
+  ;; original documentation at: http://www.gdal.org/ogr/classOGRDataSource.html
+  (:documentation "This class represents a data source.
+
+  A data source potentially consists of many layers (OGRLayer). A data
+  source normally consists of one, or a related set of files, though
+  the name doesn't have to be a real item in the file system.
+
+  When an OGRDataSource is destroyed, all it's associated OGRLayers
+  objects are also destroyed.")
+  ())
+
+(defclass layer (ogr-class)
+  ((data-source
+    :type (or null data-source)
+    :initarg :data-source
+    :accessor data-source
+    :initform nil)))
+
+(defclass geometry (ogr-class)
+  ((data-source
+    :type (or null data-source)
+    :initarg :data-source
+    :accessor data-source
+    :initform nil)))
 
 ;; --------------------------------------------------------
 
@@ -126,6 +164,21 @@ all field types can be known. "
 
 ;; --------------------------------------------------------
 
+(cffi:defcenum OGR-Err
+
+    (:NONE                0)
+  (:NOT_ENOUGH_DATA     1)
+  (:NOT_ENOUGH_MEMORY   2)
+  (:UNSUPPORTED_GEOMETRY_TYPE 3)
+  (:UNSUPPORTED_OPERATION 4)
+  (:CORRUPT_DATA        5)
+  (:FAILURE             6)
+  (:UNSUPPORTED_SRS     7)
+  (:INVALID_HANDLE      8))
+
+
+;; --------------------------------------------------------
+
 (cffi:defcfun ("OGR_Fld_GetType" OGR-Fld-Get-Type) :int
 
   "Fetch type of this field.
@@ -221,7 +274,7 @@ be modified.}"
 ;; --------------------------------------------------------
 
 (cffi:defcenum OGR-wkb-Geometry-Type
-  "List of well known binary geometry types. These are used within the
+    "List of well known binary geometry types. These are used within the
 BLOBs but are also returned from OGRGeometry::getGeometryType() to
 identify the type of a geometry object."
   (:wkbUnknown 0)	; unknown type, non-standard
@@ -249,28 +302,6 @@ identify the type of a geometry object."
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetGeometryType" %OGR-G-Get-Geometry-Type) :int ; OGRwkbGeometryType
-
-  "Fetch geometry type.
-
-Note that the geometry type may include the 2.5D flag. To get a 2D
-flattened version of the geometry type apply the wkbFlatten() macro to
-the return result.
-
-This function is the same as the CPP method OGRGeometry::getGeometryType().
-Parameters:	hGeom 	handle on the geometry to get type from.
-
-@return{the geometry type code.}"
-  (hGeom :pointer))			; OGRGeometryH
-
-(defun OGR-G-Get-Geometry-Type (hGeom)
-  (cffi:foreign-enum-keyword 'OGR-wkb-Geometry-Type
-			     (%OGR-G-Get-Geometry-Type hGeom)))
-
-(export 'OGR-G-Get-Geometry-Type)
-
-;; --------------------------------------------------------
-
 (cffi:defcfun ("OGR_F_Destroy" OGR-F-Destroy) :void 	
 
   "Destroy feature.
@@ -291,10 +322,10 @@ Parameters:	hFeat 	handle to the feature to destroy."
 
 (defconstant +wkb25DBit+ #x80000000)
 
-(defun wkbFlatten (x)
-  "The wkbFlatten() macro is used above to convert the type for a
-wkbPoint25D (a point with a z coordinate) into the base 2D geometry
-type code (wkbPoint). For each 2D geometry type there is a
+(defun wkb-flatten (x)
+  "The wkb-flatten function is used above to convert the type for a
+:wkbPoint25D (a point with a z coordinate) into the base 2D geometry
+type code (:wkbPoint). For each 2D geometry type there is a
 corresponding 2.5D type code. The 2D and 2.5D geometry cases are
 handled by the same C++ class, so our code will handle 2D or 3D cases
 properly."
@@ -304,25 +335,11 @@ properly."
 		x)))
     (cffi:foreign-enum-keyword 'OGR-wkb-Geometry-Type
 			       (logand %x (lognot +wkb25DBit+)))))
-(export 'wkbFlatten)
+(export 'wkb-flatten)
 
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetX" ogr-g-getx) :double
-  (geom :pointer)
-  (i :int))
-(export 'ogr-g-getx)
-
-(cffi:defcfun ("OGR_G_GetY" ogr-g-gety) :double
-  (geom :pointer)
-  (i :int))
-(export 'ogr-g-gety)
-
-(cffi:defcfun ("OGR_G_GetZ" ogr-g-getz) :double
-  (geom :pointer)
-  (i :int))
-(export 'ogr-g-getz)
 
 
 
