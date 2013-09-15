@@ -1,10 +1,6 @@
 (defpackage :cl-ogr
   (:nicknames :ogr)
-  (:use :cl)
-  (:export
-   #:parse-nt
-   #:predicate?
-   #:literal-string))
+  (:use :cl))
 
 (cffi:define-foreign-library libgdal
     (:unix (:or "libgdal.so.1" "libgdal.so"))

@@ -108,6 +108,7 @@ This method is the same as the C++ method OGRDataSource::DestroyDataSource().
 
 ;; --------------------------------------------------------
 
+#|
 const char * 	OGR_DS_GetName (OGRDataSourceH)
  	Returns the name of the data source. 
 int 	OGR_DS_GetLayerCount (OGRDataSourceH)
@@ -166,4 +167,6 @@ OGRDataSourceH 	OGRGetOpenDS (int iDS)
 
 void 	OGRCleanupAll (void)
  	Cleanup all OGR related resources.
+|#
+
 ;; EOF

@@ -16,6 +16,7 @@
 
 (defclass data-source (ogr-class)
   ;; original documentation at: http://www.gdal.org/ogr/classOGRDataSource.html
+  ()
   (:documentation "This class represents a data source.
 
   A data source potentially consists of many layers (OGRLayer). A data
@@ -23,8 +24,7 @@
   the name doesn't have to be a real item in the file system.
 
   When an OGRDataSource is destroyed, all it's associated OGRLayers
-  objects are also destroyed.")
-  ())
+  objects are also destroyed."))
 
 (defclass layer (ogr-class)
   ((data-source
@@ -148,7 +148,6 @@ by the application.}"
   "List of feature field types. This list is likely to be extended in
 the future ... avoid coding applications based on the assumption that
 all field types can be known. "
-
   (:OFTInteger 0)		     ; Simple 32bit integer
   (:OFTIntegerList 1)		     ; List of 32bit integers
   (:OFTReal 2)			     ; Double Precision floating point
@@ -165,8 +164,9 @@ all field types can be known. "
 ;; --------------------------------------------------------
 
 (cffi:defcenum OGR-Err
-
-    (:NONE                0)
+    "Errors are defined as macro constants, but we define is an
+enumeration with set constant values."
+  (:NONE                0)
   (:NOT_ENOUGH_DATA     1)
   (:NOT_ENOUGH_MEMORY   2)
   (:UNSUPPORTED_GEOMETRY_TYPE 3)
@@ -175,7 +175,6 @@ all field types can be known. "
   (:FAILURE             6)
   (:UNSUPPORTED_SRS     7)
   (:INVALID_HANDLE      8))
-
 
 ;; --------------------------------------------------------
 
@@ -337,10 +336,6 @@ properly."
 			       (logand %x (lognot +wkb25DBit+)))))
 (export 'wkb-flatten)
 
-
 ;; --------------------------------------------------------
-
-
-
 
 ;; EOF
