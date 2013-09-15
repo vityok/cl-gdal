@@ -27,7 +27,13 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateFromWkb" OGR-G-Create-From-Wkb) :int
+(cffi:defcfun ("OGR_G_CreateFromWkb" %OGR-G-Create-From-Wkb) :int ; OGRErr
+  (pabyData :string)
+  (hSRS :pointer)			; OGRSpatialReferenceH
+  (phGeometry :pointer)			; OGRGeometryH *
+  (nBytes :int))
+
+(defun OGR-G-Create-From-Wkb (pabyData hSRS phGeometry nBytes)
   "Create a geometry object of the appropriate type from it's well
  known binary representation.
 
@@ -53,21 +59,27 @@
  @argument[nBytes]{the number of bytes of data available in pabyData,
  or -1 if it is not known, but assumed to be sufficient.}
 
- @return{OGRERR_NONE if all goes well, otherwise any of
- OGRERR_NOT_ENOUGH_DATA, OGRERR_UNSUPPORTED_GEOMETRY_TYPE, or
- OGRERR_CORRUPT_DATA may be returned.}"
-  (pabyData :string)
-  (hSRS :pointer)			; OGRSpatialReferenceH
-  (phGeometry :pointer)			; OGRGeometryH *
-  (nBytes :int))
+ @return{:NONE if all goes well, otherwise any of
+ :NOT_ENOUGH_DATA, :UNSUPPORTED_GEOMETRY_TYPE, or
+ :CORRUPT_DATA may be returned.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Create-From-Wkb pabyData hSRS phGeometry nBytes)))
+
 (export 'OGR-G-Create-From-Wkb)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateFromWkt" OGR-G-Create-From-Wkt) :int
+(cffi:defcfun ("OGR_G_CreateFromWkt" %OGR-G-Create-From-Wkt) :int ; OGRErr
+  (ppszData :pointer)			; char **
+  (hSRS :pointer)			; OGRSpatialReferenceH
+  (phGeometry :pointer))		; OGRGeometryH *
+
+(defun OGR-G-Create-From-Wkt (ppszData hSRS phGeometry)
   "Create a geometry object of the appropriate type from it's well known text representation.
 
- The OGRGeometryFactory::createFromWkt CPP method is the same as this function.
+ The OGRGeometryFactory::createFromWkt CPP method is the same as this
+ function.
 
  @argument[ppszData]{input zero terminated string containing well
  known text representation of the geometry to be created. The pointer
@@ -81,12 +93,13 @@
  method fails. If not NULL, *phGeometry should be freed with
  OGR_G_DestroyGeometry() after use.}
 
- @return{OGRERR_NONE if all goes well, otherwise any of
- OGRERR_NOT_ENOUGH_DATA, OGRERR_UNSUPPORTED_GEOMETRY_TYPE, or
- OGRERR_CORRUPT_DATA may be returned.}"
-  (ppszData :pointer)			; char **
-  (hSRS :pointer)			; OGRSpatialReferenceH
-  (phGeometry :pointer))		; OGRGeometryH *
+ @return{NONE if all goes well, otherwise any of
+ NOT_ENOUGH_DATA, UNSUPPORTED_GEOMETRY_TYPE, or
+ CORRUPT_DATA may be returned.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Create-From-Wkt ppszData hSRS phGeometry)))
+
 (export 'OGR-G-Create-From-Wkt)
 
 ;; --------------------------------------------------------
@@ -341,7 +354,12 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ImportFromWkb" OGR-G-Import-From-Wkb) :int ; OGRErr
+(cffi:defcfun ("OGR_G_ImportFromWkb" %OGR-G-Import-From-Wkb) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (pabyData :string)			; unsigned char *
+  (nSize :int))
+
+(defun OGR-G-Import-From-Wkb (hGeom pabyData nSize)
   "Assign geometry from well known binary data.
 
  The object must have already been instantiated as the correct derived
@@ -359,13 +377,18 @@ OGR 1.8.0"
  @return{NONE if all goes well, otherwise any
  of :NOT_ENOUGH_DATA, :UNSUPPORTED_GEOMETRY_TYPE, or :CORRUPT_DATA may
  be returned.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (pabyData :string)			; unsigned char *
-  (nSize :int))
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Import-From-Wkb hGeom pabyData nSize)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ExportToWkb" OGR-G-Export-To-Wkb) :int ; OGRErr
+(cffi:defcfun ("OGR_G_ExportToWkb" %OGR-G-Export-To-Wkb) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (eOrder :int)				; OGRwkbByteOrder
+  (pabyDstBuffer :string))		; unsigned char *
+
+(defun OGR-G-Export-To-Wkb (hGeom eOrder pabyDstBuffer)
   "Convert a geometry into well known binary format.
 
  This function relates to the SFCOM IWks::ExportToWKB() method.
@@ -379,11 +402,10 @@ OGR 1.8.0"
  @argument[pabyDstBuffer]{a buffer into which the binary
  representation is written. This buffer must be at least
  OGR_G_WkbSize() byte in size.}
- @return{Currently OGRERR_NONE is always returned.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (eOrder :int)				; OGRwkbByteOrder
-  (pabyDstBuffer :string))		; unsigned char *
-
+ @return{Currently :NONE is always returned.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Export-To-Wkb hGeom eOrder pabyDstBuffer)))
 
 ;; --------------------------------------------------------
 
@@ -405,7 +427,11 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ImportFromWkt" OGR-G-Import-From-Wkt) :int ; OGRErr
+(cffi:defcfun ("OGR_G_ImportFromWkt" %OGR-G-Import-From-Wkt) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (ppszSrcText (:pointer :string)))	; char **
+
+(defun OGR-G-Import-From-Wkt (hGeom ppszSrcText)
   "Assign geometry from well known text data.
 
  The object must have already been instantiated as the correct derived
@@ -417,17 +443,23 @@ OGR 1.8.0"
 
  @argument[hGeom]{handle on the geometry to assign well know text data to.}
 
- @argument[ppszSrcText]{pointer to a pointer to the source text. The pointer is updated to pointer after the consumed text.}
+ @argument[ppszSrcText]{pointer to a pointer to the source text. The
+ pointer is updated to pointer after the consumed text.}
 
- @return{OGRERR_NONE if all goes well, otherwise any of
- OGRERR_NOT_ENOUGH_DATA, OGRERR_UNSUPPORTED_GEOMETRY_TYPE, or
- OGRERR_CORRUPT_DATA may be returned."
-  (hGeom :pointer)			; OGRGeometryH
-  (ppszSrcText (:pointer :string)))	; char **
+ @return{:NONE if all goes well, otherwise any of
+ :NOT_ENOUGH_DATA, :UNSUPPORTED_GEOMETRY_TYPE, or
+ :CORRUPT_DATA may be returned."
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Import-From-Wkt hGeom ppszSrcText)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ExportToWkt" OGR-G-Export-To-Wkt) :int ; OGRErr
+(cffi:defcfun ("OGR_G_ExportToWkt" %OGR-G-Export-To-Wkt) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (ppszSrcText (:pointer :string)))	; char **
+
+(defun OGR-G-Export-To-Wkt (hGeom ppszSrcText)
   "Convert a geometry into well known text format.
 
  This function relates to the SFCOM IWks::ExportToWKT() method.
@@ -440,9 +472,10 @@ OGR 1.8.0"
  assigned to the passed pointer. After use, *ppszDstText should be
  freed with OGRFree().}
 
- @return{Currently OGRERR_NONE is always returned.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (ppszSrcText (:pointer :string)))	; char **
+ @return{Currently :NONE is always returned.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Export-To-Wkt hGeom ppszSrcText)))
 
 ;; --------------------------------------------------------
 
@@ -478,8 +511,8 @@ OGR 1.8.0"
  @argument[hGeom]{handle on the geometry to get name from.}
 
  @return{name used for this geometry type in well known text format.}"
-
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Get-Geometry-Name)
 
 ;; --------------------------------------------------------
 
@@ -490,6 +523,7 @@ OGR 1.8.0"
 
  @argument[hGeom]{handle on the geometry to convert.}"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Flatten-To-2D)
 
 ;; --------------------------------------------------------
 
@@ -502,6 +536,7 @@ OGR 1.8.0"
 
  @argument[hGeom]{handle to the geometry.}"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Close-Rings)
 
 ;; --------------------------------------------------------
 
@@ -531,8 +566,8 @@ OGR 1.8.0"
  @argument[pszGML]{The GML fragment for the geometry.}
 
  @return{a geometry on succes, or NULL on error."
-
   (pszGML :string))			; const char *
+(export 'OGR-G-Create-From-GML)
 
 ;; --------------------------------------------------------
 
@@ -550,6 +585,7 @@ OGR 1.8.0"
 
  @return{A GML fragment or NULL in case of error.}"
   (hGeometry :pointer))			; OGRGeometryH
+(export 'OGR-G-Export-To-GML)
 
 ;; --------------------------------------------------------
 
@@ -591,6 +627,7 @@ OGR 1.8.0"
  Since: OGR 1.8.0"
   (hGeometry :pointer)			; OGRGeometryH
   (papszOptions (:pointer :string)))	; char **
+(export 'OGR-G-Export-To-GML-Ex)
 
 ;; --------------------------------------------------------
 
@@ -610,6 +647,7 @@ OGR 1.8.0"
  @return{A KML fragment or NULL in case of error.}"
   (hGeometry :pointer)			; OGRGeometryH
   (pszAltitudeMode :string))		; const char *
+(export 'OGR-G-Export-To-KML)
 
 ;; --------------------------------------------------------
 
@@ -626,6 +664,7 @@ OGR 1.8.0"
 
  @return{A GeoJSON fragment or NULL in case of error.}"
   (hGeometry :pointer))			; OGRGeometryH
+(export 'OGR-G-Export-To-Json)
 
 ;; --------------------------------------------------------
 
@@ -647,6 +686,7 @@ OGR 1.8.0"
  Since: OGR 1.9.0"
   (hGeometry :pointer)			; OGRGeometryH
   (papszOptions (:pointer :string)))	; char **
+(export 'OGR-G-Export-To-Json-Ex)
 
 ;; --------------------------------------------------------
 
@@ -671,6 +711,7 @@ OGR 1.8.0"
  @argument[hSRS]{handle on the new spatial reference system to apply.}"
   (hGeom :pointer)			; OGRGeometryH
   (hSRS :pointer))			; OGRSpatialReferenceH
+(export 'OGR-G-Assign-Spatial-Reference)
 
 ;; --------------------------------------------------------
 
@@ -688,11 +729,15 @@ OGR 1.8.0"
 
  @return{a reference to the spatial reference geometry."
   (hGeom :pointer))			; OGRGeometryH
-
+(export 'OGR-G-Get-Spatial-Reference)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Transform" OGR-G-Transform) :int ; OGRErr
+(cffi:defcfun ("OGR_G_Transform" %OGR-G-Transform) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (hTransform :pointer))		; OGRCoordinateTransformationH
+
+(defun OGR-G-Transform (hGeom hTransform)
   "Apply arbitrary coordinate transformation to geometry.
 
  This function will transform the coordinates of a geometry from their
@@ -714,13 +759,19 @@ OGR 1.8.0"
 
  @argument[hTransform]{handle on the transformation to apply.}
 
- @return{OGRERR_NONE on success or an error code.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hTransform :pointer))		; OGRCoordinateTransformationH
+ @return{:NONE on success or an error code.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Transform hGeom hTransform)))
+(export 'OGR-G-Transform)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_TransformTo" OGR_G_TransformTo) :int ; OGRErr
+(cffi:defcfun ("OGR_G_TransformTo" %OGR-G-Transform-To) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (hSRS :pointer))			; OGRSpatialReferenceH
+
+(defun OGR-G-Transform-To (hGeom hSRS)
   "Transform geometry to new spatial reference system.
 
  This function will transform the coordinates of a geometry from their
@@ -745,10 +796,9 @@ OGR 1.8.0"
 
  @argument[hSRS]{handle on the spatial reference system to apply.}
 
- @return{OGRERR_NONE on success, or an error code.}"
-
-  (hGeom :pointer)			; OGRGeometryH
-  (hSRS :pointer))			; OGRSpatialReferenceH
+ @return{:NONE on success, or an error code.}"
+  (%OGR-G-Transform-To hGeom hSRS))
+(export 'OGR-G-Transform-To)
 
 ;; --------------------------------------------------------
 
@@ -771,11 +821,11 @@ OGR 1.8.0"
  Since: OGR 1.8.0"
   (hThis :pointer)			; OGRGeometryH
   (dTolerance :double))			; double
+(export 'OGR-G-Simplify)
 
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_G_SimplifyPreserveTopology" OGR-G-Simplify-Preserve-Topology) :pointer ; OGRGeometryH
-
   "Simplify the geometry while preserving topology.
 
  This function is the same as the C++ method
@@ -795,11 +845,11 @@ OGR 1.8.0"
  Since: OGR 1.9.0"
   (hThis :pointer)			      ; OGRGeometryH
   (dTolerance :double))			      ; double
+(export 'OGR-G-Simplify-Preserve-Topology)
 
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_G_Segmentize" OGR-G-Segmentize) :void
-
   "Modify the geometry such it has no segment longer then the given
  distance.
 
@@ -812,9 +862,9 @@ OGR 1.8.0"
 
  @argument[dfMaxLength]{the maximum distance between 2 points after
  segmentization}"
-
   (hGeom :pointer)			; OGRGeometryH
   (dfMaxLength :double))		; double
+(export 'OGR-G-Segmentize)
 
 ;; --------------------------------------------------------
 
@@ -834,6 +884,7 @@ OGR 1.8.0"
  @return{TRUE if the geometries intersect, otherwise FALSE.}"
   (hGeom :pointer)			       ; OGRGeometryH
   (hOtherGeom :pointer))		       ; OGRGeometryH
+(export 'OGR-G-Intersects)
 
 ;; --------------------------------------------------------
 
@@ -850,6 +901,7 @@ OGR 1.8.0"
  @return{TRUE if equivalent or FALSE otherwise.}"
   (hGeom :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Equals)
 
 ;; --------------------------------------------------------
 
@@ -872,6 +924,7 @@ OGR 1.8.0"
  @return{TRUE if they are disjoint, otherwise FALSE."
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Disjoint)
 
 ;; --------------------------------------------------------
 
@@ -894,6 +947,7 @@ OGR 1.8.0"
  @return{TRUE if they are touching, otherwise FALSE."
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Touches)
 
 ;; --------------------------------------------------------
 
@@ -916,6 +970,7 @@ OGR 1.8.0"
  @return{TRUE if they are crossing, otherwise FALSE.}"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Crosses)
 
 ;; --------------------------------------------------------
 
@@ -938,6 +993,7 @@ OGR 1.8.0"
  @return{TRUE if hThis is within hOther, otherwise FALSE."
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Within)
 
 ;; --------------------------------------------------------
 
@@ -960,6 +1016,7 @@ OGR 1.8.0"
  @return{TRUE if hThis contains hOther geometry, otherwise FALSE.}"
   (hThis :pointer)			   ; OGRGeometryH
   (hOther :pointer))			   ; OGRGeometryH
+(export 'OGR-G-Contains)
 
 ;; --------------------------------------------------------
 
@@ -983,7 +1040,7 @@ OGR 1.8.0"
  @return{TRUE if they are overlapping, otherwise FALSE.}"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
-
+(export 'OGR-G-Overlaps)
 
 ;; --------------------------------------------------------
 
@@ -1007,6 +1064,7 @@ OGR 1.8.0"
 
  Since: OGR 1.8.0"
   (hTarget :pointer))			; OGRGeometryH
+(export 'OGR-G-Boundary)
 
 ;; --------------------------------------------------------
 
@@ -1028,10 +1086,11 @@ OGR 1.8.0"
  @return{a handle to a newly allocated geometry now owned by the
  caller, or NULL on failure.}"
   (hTarget :pointer))			; OGRGeometryH
+(export 'OGR-G-Convex-Hull)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun  ("OGR_G_Buffer" OGR-G-Buffer) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_Buffer" OGR-G-Buffer) :pointer ; OGRGeometryH
   "Compute buffer of geometry.
 
  Builds a new geometry containing the buffer region around the
@@ -1062,6 +1121,7 @@ OGR 1.8.0"
   (hTarget :pointer)			; OGRGeometryH
   (dfDist :double)
   (nQuadSegs :int))
+(export 'OGR-G-Buffer)
 
 ;; --------------------------------------------------------
 
@@ -1086,6 +1146,7 @@ OGR 1.8.0"
  is no intersection or an error occurs.}"
   (hThis :pointer)			   ; OGRGeometryH
   (hOther :pointer))			   ; OGRGeometryH
+(export 'OGR-G-Intersection)
 
 ;; --------------------------------------------------------
 
@@ -1110,6 +1171,7 @@ OGR 1.8.0"
  occurs.}"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Union)
 
 ;; --------------------------------------------------------
 
@@ -1129,6 +1191,7 @@ OGR 1.8.0"
  @return{a new geometry representing the union or NULL if an error
  occurs.}"
   (hThis :pointer))			; OGRGeometryH
+(export 'OGR-G-Union-Cascaded)
 
 ;; --------------------------------------------------------
 
@@ -1152,6 +1215,7 @@ OGR 1.8.0"
 
  Since: OGR 1.10"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Point-On-Surface)
 
 ;; --------------------------------------------------------
 
@@ -1177,6 +1241,7 @@ OGR 1.8.0"
  difference is empty or an error occurs.}"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Difference)
 
 ;; --------------------------------------------------------
 
@@ -1204,6 +1269,7 @@ OGR 1.8.0"
  Since: OGR 1.8.0"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Sym-Difference)
 
 ;; --------------------------------------------------------
 
@@ -1227,6 +1293,7 @@ OGR 1.8.0"
  occurs.}"
   (hFirst :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
+(export 'OGR-G-Distance)
 
 ;; --------------------------------------------------------
 
@@ -1244,6 +1311,7 @@ OGR 1.8.0"
 
  Since:OGR 1.8.0"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Length)
 
 ;; --------------------------------------------------------
 
@@ -1263,10 +1331,15 @@ OGR 1.8.0"
 
  Since: OGR 1.8.0"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Area)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Centroid" OGR-G-Centroid) :int
+(cffi:defcfun ("OGR_G_Centroid" %OGR-G-Centroid) :int
+  (hGeom :pointer)			; OGRGeometryH
+  (hCentroidPoint :pointer))		; OGRGeometryH
+
+(defun OGR-G-Centroid (hGeom hCentroidPoint)
   "Compute the geometry centroid.
 
  The centroid location is applied to the passed in OGRPoint
@@ -1286,9 +1359,11 @@ OGR 1.8.0"
  GEOS library, this function will always fail, issuing a
  CPLE_NotSupported error.
 
- @return{OGRERR_NONE on success or OGRERR_FAILURE on error.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hCentroidPoint :pointer))		; OGRGeometryH
+ @return{:NONE on success or :FAILURE on error.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Centroid hGeom hCentroidPoint)))
+(export 'OGR-G-Centroid)
 
 ;; --------------------------------------------------------
 
@@ -1303,10 +1378,11 @@ OGR 1.8.0"
 
  @argument[hGeom]{handle on the geometry to empty.}"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Empty)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun  ("OGR_G_IsEmpty" OGR-G-Is-Empty) :int
+(cffi:defcfun ("OGR_G_IsEmpty" OGR-G-Is-Empty) :int
   "Test if the geometry is empty.
 
  This method is the same as the CPP method OGRGeometry::IsEmpty().
@@ -1315,6 +1391,7 @@ OGR 1.8.0"
 
  @return{TRUE if the geometry has no points, otherwise FALSE.}"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Is-Empty)
 
 ;; --------------------------------------------------------
 
@@ -1331,10 +1408,11 @@ OGR 1.8.0"
 
  @return{TRUE if the geometry has no points, otherwise FALSE.}"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Is-Valid)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun  ("OGR_G_IsSimple" OGR-G-Is-Simple) :int
+(cffi:defcfun ("OGR_G_IsSimple" OGR-G-Is-Simple) :int
   "Returns TRUE if the geometry is simple.
 
  Returns TRUE if the geometry has no anomalous geometric points, such
@@ -1352,7 +1430,7 @@ OGR 1.8.0"
 
  @return{TRUE if object is simple, otherwise FALSE.}"
   (hGeom :pointer))			; OGRGeometryH
-
+(export 'OGR-G-Is-Simple)
 
 ;; --------------------------------------------------------
 
@@ -1369,6 +1447,7 @@ OGR 1.8.0"
 
  @return{TRUE if the geometry has no points, otherwise FALSE.}"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Is-Ring)
 
 ;; --------------------------------------------------------
 
@@ -1395,7 +1474,7 @@ OGR 1.8.0"
 
  Since: OGR 1.9.0"
   (hTarget :pointer))			; OGRGeometryH
-
+(export 'OGR-G-Polygonize)
 
 ;; --------------------------------------------------------
 
@@ -1418,6 +1497,7 @@ OGR 1.8.0"
 
  @return{the number of points.}"
   (hGeom :pointer))			; OGRGeometryH ;
+(export 'OGR-G-Get-Point-Count)
 
 ;; --------------------------------------------------------
 
@@ -1458,6 +1538,7 @@ OGR 1.8.0"
   (nYStride :int)
   (pabyZ :pointer)			; void *
   (nZStride :int))
+(export 'OGR-G-Get-Points)
 
 ;; --------------------------------------------------------
 
@@ -1476,6 +1557,7 @@ OGR 1.8.0"
   (pdfX (:pointer :double))			   ; double *
   (pdfY (:pointer :double))			   ; double *
   (pdfZ (:pointer :double)))			   ; double *
+(export 'OGR-G-Get-Point)
 
 ;; --------------------------------------------------------
 
@@ -1497,6 +1579,7 @@ OGR 1.8.0"
   (dfX :double)
   (dfY :double)
   (dfZ :double))
+(export 'OGR-G-Set-Point)
 
 ;; --------------------------------------------------------
 
@@ -1516,6 +1599,7 @@ OGR 1.8.0"
   (i :int)
   (dfX :double)
   (dfY :double))
+(export 'OGR-G-Set-Point-2D)
 
 ;; --------------------------------------------------------
 
@@ -1533,6 +1617,7 @@ OGR 1.8.0"
   (dfX :double)
   (dfY :double)
   (dfZ :double))
+(export 'OGR-G-Add-Point)
 
 ;; --------------------------------------------------------
 
@@ -1550,11 +1635,11 @@ OGR 1.8.0"
   (hGeom :pointer)			; OGRGeometryH
   (dfX :double)
   (dfY :double))
+(export 'OGR-G-Add-Point-2D)
 
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_G_GetGeometryCount" OGR-G-Get-Geometry-Count) :int
-
   "Fetch the number of elements in a geometry or number of geometries in
  container.
 
@@ -1571,6 +1656,7 @@ OGR 1.8.0"
 
  @return{the number of elements.}"
   (hGeom :pointer))			; OGRGeometryH
+(export 'OGR-G-Get-Geometry-Count)
 
 ;; --------------------------------------------------------
 
@@ -1600,11 +1686,15 @@ OGR 1.8.0"
  @return{handle to the requested geometry.}"
   (hGeom :pointer)			; OGRGeometryH
   (iSubGeom :int))
-
+(export 'OGR-G-Get-Geometry-Ref)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_AddGeometry" OGR-G-Add-Geometry) :int ; OGRErr
+(cffi:defcfun ("OGR_G_AddGeometry" %OGR-G-Add-Geometry) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (hNewSubGeom :pointer))		; OGRGeometryH
+
+(defun OGR-G-Add-Geometry (hGeom hNewSubGeom)
   "Add a geometry to a geometry container.
 
  Some subclasses of OGRGeometryCollection restrict the types of
@@ -1627,12 +1717,18 @@ OGR 1.8.0"
  @return{OGRERR_NONE if successful, or
  OGRERR_UNSUPPORTED_GEOMETRY_TYPE if the geometry type is illegal for
  the type of existing geometry.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hNewSubGeom :pointer))		; OGRGeometryH
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Add-Geometry hGeom hNewSubGeom)))
+(export 'OGR-G-Add-Geometry)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_AddGeometryDirectly" OGR-G-Add-Geometry-Directly) :int ; OGRErr
+(cffi:defcfun ("OGR_G_AddGeometryDirectly" %OGR-G-Add-Geometry-Directly) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (hNewSubGeom :pointer))		; OGRGeometryH
+
+(defun OGR-G-Add-Geometry-Directly (hGeom hNewSubGeom)
   "Add a geometry directly to an existing geometry container.
 
  Some subclasses of OGRGeometryCollection restrict the types of
@@ -1650,18 +1746,24 @@ OGR 1.8.0"
  next ones will be the interior rings.
 
  @argument[hGeom]{existing geometry.}
-
  @argument[hNewSubGeom]{geometry to add to the existing geometry.}
 
- @return{OGRERR_NONE if successful, or
- OGRERR_UNSUPPORTED_GEOMETRY_TYPE if the geometry type is illegal for
- the type of geometry container.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hNewSubGeom :pointer))		; OGRGeometryH
+ @return{:NONE if successful, or
+ :UNSUPPORTED_GEOMETRY_TYPE if the geometry type is illegal for the
+ type of geometry container.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Add-Geometry-Directly hGeom hNewSubGeom)))
+(export 'OGR-G-Add-Geometry-Directly)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_RemoveGeometry" OGR-G-Remove-Geometry) :int ; OGRErr
+(cffi:defcfun ("OGR_G_RemoveGeometry" %OGR-G-Remove-Geometry) :int ; OGRErr
+  (hGeom :pointer)			; OGRGeometryH
+  (iGeom :int)
+  (bDelete :int))
+
+(defun OGR-G-Remove-Geometry (hGeom iGeom bDelete)
   "Remove a geometry from an exiting geometry container.
 
  Removing a geometry will cause the geometry count to drop by one, and
@@ -1673,18 +1775,17 @@ OGR 1.8.0"
  OGRGeometryCollection::removeGeometry().
 
  @argument[hGeom]{the existing geometry to delete from.}
-
  @argument[iGeom]{the index of the geometry to delete. A value of -1
  is a special flag meaning that all geometries should be removed.}
-
  @argument[bDelete]{if TRUE the geometry will be destroyed, otherwise
  it will not. The default is TRUE as the existing geometry is
  considered to own the geometries in it.}
 
- @return{OGRERR_NONE if successful, or OGRERR_FAILURE if the index is
- out of range.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (iGeom :int)
-  (bDelete :int))
+ @return{:NONE if successful, or :FAILURE if the index is out of
+ range.}"
+  (cffi:foreign-enum-keyword
+   'ogr-err
+   (%OGR-G-Remove-Geometry hGeom iGeom bDelete)))
+(export 'OGR-G-Remove-Geometry)
 
 ;; EOF
