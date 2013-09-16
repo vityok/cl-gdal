@@ -6,8 +6,22 @@ void 	OGR_Fld_SetName (OGRFieldDefnH, const char *)
  	Reset the name of this field. 
 const char * 	OGR_Fld_GetNameRef (OGRFieldDefnH)
  	Fetch name of this field. 
-OGRFieldType 	OGR_Fld_GetType (OGRFieldDefnH)
- 	Fetch type of this field. 
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_Fld_GetType" OGR-Fld-Get-Type) :int
+
+  "Fetch type of this field.
+
+ This function is the same as the CPP method OGRFieldDefn::GetType().
+ Parameters:	hDefn 	handle to the field definition to get type from.
+
+ @return{OGRFieldType field type.}"
+  (hDefn :pointer))			; OGRFieldDefnH
+(export 'OGR-Fld-Get-Type)
+
+;; --------------------------------------------------------
+
 void 	OGR_Fld_SetType (OGRFieldDefnH, OGRFieldType)
  	Set the type of this field. This should never be done to an OGRFieldDefn that is already part of an OGRFeatureDefn. 
 OGRJustification 	OGR_Fld_GetJustify (OGRFieldDefnH)

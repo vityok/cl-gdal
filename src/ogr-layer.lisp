@@ -14,10 +14,48 @@ void 	OGR_L_SetSpatialFilterRectEx (OGRLayerH, int iGeomField, double dfMinX, do
  	Set a new rectangular spatial filter. 
 OGRErr 	OGR_L_SetAttributeFilter (OGRLayerH, const char *)
  	Set a new attribute query. 
-void 	OGR_L_ResetReading (OGRLayerH)
- 	Reset feature reading to start on the first feature. 
-OGRFeatureH 	OGR_L_GetNextFeature (OGRLayerH)
- 	Fetch the next available feature from this layer. 
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_L_ResetReading" ogr-l-reset-reading) :void
+  "Reset feature reading to start on the first feature.
+
+ This affects GetNextFeature().
+
+ This function is the same as the C++ method OGRLayer::ResetReading().
+
+ @argument[hLayer]{handle to the layer on which features are read.}"
+  (hLayer :pointer))			; OGRLayerH
+(export 'ogr-l-reset-reading)
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_L_GetNextFeature" ogr-l-get-next-feature) :pointer ; OGRFeatureH
+
+  "Fetch the next available feature from this layer.
+
+The returned feature becomes the responsiblity of the caller to delete
+with OGR_F_Destroy(). It is critical that all features associated with
+an OGRLayer (more specifically an OGRFeatureDefn) be deleted before
+that layer/datasource is deleted.
+
+Only features matching the current spatial filter (set with
+SetSpatialFilter()) will be returned.
+
+This function implements sequential access to the features of a
+layer. The OGR_L_ResetReading() function can be used to start at the
+beginning again.
+
+This function is the same as the C++ method OGRLayer::GetNextFeature().
+
+Parameters:	hLayer 	handle to the layer from which feature are read.
+
+@return{an handle to a feature, or NULL if no more features are available.}"
+
+  (hLayer :pointer))			; OGRLayerH
+(export 'ogr-l-get-next-feature)
+
+;; --------------------------------------------------------
+
 OGRErr 	OGR_L_SetNextByIndex (OGRLayerH, long)
  	Move read cursor to the nIndex'th feature in the current resultset. 
 OGRFeatureH 	OGR_L_GetFeature (OGRLayerH, long)
@@ -28,8 +66,25 @@ OGRErr 	OGR_L_CreateFeature (OGRLayerH, OGRFeatureH)
  	Create and write a new feature within a layer. 
 OGRErr 	OGR_L_DeleteFeature (OGRLayerH, long)
  	Delete feature from layer. 
-OGRFeatureDefnH 	OGR_L_GetLayerDefn (OGRLayerH)
- 	Fetch the schema information for this layer. 
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_L_GetLayerDefn" OGR-L-Get-Layer-Defn) :pointer
+  "Fetch the schema information for this layer.
+
+The returned handle to the OGRFeatureDefn is owned by the OGRLayer,
+and should not be modified or freed by the application. It
+encapsulates the attribute schema of the features of the layer.
+
+This function is the same as the C++ method OGRLayer::GetLayerDefn().
+Parameters:	hLayer 	handle to the layer to get the schema information.
+
+@return{OGRFeatureDefnH an handle to the feature definition.}"
+  (hLayer :pointer))
+(export 'OGR-L-Get-Layer-Defn)
+
+;; --------------------------------------------------------
+
 OGRSpatialReferenceH 	OGR_L_GetSpatialRef (OGRLayerH)
  	Fetch the spatial reference system for this layer. 
 int 	OGR_L_GetFeatureCount (OGRLayerH, int)

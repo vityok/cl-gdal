@@ -1,15 +1,47 @@
 OGRFeatureH 	OGR_F_Create (OGRFeatureDefnH) CPL_WARN_UNUSED_RESULT
  	Feature factory. 
-void 	OGR_F_Destroy (OGRFeatureH)
- 	Destroy feature. 
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_F_Destroy" OGR-F-Destroy) :void 	
+  "Destroy feature.
+
+The feature is deleted, but within the context of the GDAL/OGR
+heap. This is necessary when higher level applications use GDAL/OGR
+from a DLL and they want to delete a feature created within the
+DLL. If the delete is done in the calling application the memory will
+be freed onto the application heap which is inappropriate.
+
+This function is the same as the C++ method OGRFeature::DestroyFeature().
+Parameters:	hFeat 	handle to the feature to destroy."
+  (hFeat :pointer))			; OGRFeatureH
+(export 'OGR-F-Destroy)
+
+;; --------------------------------------------------------
+
 OGRFeatureDefnH 	OGR_F_GetDefnRef (OGRFeatureH)
  	Fetch feature definition. 
 OGRErr 	OGR_F_SetGeometryDirectly (OGRFeatureH, OGRGeometryH)
  	Set feature geometry. 
 OGRErr 	OGR_F_SetGeometry (OGRFeatureH, OGRGeometryH)
  	Set feature geometry. 
-OGRGeometryH 	OGR_F_GetGeometryRef (OGRFeatureH)
- 	Fetch an handle to feature geometry. 
+
+;; --------------------------------------------------------
+
+(cffi:defcfun  ("OGR_F_GetGeometryRef" OGR-F-Get-Geometry-Ref) :pointer ; OGRGeometryH	
+
+  "Fetch an handle to feature geometry.
+
+This function is the same as the C++ method OGRFeature::GetGeometryRef().
+Parameters:	hFeat 	handle to the feature to get geometry from.
+
+@return{an handle to internal feature geometry. This object should not
+be modified.}"
+  (hFeat :pointer))			; OGRFeatureH
+(export 'OGR-F-Get-Geometry-Ref)
+
+;; --------------------------------------------------------
+
 OGRGeometryH 	OGR_F_StealGeometry (OGRFeatureH)
  	Take away ownership of geometry. 
 OGRFeatureH 	OGR_F_Clone (OGRFeatureH)
@@ -28,12 +60,74 @@ void 	OGR_F_UnsetField (OGRFeatureH, int)
  	Clear a field, marking it as unset. 
 OGRField * 	OGR_F_GetRawFieldRef (OGRFeatureH, int)
  	Fetch an handle to the internal field value given the index. 
-int 	OGR_F_GetFieldAsInteger (OGRFeatureH, int)
- 	Fetch field value as integer. 
-double 	OGR_F_GetFieldAsDouble (OGRFeatureH, int)
- 	Fetch field value as a double. 
-const char * 	OGR_F_GetFieldAsString (OGRFeatureH, int)
- 	Fetch field value as a string. 
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_F_GetFieldAsInteger" OGR-F-Get-Field-As-Integer) :int
+
+  "Fetch field value as integer.
+
+OFTString features will be translated using atoi(). OFTReal fields
+will be cast to integer. Other field types, or errors will result in a
+return value of zero.
+
+This function is the same as the C++ method OGRFeature::GetFieldAsInteger().
+Parameters:	hFeat 	handle to the feature that owned the field.
+	iField 	the field to fetch, from 0 to GetFieldCount()-1.
+
+@return{the field value.}"
+  (hFeat :pointer)			; OGRFeatureH
+  (iField :int))
+
+(export 'OGR-F-Get-Field-As-Integer)
+
+;; --------------------------------------------------------
+ 
+(cffi:defcfun ("OGR_F_GetFieldAsDouble" OGR-F-Get-Field-As-Double) :double 	
+
+
+  "Fetch field value as a double.
+
+OFTString features will be translated using atof(). OFTInteger fields
+will be cast to double. Other field types, or errors will result in a
+return value of zero.
+
+This function is the same as the C++ method OGRFeature::GetFieldAsDouble().
+Parameters:	hFeat 	handle to the feature that owned the field.
+	iField 	the field to fetch, from 0 to GetFieldCount()-1.
+
+Returns:
+the field value."
+
+  (hFeat :pointer)			; OGRFeatureH
+  (iField :int))
+
+(export 'OGR-F-Get-Field-As-Double)
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_F_GetFieldAsString" OGR-F-Get-Field-As-String) :string 	
+
+  "Fetch field value as a string.
+
+OFTReal and OFTInteger fields will be translated to string using
+sprintf(), but not necessarily using the established formatting
+rules. Other field types, or errors will result in a return value of
+zero.
+
+This function is the same as the C++ method OGRFeature::GetFieldAsString().
+Parameters:	hFeat 	handle to the feature that owned the field.
+	iField 	the field to fetch, from 0 to GetFieldCount()-1.
+
+@return{the field value. This string is internal, and should not be
+modified, or freed. Its lifetime may be very brief.}"
+  (hFeat :pointer)			; OGRFeatureH
+  (iField :int))
+
+(export 'OGR-F-Get-Field-As-String)
+
+;; --------------------------------------------------------
+
 const int * 	OGR_F_GetFieldAsIntegerList (OGRFeatureH, int, int *)
  	Fetch field value as a list of integers. 
 const double * 	OGR_F_GetFieldAsDoubleList (OGRFeatureH, int, int *)

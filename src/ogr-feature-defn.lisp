@@ -6,10 +6,41 @@ void 	OGR_FD_Release (OGRFeatureDefnH)
  	Drop a reference, and destroy if unreferenced. 
 const char * 	OGR_FD_GetName (OGRFeatureDefnH)
  	Get name of the OGRFeatureDefn passed as an argument. 
-int 	OGR_FD_GetFieldCount (OGRFeatureDefnH)
- 	Fetch number of fields on the passed feature definition. 
-OGRFieldDefnH 	OGR_FD_GetFieldDefn (OGRFeatureDefnH, int)
- 	Fetch field definition of the passed feature definition. 
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_FD_GetFieldCount" OGR-FD-Get-Field-Count) :int
+
+  "Fetch number of fields on the passed feature definition.
+
+This function is the same as the C++ OGRFeatureDefn::GetFieldCount().
+Parameters:	hDefn 	handle to the feature definition to get the fields count from.
+
+@return{count of fields.}"
+  (hDefn :pointer))			; OGRFeatureDefnH
+
+(export 'OGR-FD-Get-Field-Count)
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGR_FD_GetFieldDefn" OGR-FD-Get-Field-Defn) :pointer
+
+  "Fetch field definition of the passed feature definition.
+
+This function is the same as the C++ method OGRFeatureDefn::GetFieldDefn().
+
+Starting with GDAL 1.7.0, this method will also issue an error if the index is not valid.
+Parameters:	hDefn 	handle to the feature definition to get the field definition from.
+	iField 	the field to fetch, between 0 and GetFieldCount()-1.
+
+@return{OGRFieldDefnH an handle to an internal field definition object
+or NULL if invalid index. This object should not be modified or freed
+by the application.}"
+  (hDefn :pointer)			; OGRFeatureDefnH
+  (iField :int))
+(export 'OGR-FD-Get-Field-Defn)
+
+;; --------------------------------------------------------
+
 int 	OGR_FD_GetFieldIndex (OGRFeatureDefnH, const char *)
  	Find field by name. 
 void 	OGR_FD_AddFieldDefn (OGRFeatureDefnH, OGRFieldDefnH)
