@@ -56,29 +56,6 @@ Make a copy of a color table.
 
 This function is the same as the C++ method GDALColorTable::Clone()
 
-void GDALComputeRasterMinMax 	(	GDALRasterBandH 	hBand,
-		int 	bApproxOK,
-		double 	adfMinMax[2]
-	)
-
-
-Compute the min/max values for a band.
-See also:
-GDALRasterBand::ComputeRasterMinMax()
-CPLErr GDALComputeRasterStatistics 	(	GDALRasterBandH 	hBand,
-		int 	bApproxOK,
-		double * 	pdfMin,
-		double * 	pdfMax,
-		double * 	pdfMean,
-		double * 	pdfStdDev,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
-	)
-
-
-Compute image statistics.
-See also:
-GDALRasterBand::ComputeStatistics()
 void GDALCopyBits 	(	const GByte * 	pabySrcData,
 		int 	nSrcOffset,
 		int 	nSrcStep,
@@ -183,14 +160,6 @@ GDALDatasetH GDALCreateCopy 	(	GDALDriverH 	hDriver,
 Create a copy of a dataset.
 See also:
 GDALDriver::CreateCopy()
-CPLErr GDALCreateMaskBand 	(	GDALRasterBandH 	hBand,
-		int 	nFlags
-	)
-
-
-Adds a mask band to the current band.
-See also:
-GDALRasterBand::CreateMaskBand()
 GDALRasterAttributeTableH GDALCreateRasterAttributeTable 	(	void 		 )
 
 
@@ -268,15 +237,6 @@ int GDALDumpOpenDatasets 	(	FILE * 	fp	 )
 List open datasets.
 
 Dumps a list of all open datasets (shared or not) to the indicated text file (may be stdout or stderr). This function is primarily intended to assist in debugging "dataset leaks" and reference counting issues. The information reported includes the dataset name, referenced count, shared status, driver name, size, and band count.
-CPLErr GDALFillRaster 	(	GDALRasterBandH 	hBand,
-		double 	dfRealValue,
-		double 	dfImaginaryValue
-	)
-
-
-Fill this band with a constant value.
-See also:
-GDALRasterBand::Fill()
 int GDALFlushCacheBlock 	(	void 		 )
 
 
@@ -285,12 +245,7 @@ Try to flush one cached raster block.
 This function will search the first unlocked raster block and will flush it to release the associated memory.
 Returns:
 TRUE if one block was flushed, FALSE if there are no cached blocks or if they are currently locked.
-CPLErr GDALFlushRasterCache 	(	GDALRasterBandH 	hBand	 )
 
-
-Flush raster data cache.
-See also:
-GDALRasterBand::FlushCache()
 int GDALGCPsToGeoTransform 	(	int 	nGCPCount,
 		const GDAL_GCP * 	pasGCPs,
 		double * 	padfGeoTransform,
@@ -353,27 +308,8 @@ Parameters:	eAsyncStatusType 	type to get name of.
 
 Returns:
 string corresponding to type.
-GDALDatasetH GDALGetBandDataset 	(	GDALRasterBandH 	hBand	 )
 
 
-Fetch the owning dataset handle.
-See also:
-GDALRasterBand::GetDataset()
-int GDALGetBandNumber 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch the band number.
-See also:
-GDALRasterBand::GetBand()
-void GDALGetBlockSize 	(	GDALRasterBandH 	hBand,
-		int * 	pnXSize,
-		int * 	pnYSize
-	)
-
-
-Fetch the "natural" block size of this band.
-See also:
-GDALRasterBand::GetBlockSize()
 int GDALGetCacheMax 	(	void 		 )
 
 
@@ -487,26 +423,8 @@ Parameters:	eDataType 	type, such as GDT_Byte.
 
 Returns:
 the number of bits or zero if it is not recognised.
-CPLErr GDALGetDefaultHistogram 	(	GDALRasterBandH 	hBand,
-		double * 	pdfMin,
-		double * 	pdfMax,
-		int * 	pnBuckets,
-		int ** 	ppanHistogram,
-		int 	bForce,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
-	)
 
 
-Fetch default raster histogram.
-See also:
-GDALRasterBand::GetDefaultHistogram()
-GDALRasterAttributeTableH GDALGetDefaultRAT 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch default Raster Attribute Table.
-See also:
-GDALRasterBand::GetDefaultRAT()
 const char* GDALGetDescription 	(	GDALMajorObjectH 	hObject	 )
 
 
@@ -575,18 +493,7 @@ Parameters:	hDriver 	the handle of the driver
 
 Returns:
 the short name of the driver. The returned string should not be freed and is owned by the driver.
-GDALRasterBandH GDALGetMaskBand 	(	GDALRasterBandH 	hBand	 )
 
-
-Return the mask band associated with the band.
-See also:
-GDALRasterBand::GetMaskBand()
-int GDALGetMaskFlags 	(	GDALRasterBandH 	hBand	 )
-
-
-Return the status flags of the mask band associated with the band.
-See also:
-GDALRasterBand::GetMaskFlags()
 char** GDALGetMetadata 	(	GDALMajorObjectH 	hObject,
 		const char * 	pszDomain
 	)
@@ -604,20 +511,7 @@ const char* GDALGetMetadataItem 	(	GDALMajorObjectH 	hObject,
 Fetch single metadata item.
 See also:
 GDALMajorObject::GetMetadataItem()
-GDALRasterBandH GDALGetOverview 	(	GDALRasterBandH 	hBand,
-		int 	i
-	)
 
-
-Fetch overview raster band object.
-See also:
-GDALRasterBand::GetOverview()
-int GDALGetOverviewCount 	(	GDALRasterBandH 	hBand	 )
-
-
-Return the number of overview layers available.
-See also:
-GDALRasterBand::GetOverviewCount()
 GDALPaletteInterp GDALGetPaletteInterpretation 	(	GDALColorTableH 	hTable	 )
 
 
@@ -634,138 +528,8 @@ Parameters:	eInterp 	palette interpretation to get name of.
 
 Returns:
 string corresponding to palette interpretation.
-GDALAccess GDALGetRasterAccess 	(	GDALRasterBandH 	hBand	 )
 
 
-Find out if we have update permission for this band.
-See also:
-GDALRasterBand::GetAccess()
-int GDALGetRasterBandXSize 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch XSize of raster.
-See also:
-GDALRasterBand::GetXSize()
-int GDALGetRasterBandYSize 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch YSize of raster.
-See also:
-GDALRasterBand::GetYSize()
-char** GDALGetRasterCategoryNames 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch the list of category names for this raster.
-See also:
-GDALRasterBand::GetCategoryNames()
-GDALColorInterp GDALGetRasterColorInterpretation 	(	GDALRasterBandH 	hBand	 )
-
-
-How should this band be interpreted as color?
-See also:
-GDALRasterBand::GetColorInterpretation()
-GDALColorTableH GDALGetRasterColorTable 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch the color table associated with band.
-See also:
-GDALRasterBand::GetColorTable()
-GDALDataset::GetRasterCount().
-GDALDataType GDALGetRasterDataType 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch the pixel data type for this band.
-See also:
-GDALRasterBand::GetRasterDataType()
-CPLErr GDALGetRasterHistogram 	(	GDALRasterBandH 	hBand,
-		double 	dfMin,
-		double 	dfMax,
-		int 	nBuckets,
-		int * 	panHistogram,
-		int 	bIncludeOutOfRange,
-		int 	bApproxOK,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
-	)
-
-
-Compute raster histogram.
-See also:
-GDALRasterBand::GetHistogram()
-double GDALGetRasterMaximum 	(	GDALRasterBandH 	hBand,
-		int * 	pbSuccess
-	)
-
-
-Fetch the maximum value for this band.
-See also:
-GDALRasterBand::GetMaximum()
-double GDALGetRasterMinimum 	(	GDALRasterBandH 	hBand,
-		int * 	pbSuccess
-	)
-
-
-Fetch the minimum value for this band.
-See also:
-GDALRasterBand::GetMinimum()
-double GDALGetRasterNoDataValue 	(	GDALRasterBandH 	hBand,
-		int * 	pbSuccess
-	)
-
-
-Fetch the no data value for this band.
-See also:
-GDALRasterBand::GetNoDataValue()
-double GDALGetRasterOffset 	(	GDALRasterBandH 	hBand,
-		int * 	pbSuccess
-	)
-
-
-Fetch the raster value offset.
-See also:
-GDALRasterBand::GetOffset()
-GDALRasterBandH GDALGetRasterSampleOverview 	(	GDALRasterBandH 	hBand,
-		int 	nDesiredSamples
-	)
-
-
-Fetch best sampling overview.
-See also:
-GDALRasterBand::GetRasterSampleOverview()
-double GDALGetRasterScale 	(	GDALRasterBandH 	hBand,
-		int * 	pbSuccess
-	)
-
-
-Fetch the raster value scale.
-See also:
-GDALRasterBand::GetScale()
-CPLErr GDALGetRasterStatistics 	(	GDALRasterBandH 	hBand,
-		int 	bApproxOK,
-		int 	bForce,
-		double * 	pdfMin,
-		double * 	pdfMax,
-		double * 	pdfMean,
-		double * 	pdfStdDev
-	)
-
-
-Fetch image statistics.
-See also:
-GDALRasterBand::GetStatistics()
-const char* GDALGetRasterUnitType 	(	GDALRasterBandH 	hBand	 )
-
-
-Return raster unit type.
-See also:
-GDALRasterBand::GetUnitType()
-
-int GDALHasArbitraryOverviews 	(	GDALRasterBandH 	hBand	 )
-
-
-Check for arbitrary overviews.
-See also:
-GDALRasterBand::HasArbitraryOverviews()
 GDALDriverH GDALIdentifyDriver 	(	const char * 	pszFilename,
 		char ** 	papszFileList
 	)
@@ -822,21 +586,7 @@ double GDALPackedDMSToDec 	(	double 	dfPacked	 )
 Convert a packed DMS value (DDDMMMSSS.SS) into decimal degrees.
 
 See CPLPackedDMSToDec().
-CPLErr GDALRasterAdviseRead 	(	GDALRasterBandH 	hBand,
-		int 	nXOff,
-		int 	nYOff,
-		int 	nXSize,
-		int 	nYSize,
-		int 	nBufXSize,
-		int 	nBufYSize,
-		GDALDataType 	eDT,
-		char ** 	papszOptions
-	)
 
-
-Advise driver of upcoming read requests.
-See also:
-GDALRasterBand::AdviseRead()
 CPLErr GDALRasterBandCopyWholeRaster 	(	GDALRasterBandH 	hSrcBand,
 		GDALRasterBandH 	hDstBand,
 		char ** 	papszOptions,
@@ -860,24 +610,7 @@ Parameters:	hSrcBand 	the source band
 
 Returns:
 CE_None on success, or CE_Failure on failure.
-CPLErr GDALRasterIO 	(	GDALRasterBandH 	hBand,
-		GDALRWFlag 	eRWFlag,
-		int 	nXOff,
-		int 	nYOff,
-		int 	nXSize,
-		int 	nYSize,
-		void * 	pData,
-		int 	nBufXSize,
-		int 	nBufYSize,
-		GDALDataType 	eBufType,
-		int 	nPixelSpace,
-		int 	nLineSpace
-	)
 
-
-Read/write a region of image data for this band.
-See also:
-GDALRasterBand::RasterIO()
 int GDALRATChangesAreWrittenToFile 	(	GDALRasterAttributeTableH 	hRAT	 )
 
 
@@ -1095,16 +828,7 @@ CPLErr GDALRATValuesIOAsString 	(	GDALRasterAttributeTableH 	hRAT,
 Read or Write a block of strings to/from the Attribute Table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
-CPLErr GDALReadBlock 	(	GDALRasterBandH 	hBand,
-		int 	nXOff,
-		int 	nYOff,
-		void * 	pData
-	)
 
-
-Read a block of image data efficiently.
-See also:
-GDALRasterBand::ReadBlock()
 int GDALReadWorldFile 	(	const char * 	pszBaseFilename,
 		const char * 	pszExtension,
 		double * 	padfGeoTransform
@@ -1202,25 +926,7 @@ void GDALSetColorEntry 	(	GDALColorTableH 	hTable,
 Set entry in color table.
 
 This function is the same as the C++ method GDALColorTable::SetColorEntry()
-CPLErr GDALSetDefaultHistogram 	(	GDALRasterBandH 	hBand,
-		double 	dfMin,
-		double 	dfMax,
-		int 	nBuckets,
-		int * 	panHistogram
-	)
 
-
-Set default histogram.
-See also:
-GDALRasterBand::SetDefaultHistogram()
-CPLErr GDALSetDefaultRAT 	(	GDALRasterBandH 	hBand,
-		GDALRasterAttributeTableH 	hRAT
-	)
-
-
-Set default Raster Attribute Table.
-See also:
-GDALRasterBand::GDALSetDefaultRAT()
 void GDALSetDescription 	(	GDALMajorObjectH 	hObject,
 		const char * 	pszNewDesc
 	)
@@ -1249,75 +955,7 @@ Set single metadata item.
 See also:
 GDALMajorObject::SetMetadataItem()
 
-CPLErr GDALSetRasterCategoryNames 	(	GDALRasterBandH 	hBand,
-		char ** 	papszNames
-	)
 
-
-Set the category names for this band.
-See also:
-GDALRasterBand::SetCategoryNames()
-CPLErr GDALSetRasterColorInterpretation 	(	GDALRasterBandH 	hBand,
-		GDALColorInterp 	eColorInterp
-	)
-
-
-Set color interpretation of a band.
-See also:
-GDALRasterBand::SetColorInterpretation()
-CPLErr GDALSetRasterColorTable 	(	GDALRasterBandH 	hBand,
-		GDALColorTableH 	hCT
-	)
-
-
-Set the raster color table.
-See also:
-GDALRasterBand::SetColorTable()
-CPLErr GDALSetRasterNoDataValue 	(	GDALRasterBandH 	hBand,
-		double 	dfValue
-	)
-
-
-Set the no data value for this band.
-See also:
-GDALRasterBand::SetNoDataValue()
-CPLErr GDALSetRasterOffset 	(	GDALRasterBandH 	hBand,
-		double 	dfNewOffset
-	)
-
-
-Set scaling offset.
-See also:
-GDALRasterBand::SetOffset()
-CPLErr GDALSetRasterScale 	(	GDALRasterBandH 	hBand,
-		double 	dfNewOffset
-	)
-
-
-Set scaling ratio.
-See also:
-GDALRasterBand::SetScale()
-CPLErr GDALSetRasterStatistics 	(	GDALRasterBandH 	hBand,
-		double 	dfMin,
-		double 	dfMax,
-		double 	dfMean,
-		double 	dfStdDev
-	)
-
-
-Set statistics on band.
-See also:
-GDALRasterBand::SetStatistics()
-CPLErr GDALSetRasterUnitType 	(	GDALRasterBandH 	hBand,
-		const char * 	pszNewValue
-	)
-
-
-Set unit type.
-See also:
-GDALRasterBand::SetUnitType()
-Since:
-GDAL 1.8.0
 void GDALSwapWords 	(	void * 	pData,
 		int 	nWordSize,
 		int 	nWordCount,
@@ -1366,16 +1004,7 @@ Parameters:	pszRequest 	the type of version info desired, as listed above.
 
 Returns:
 an internal string containing the requested information.
-CPLErr GDALWriteBlock 	(	GDALRasterBandH 	hBand,
-		int 	nXOff,
-		int 	nYOff,
-		void * 	pData
-	)
 
-
-Write a block of image data efficiently.
-See also:
-GDALRasterBand::WriteBlock()
 int GDALWriteWorldFile 	(	const char * 	pszBaseFilename,
 		const char * 	pszExtension,
 		double * 	padfGeoTransform
