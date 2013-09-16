@@ -203,10 +203,11 @@ Example:
 
  This function is the same as the C++ method OGRDataSource::CopyLayer
 
-Parameters:	hDS 	handle to the data source where to create the new layer
-	hSrcLayer 	handle to the source layer.
-	pszNewName 	the name of the layer to create.
-	papszOptions 	a StringList of name=value options. Options are driver specific.
+ @argument[hDS]{handle to the data source where to create the new layer}
+ @argument[hSrcLayer]{handle to the source layer.}
+ @argument[pszNewName]{the name of the layer to create.}
+ @argument[papszOptions]{a StringList of name=value options. Options
+ are driver specific.}
 
  @return{an handle to the layer, or NULL if an error occurs.}"
   (hDS :pointer)			; OGRDataSourceH
@@ -469,11 +470,11 @@ Parameters:	hDS 	handle to the data source where to create the new layer
 ;; --------------------------------------------------------
 
 (defun open-data-source (name &optional (update 0) (drivers (cffi:null-pointer)))
+  "Returns DATA-SOURCE instance in case of success, NIL otherwise."
   (let ((ds-pointer (ogr-open name update drivers)))
-    (when (cffi:null-pointer-p ds-pointer)
-      (error "Failed to open OGRDataSource: ~a" name))
-    (make-instance 'data-source
-		   :pointer ds-pointer)))
+    (unless (cffi:null-pointer-p ds-pointer)
+      (make-instance 'data-source
+		     :pointer ds-pointer))))
 (export 'open-data-source)
 
 ;; --------------------------------------------------------
@@ -507,6 +508,20 @@ Parameters:	hDS 	handle to the data source where to create the new layer
 		       :pointer layer-pointer
 		       :data-source ds)))))
 (export 'get-layer)
+
+;; --------------------------------------------------------
+
+(defgeneric get-name (ds)
+  (:method ((ds data-source))
+    (ogr-ds-get-name (pointer ds))))
+(export 'get-name)
+
+;; --------------------------------------------------------
+
+(defgeneric delete-layer (ds iLayer)
+  (:method ((ds data-source) (iLayer fixnum))
+    (ogr-ds-delete-layer ds iLayer)))
+(export 'delete-layer)
 
 ;; --------------------------------------------------------
 
