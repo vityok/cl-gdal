@@ -96,4 +96,32 @@
   :GF_Read				; Read data
   :GF_Write)				; Write data
 
+;; --------------------------------------------------------
+
+(cffi:defcfun ("GDALAllRegister" GDAL-All-Register) :void 	
+  "Register all known configured GDAL drivers. 
+
+ This function will drive any of the following that are configured
+ into GDAL. Many others as well haven't been updated in this
+ documentation (see full list):
+
+ GeoTIFF (GTiff) 
+ Geosoft GXF (GXF) 
+ Erdas Imagine (HFA) 
+ CEOS (CEOS) 
+ ELAS (ELAS) 
+ Arc/Info Binary Grid (AIGrid) 
+ SDTS Raster DEM (SDTS) 
+ OGDI (OGDI) 
+ ESRI Labelled BIL (EHdr) 
+ PCI .aux Labelled Raw Raster (PAux) 
+ HDF4 Hierachal Data Format Release 4 
+ HDF5 Hierachal Data Format Release 5 
+ GSAG Golden Software ASCII Grid 
+ GSBG Golden Software Binary Grid 
+
+ This function should generally be called once at the beginning of the
+ application." )
+(export 'GDAL-All-Register)
+
 ;; EOF

@@ -31,7 +31,8 @@ Master: http://www.gdal.org"
     :components
     ((:module "src"
 	      :components ((:file "gdal-package")
-			   (:file "gdal-core"))))
+			   (:file "gdal-core")
+			   (:file "gdal-dataset"))))
     :depends-on (:cffi
 		 :trivial-garbage))
 

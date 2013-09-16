@@ -8,6 +8,6 @@
 (defpackage :cl-gdal
   (:nicknames :gdal)
   (:use :cl)
-  (:export #:data-source))
+  (:export #:GDAL-All-Register))
 
 ;; EOF
