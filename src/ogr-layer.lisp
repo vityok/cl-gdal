@@ -795,8 +795,8 @@ This function is the same as the C++ method OGRLayer::TestCapability().
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_AlterFieldDefn) ogr-err
-Alter the definition of an existing field on a layer.
+(cffi:defcfun ("OGR_L_AlterFieldDefn" ogr-l-alter-field-defn) ogr-err
+  "Alter the definition of an existing field on a layer.
 
  You must use this to alter the definition of an existing field of a
  real layer. Internally the OGRFeatureDefn for the layer will be
@@ -816,23 +816,27 @@ Alter the definition of an existing field on a layer.
 
  This function is the same as the C++ method OGRLayer::AlterFieldDefn().
 
-@argument[hLayer 	handle to the layer.
-	iField 	index of the field whose definition must be altered.
-	hNewFieldDefn 	new field definition
-	nFlags 	combination of ALTER_NAME_FLAG, ALTER_TYPE_FLAG and ALTER_WIDTH_PRECISION_FLAG to indicate which of the name and/or type and/or width and precision fields from the new field definition must be taken into account.
+ @argument[hLayer]{handle to the layer.}
+ @argument[iField]{index of the field whose definition must be altered.}
+ @argument[hNewFieldDefn]{new field definition}
+ @argument[nFlags]{combination of ALTER_NAME_FLAG, ALTER_TYPE_FLAG and
+ ALTER_WIDTH_PRECISION_FLAG to indicate which of the name and/or type
+ and/or width and precision fields from the new field definition must
+ be taken into account.}
 
  @return{OGRERR_NONE on success.}
 
-Since: OGR 1.9.0
-(hLayer ogr-layer-h,
-		int 	iField,
-		OGRFieldDefnH 	hNewFieldDefn,
-		int 	nFlags
-	)
+ Since: OGR 1.9.0"
+  (hLayer ogr-layer-h)
+  (iField :int)
+  (hNewFieldDefn ogr-field-defn-h)
+  (nFlags :int))
+(export 'ogr-l-alter-field-defn)
+
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_StartTransaction) ogr-err
- For datasources which support transactions, StartTransaction creates
+(cffi:defcfun ("OGR_L_StartTransaction" ogr-l-start-transaction) ogr-err
+  "For datasources which support transactions, StartTransaction creates
  a transaction.
 
  If starting the transaction fails, will return
@@ -843,13 +847,14 @@ Since: OGR 1.9.0
 
  @argument[hLayer]{handle to the layer}
 
- @return{OGRERR_NONE on success.}
-(hLayer ogr-layer-h	 )
+ @return{OGRERR_NONE on success.}"
+  (hLayer ogr-layer-h))
+(export 'ogr-l-start-transaction)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_CommitTransaction) ogr-err
- For datasources which support transactions, CommitTransaction commits
+(cffi:defcfun ("OGR_L_CommitTransaction" ogr-l-commit-transaction) ogr-err
+  "For datasources which support transactions, CommitTransaction commits
  a transaction.
 
  If no transaction is active, or the commit fails, will return
@@ -861,26 +866,29 @@ Since: OGR 1.9.0
 
  @argument[hLayer]{handle to the layer}
 
- @return{OGRERR_NONE on success.}
-(hLayer ogr-layer-h	 )
+ @return{OGRERR_NONE on success.}"
+  (hLayer ogr-layer-h))
+(export 'ogr-l-commit-transaction)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_RollbackTransaction) ogr-err
+(cffi:defcfun ("OGR_L_RollbackTransaction" ogr-l-rollback-transaction) ogr-err
 
- For datasources which support transactions, RollbackTransaction will
- roll back a datasource to its state before the start of the current
- transaction. If no transaction is active, or the rollback fails, will
- return OGRERR_FAILURE. Datasources which do not support transactions
- will always return OGRERR_NONE.
+  "For datasources which support transactions, RollbackTransaction will
+  roll back a datasource to its state before the start of the current
+  transaction. If no transaction is active, or the rollback fails, will
+  return OGRERR_FAILURE. Datasources which do not support transactions
+  will always return OGRERR_NONE.
 
- This function is the same as the C++ method
- OGRLayer::RollbackTransaction().
+  This function is the same as the C++ method
+  OGRLayer::RollbackTransaction().
 
- @argument[hLayer]{handle to the layer}
+  @argument[hLayer]{handle to the layer}
 
- @return{OGRERR_NONE on success.}
-(hLayer ogr-layer-h	 )
+  @return{OGRERR_NONE on success.}"
+  (hLayer ogr-layer-h))
+(export 'ogr-l-rollback-transaction)
+
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_L_SyncToDisk" ogr-l-sync-to-disk) ogr-err
@@ -1008,9 +1016,9 @@ This function is the same as the C++ method OGRLayer::Intersection().
  interrupted, OGRERR_NONE otherwise.}
 
  Since: OGR 1.10
-(	OGRLayerH 	pLayerInput,
-		OGRLayerH 	pLayerMethod,
-		OGRLayerH 	pLayerResult,
+(	pLayerInput ogr-layer-h)
+		(pLayerMethod ogr-layer-h)
+		(pLayerResult ogr-layer-h)
 		char ** 	papszOptions,
 		GDALProgressFunc 	pfnProgress,
 		void * 	pProgressArg
@@ -1066,9 +1074,9 @@ The recognized list of options is :
 
  Since: OGR 1.10
 
-(	OGRLayerH 	pLayerInput,
-		OGRLayerH 	pLayerMethod,
-		OGRLayerH 	pLayerResult,
+(	pLayerInput ogr-layer-h)
+		(pLayerMethod ogr-layer-h)
+		(pLayerResult ogr-layer-h)
 		char ** 	papszOptions,
 		GDALProgressFunc 	pfnProgress,
 		void * 	pProgressArg
@@ -1119,9 +1127,9 @@ This function is the same as the C++ method OGRLayer::SymDifference().
 
  Since: OGR 1.10"
 
-(	OGRLayerH 	pLayerInput,
-		OGRLayerH 	pLayerMethod,
-		OGRLayerH 	pLayerResult,
+(	pLayerInput ogr-layer-h)
+		(pLayerMethod ogr-layer-h)
+		(pLayerResult ogr-layer-h)
 		char ** 	papszOptions,
 		GDALProgressFunc 	pfnProgress,
 		void * 	pProgressArg
@@ -1170,9 +1178,9 @@ The recognized list of options is :
 
  Since: OGR 1.10"
 
-(	OGRLayerH 	pLayerInput,
-		OGRLayerH 	pLayerMethod,
-		OGRLayerH 	pLayerResult,
+(	pLayerInput ogr-layer-h)
+		(pLayerMethod ogr-layer-h)
+		(pLayerResult ogr-layer-h)
 		char ** 	papszOptions,
 		GDALProgressFunc 	pfnProgress,
 		void * 	pProgressArg
@@ -1221,9 +1229,9 @@ This function is the same as the C++ method OGRLayer::Update().
  interrupted, OGRERR_NONE otherwise.}
 
  Since: OGR 1.10"
-(	OGRLayerH 	pLayerInput,
-		OGRLayerH 	pLayerMethod,
-		OGRLayerH 	pLayerResult,
+(	pLayerInput ogr-layer-h)
+		(pLayerMethod ogr-layer-h)
+		(pLayerResult ogr-layer-h)
 		char ** 	papszOptions,
 		GDALProgressFunc 	pfnProgress,
 		void * 	pProgressArg
@@ -1273,9 +1281,9 @@ The recognized list of options is :
 
  Since: OGR 1.10
 
-(	OGRLayerH 	pLayerInput,
-		OGRLayerH 	pLayerMethod,
-		OGRLayerH 	pLayerResult,
+(	pLayerInput ogr-layer-h)
+		(pLayerMethod ogr-layer-h)
+		(pLayerResult ogr-layer-h)
 		char ** 	papszOptions,
 		GDALProgressFunc 	pfnProgress,
 		void * 	pProgressArg
@@ -1319,9 +1327,9 @@ The recognized list of options is :
  interrupted, OGRERR_NONE otherwise.}
 
  Since: OGR 1.10"
-(	OGRLayerH 	pLayerInput,
-		OGRLayerH 	pLayerMethod,
-		OGRLayerH 	pLayerResult,
+(pLayerInput ogr-layer-h)
+		(pLayerMethod ogr-layer-h)
+		(pLayerResult ogr-layer-h)
 		char ** 	papszOptions,
 		GDALProgressFunc 	pfnProgress,
 		void * 	pProgressArg
