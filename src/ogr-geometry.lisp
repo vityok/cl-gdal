@@ -27,13 +27,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateFromWkb" %OGR-G-Create-From-Wkb) :int ; OGRErr
-  (pabyData :string)
-  (hSRS :pointer)			; OGRSpatialReferenceH
-  (phGeometry :pointer)			; OGRGeometryH *
-  (nBytes :int))
-
-(defun OGR-G-Create-From-Wkb (pabyData hSRS phGeometry nBytes)
+(cffi:defcfun ("OGR_G_CreateFromWkb" OGR-G-Create-From-Wkb) ogr-err
   "Create a geometry object of the appropriate type from it's well
  known binary representation.
 
@@ -62,21 +56,17 @@
  @return{:NONE if all goes well, otherwise any of
  :NOT_ENOUGH_DATA, :UNSUPPORTED_GEOMETRY_TYPE, or
  :CORRUPT_DATA may be returned.}"
-  (cffi:foreign-enum-keyword
-   'ogr-err
-   (%OGR-G-Create-From-Wkb pabyData hSRS phGeometry nBytes)))
-
+  (pabyData :string)
+  (hSRS :pointer)			; OGRSpatialReferenceH
+  (phGeometry :pointer)			; OGRGeometryH *
+  (nBytes :int))
 (export 'OGR-G-Create-From-Wkb)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateFromWkt" %OGR-G-Create-From-Wkt) :int ; OGRErr
-  (ppszData :pointer)			; char **
-  (hSRS :pointer)			; OGRSpatialReferenceH
-  (phGeometry :pointer))		; OGRGeometryH *
-
-(defun OGR-G-Create-From-Wkt (ppszData hSRS phGeometry)
-  "Create a geometry object of the appropriate type from it's well known text representation.
+(cffi:defcfun ("OGR_G_CreateFromWkt" OGR-G-Create-From-Wkt) ogr-err
+  "Create a geometry object of the appropriate type from it's well
+ known text representation.
 
  The OGRGeometryFactory::createFromWkt CPP method is the same as this
  function.
@@ -96,10 +86,9 @@
  @return{NONE if all goes well, otherwise any of
  NOT_ENOUGH_DATA, UNSUPPORTED_GEOMETRY_TYPE, or
  CORRUPT_DATA may be returned.}"
-  (cffi:foreign-enum-keyword
-   'ogr-err
-   (%OGR-G-Create-From-Wkt ppszData hSRS phGeometry)))
-
+  (ppszData :pointer)			; char **
+  (hSRS :pointer)			; OGRSpatialReferenceH
+  (phGeometry :pointer))		; OGRGeometryH *
 (export 'OGR-G-Create-From-Wkt)
 
 ;; --------------------------------------------------------
@@ -110,11 +99,8 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateGeometry" %OGR-G-Create-Geometry) :pointer ; OGRGeometryH
-  (eGeometryType :int))			; OGR-wkb-Geometry-Type
-
-(defun OGR-G-Create-Geometry (eGeometryType)
-  "Create an empty geometry of desired type.
+(cffi:defcfun ("OGR_G_CreateGeometry" OGR-G-Create-Geometry) :pointer ; OGRGeometryH
+"Create an empty geometry of desired type.
 
  This is equivalent to allocating the desired geometry with new, but
  the allocation is guaranteed to take place in the context of the
@@ -127,8 +113,7 @@
 
  @return{handle to the newly create geometry or NULL on
  failure. Should be freed with OGR_G_DestroyGeometry() after use.}"
-  (%ogr-g-create-geometry (cffi:foreign-enum-value 'ogr-wkb-geometry-type
-						   eGeometryType)))
+  (eGeometryType OGR-wkb-Geometry-Type))			; OGR-wkb-Geometry-Type
 (export 'ogr-g-create-geometry)
 
 ;; --------------------------------------------------------
@@ -1335,11 +1320,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Centroid" %OGR-G-Centroid) :int
-  (hGeom :pointer)			; OGRGeometryH
-  (hCentroidPoint :pointer))		; OGRGeometryH
-
-(defun OGR-G-Centroid (hGeom hCentroidPoint)
+(cffi:defcfun ("OGR_G_Centroid" ogr-g-centroid) ogr-err
   "Compute the geometry centroid.
 
  The centroid location is applied to the passed in OGRPoint
@@ -1360,9 +1341,8 @@ OGR 1.8.0"
  CPLE_NotSupported error.
 
  @return{:NONE on success or :FAILURE on error.}"
-  (cffi:foreign-enum-keyword
-   'ogr-err
-   (%OGR-G-Centroid hGeom hCentroidPoint)))
+  (hGeom :pointer)			; OGRGeometryH
+  (hCentroidPoint :pointer))		; OGRGeometryH
 (export 'OGR-G-Centroid)
 
 ;; --------------------------------------------------------
@@ -1690,11 +1670,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_AddGeometry" %OGR-G-Add-Geometry) :int ; OGRErr
-  (hGeom :pointer)			; OGRGeometryH
-  (hNewSubGeom :pointer))		; OGRGeometryH
-
-(defun OGR-G-Add-Geometry (hGeom hNewSubGeom)
+(cffi:defcfun ("OGR_G_AddGeometry" OGR-G-Add-Geometry) ogr-err ; OGRErr
   "Add a geometry to a geometry container.
 
  Some subclasses of OGRGeometryCollection restrict the types of
@@ -1717,18 +1693,13 @@ OGR 1.8.0"
  @return{OGRERR_NONE if successful, or
  OGRERR_UNSUPPORTED_GEOMETRY_TYPE if the geometry type is illegal for
  the type of existing geometry.}"
-  (cffi:foreign-enum-keyword
-   'ogr-err
-   (%OGR-G-Add-Geometry hGeom hNewSubGeom)))
+  (hGeom :pointer)			; OGRGeometryH
+  (hNewSubGeom :pointer))		; OGRGeometryH
 (export 'OGR-G-Add-Geometry)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_AddGeometryDirectly" %OGR-G-Add-Geometry-Directly) :int ; OGRErr
-  (hGeom :pointer)			; OGRGeometryH
-  (hNewSubGeom :pointer))		; OGRGeometryH
-
-(defun OGR-G-Add-Geometry-Directly (hGeom hNewSubGeom)
+(cffi:defcfun ("OGR_G_AddGeometryDirectly" OGR-G-Add-Geometry-Directly) ogr-err ; OGRErr
   "Add a geometry directly to an existing geometry container.
 
  Some subclasses of OGRGeometryCollection restrict the types of
@@ -1751,19 +1722,13 @@ OGR 1.8.0"
  @return{:NONE if successful, or
  :UNSUPPORTED_GEOMETRY_TYPE if the geometry type is illegal for the
  type of geometry container.}"
-  (cffi:foreign-enum-keyword
-   'ogr-err
-   (%OGR-G-Add-Geometry-Directly hGeom hNewSubGeom)))
+  (hGeom :pointer)			; OGRGeometryH
+  (hNewSubGeom :pointer))		; OGRGeometryH
 (export 'OGR-G-Add-Geometry-Directly)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_RemoveGeometry" %OGR-G-Remove-Geometry) :int ; OGRErr
-  (hGeom :pointer)			; OGRGeometryH
-  (iGeom :int)
-  (bDelete :int))
-
-(defun OGR-G-Remove-Geometry (hGeom iGeom bDelete)
+(cffi:defcfun ("OGR_G_RemoveGeometry" OGR-G-Remove-Geometry) ogr-err
   "Remove a geometry from an exiting geometry container.
 
  Removing a geometry will cause the geometry count to drop by one, and
@@ -1783,9 +1748,9 @@ OGR 1.8.0"
 
  @return{:NONE if successful, or :FAILURE if the index is out of
  range.}"
-  (cffi:foreign-enum-keyword
-   'ogr-err
-   (%OGR-G-Remove-Geometry hGeom iGeom bDelete)))
+  (hGeom :pointer)			; OGRGeometryH
+  (iGeom :int)
+  (bDelete :int))
 (export 'OGR-G-Remove-Geometry)
 
 ;; EOF

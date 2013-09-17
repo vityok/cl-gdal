@@ -6,12 +6,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defctype data-source-h (:pointer :void)
-  "OGRDataSourceH")
-
-;; --------------------------------------------------------
-
-(cffi:defcfun  ("OGROpen" ogr-open) :pointer ; OGRDataSourceH
+(cffi:defcfun ("OGROpen" ogr-open) ogr-data-source-h
   (psz-name :string)
   (p-update :int)
   (path-driver-list :pointer)) ;; OGRSFDriverH

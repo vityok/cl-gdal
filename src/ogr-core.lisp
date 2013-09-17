@@ -7,6 +7,18 @@
 
 ;; --------------------------------------------------------
 
+(cffi:defctype ogr-layer-h :pointer "OGRLayerH")
+
+(cffi:defctype ogr-data-source-h :pointer "OGRDataSourceH")
+
+(cffi:defctype ogr-geometry-h :pointer "OGRGeometryH")
+
+(cffi:defctype ogr-feature-h :pointer "OGRFeatureH")
+
+(cffi:defctype ogr-feature-defn-h :pointer "OGRFeatureDefnH")
+
+;; --------------------------------------------------------
+
 (defclass ogr-class ()
   ((pointer
     :type (or null cffi:foreign-pointer)
@@ -124,8 +136,8 @@ properly."
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGRCleanupAll" OGR-Cleanup-All) :void 	 	
-  "Cleanup all OGR related resources. 
+(cffi:defcfun ("OGRCleanupAll" ogr-cleanup-all) :void
+  "Cleanup all OGR related resources.
 
  This function will destroy the OGRSFDriverRegistrar along with all
  registered drivers, and then cleanup long lived
@@ -134,13 +146,14 @@ properly."
  normally required, but by freeing all dynamically allocated memory it
  can make memory leak testing easier.
 
-In addition to destroying the OGRDriverRegistrar, this function also calls:
-OSRCleanup()
-CPLFinderClean()
-VSICleanupFileManager()
-CPLFreeConfig()
-CPLCleanupTLS()"
-  )
+ In addition to destroying the OGRDriverRegistrar, this function also
+ calls:
+
+ OSRCleanup()
+ CPLFinderClean()
+ VSICleanupFileManager()
+ CPLFreeConfig()
+ CPLCleanupTLS()")
 
 ;; --------------------------------------------------------
 ;; EOF
