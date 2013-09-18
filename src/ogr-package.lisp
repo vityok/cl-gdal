@@ -8,6 +8,8 @@
 
 (cffi:use-foreign-library libgdal)
 
+;; --------------------------------------------------------
+
 (defpackage :cl-ogr
   (:use :cl)
   (:nicknames :ogr)
