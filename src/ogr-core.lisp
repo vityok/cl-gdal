@@ -17,6 +17,12 @@
 
 (cffi:defctype ogr-feature-defn-h :pointer "OGRFeatureDefnH")
 
+(cffi:defctype ogr-spatial-reference-h :pointer "OGRSpatialReferenceH")
+
+(cffi:defctype ogr-field-defn-h :pointer "OGRFieldDefnH")
+
+(cffi:defctype ogr-geom-field-defn-h :pointer "OGRGeomFieldDefnH")
+
 ;; --------------------------------------------------------
 
 (defclass ogr-class ()

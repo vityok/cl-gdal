@@ -942,9 +942,8 @@ This function is the same as the C++ method OGRLayer::TestCapability().
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_SetIgnoredFields) ogr-err
-
- Set which fields can be omitted when retrieving features from the
+(cffi:defcfun ("OGR_L_SetIgnoredFields" ogr-l-set-ignored-fields) ogr-err
+  "Set which fields can be omitted when retrieving features from the
  layer.
 
  If the driver supports this functionality (testable using
@@ -964,17 +963,15 @@ This function is the same as the C++ method OGRLayer::TestCapability().
  item. If NULL is passed, the ignored list is cleared.}
 
  @return{OGRERR_NONE if all field names have been resolved (even if
- the driver does not support this method)}
+ the driver does not support this method)}"
+  (hLayer ogr-layer-h)
+  (papszFields (:pointer :string)))	; const char **
+(export 'ogr-l-set-ignored-fields)
 
-(	OGRLayerH 	,
-		const char ** 	papszFields
-	)
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_Intersection) ogr-err
-
-
-Intersection of two layers.
+(cffi:defcfun ("OGR_L_Intersection" ogr-l-intersection) ogr-err
+  "Intersection of two layers.
 
  The result layer contains features whose geometries represent areas
  that are common between features in the input layer and in the method
@@ -1000,7 +997,7 @@ The recognized list of options is :
  INPUT_PREFIX=string. Set a prefix for the field names that will be created from the fields of the input layer.
  METHOD_PREFIX=string. Set a prefix for the field names that will be created from the fields of the method layer.
 
-This function is the same as the C++ method OGRLayer::Intersection().
+ This function is the same as the C++ method OGRLayer::Intersection().
 
  @argument[pLayerInput]{the input layer. Should not be NULL.}
  @argument[pLayerMethod]{the method layer. Should not be NULL.}
@@ -1015,21 +1012,19 @@ This function is the same as the C++ method OGRLayer::Intersection().
  @return{an error code if there was an error or the execution was
  interrupted, OGRERR_NONE otherwise.}
 
- Since: OGR 1.10
-(	pLayerInput ogr-layer-h)
-		(pLayerMethod ogr-layer-h)
-		(pLayerResult ogr-layer-h)
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressArg
-	)
+ Since: OGR 1.10"
+  (pLayerInput ogr-layer-h)
+  (pLayerMethod ogr-layer-h)
+  (pLayerResult ogr-layer-h)
+  (papszOptions (:pointer :string))		 ; char **
+  (pfnProgress :pointer)			 ; GDALProgressFunc
+  (pProgressArg :pointer))			 ; void *
+(export 'ogr-l-intersection)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ( OGR_L_Union) ogr-err
-
-
-Union of two layers.
+(cffi:defcfun ("OGR_L_Union" ogr-l-union) ogr-err
+  "Union of two layers.
 
  The result layer contains features whose geometries represent areas
  that are in either in the input layer or in the method layer. The
@@ -1072,21 +1067,20 @@ The recognized list of options is :
  @return{an error code if there was an error or the execution was
  interrupted, OGRERR_NONE otherwise.}
 
- Since: OGR 1.10
+ Since: OGR 1.10"
 
-(	pLayerInput ogr-layer-h)
-		(pLayerMethod ogr-layer-h)
-		(pLayerResult ogr-layer-h)
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressArg
-	)
+  (pLayerInput ogr-layer-h)
+  (pLayerMethod ogr-layer-h)
+  (pLayerResult ogr-layer-h)
+  (papszOptions (:pointer :string))		 ; char **
+  (pfnProgress :pointer)			 ; GDALProgressFunc
+  (pProgressArg :pointer))			 ; void *
+(export 'ogr-l-union)
+
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_SymDifference) ogr-err
-
-
-"Symmetrical difference of two layers.
+(cffi:defcfun ("OGR_L_SymDifference" ogr-l-sym-difference) ogr-err
+  "Symmetrical difference of two layers.
 
  The result layer contains features whose geometries represent areas
  that are in either in the input layer or in the method layer but not
@@ -1114,31 +1108,35 @@ The recognized list of options is :
  INPUT_PREFIX=string. Set a prefix for the field names that will be created from the fields of the input layer.
  METHOD_PREFIX=string. Set a prefix for the field names that will be created from the fields of the method layer.
 
-This function is the same as the C++ method OGRLayer::SymDifference().
-@argument[pLayerInput 	the input layer. Should not be NULL.
-	pLayerMethod 	the method layer. Should not be NULL.
-	pLayerResult 	the layer where the features resulting from the operation are inserted. Should not be NULL. See above the note about the schema.
-	papszOptions 	NULL terminated list of options (may be NULL).
-	pfnProgress 	a GDALProgressFunc() compatible callback function for reporting progress or NULL.
-	pProgressArg 	argument to be passed to pfnProgress. May be NULL.
+ This function is the same as the C++ method
+ OGRLayer::SymDifference().
+
+ @argument[pLayerInput]{the input layer. Should not be NULL.}
+ @argument[pLayerMethod]{the method layer. Should not be NULL.}
+ @argument[pLayerResult]{the layer where the features resulting from
+ the operation are inserted. Should not be NULL. See above the note
+ about the schema.}
+ @argument[papszOptions]{NULL terminated list of options (may be NULL).}
+ @argument[pfnProgress]{a GDALProgressFunc() compatible callback
+ function for reporting progress or NULL.}
+ @argument[pProgressArg]{argument to be passed to pfnProgress. May be NULL.}
 
  @return{an error code if there was an error or the execution was
  interrupted, OGRERR_NONE otherwise.}
 
  Since: OGR 1.10"
+  (pLayerInput ogr-layer-h)
+  (pLayerMethod ogr-layer-h)
+  (pLayerResult ogr-layer-h)
+  (papszOptions (:pointer :string))	; char **
+  (pfnProgress :pointer)		; GDALProgressFunc
+  (pProgressArg :pointer))		; void *
+(export 'ogr-l-sym-difference)
 
-(	pLayerInput ogr-layer-h)
-		(pLayerMethod ogr-layer-h)
-		(pLayerResult ogr-layer-h)
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressArg
-	)
 ;; --------------------------------------------------------
 
-(cffi:defcfun ( OGR_L_Identity) ogr-err
-
- "Identify the features of this layer with the ones from the identity
+(cffi:defcfun ("OGR_L_Identity" ogr-l-identity) ogr-err
+  "Identify the features of this layer with the ones from the identity
  layer.
 
  The result layer contains features whose geometries represent areas
@@ -1152,8 +1150,11 @@ This function is the same as the C++ method OGRLayer::SymDifference().
  the attribute in the result feature will get the value from the
  feature of the method layer (even if it is undefined).
 
- For best performance use the minimum amount of features in the method layer and copy it into a memory layer.
- This method relies on GEOS support. Do not use unless the GEOS support is compiled in.
+ For best performance use the minimum amount of features in the method
+ layer and copy it into a memory layer.
+
+ This method relies on GEOS support. Do not use unless the GEOS
+ support is compiled in.
 
 The recognized list of options is :
  SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature could not be inserted.
@@ -1177,19 +1178,18 @@ The recognized list of options is :
  interrupted, OGRERR_NONE otherwise.}
 
  Since: OGR 1.10"
+  (pLayerInput ogr-layer-h)
+  (pLayerMethod ogr-layer-h)
+  (pLayerResult ogr-layer-h)
+  (papszOptions (:pointer :string))	; char **
+  (pfnProgress :pointer)		; GDALProgressFunc
+  (pProgressArg :pointer))		; void *
+(export 'ogr-l-identity)
 
-(	pLayerInput ogr-layer-h)
-		(pLayerMethod ogr-layer-h)
-		(pLayerResult ogr-layer-h)
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressArg
-	)
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_Update) ogr-err
-
-"Update this layer with features from the update layer.
+(cffi:defcfun ("OGR_L_Update" ogr-l-update) ogr-err
+  "Update this layer with features from the update layer.
 
  The result layer contains features whose geometries represent areas
  that are either in the input layer or in the method layer. The
@@ -1217,32 +1217,35 @@ The recognized list of options is :
  INPUT_PREFIX=string. Set a prefix for the field names that will be created from the fields of the input layer.
  METHOD_PREFIX=string. Set a prefix for the field names that will be created from the fields of the method layer.
 
-This function is the same as the C++ method OGRLayer::Update().
-@argument[pLayerInput 	the input layer. Should not be NULL.
-	pLayerMethod 	the method layer. Should not be NULL.
-	pLayerResult 	the layer where the features resulting from the operation are inserted. Should not be NULL. See above the note about the schema.
-	papszOptions 	NULL terminated list of options (may be NULL).
-	pfnProgress 	a GDALProgressFunc() compatible callback function for reporting progress or NULL.
-	pProgressArg 	argument to be passed to pfnProgress. May be NULL.
+ This function is the same as the C++ method OGRLayer::Update().
+
+ @argument[pLayerInput]{the input layer. Should not be NULL.}
+ @argument[pLayerMethod]{the method layer. Should not be NULL.}
+ @argument[pLayerResult]{the layer where the features resulting from
+ the operation are inserted. Should not be NULL. See above the note
+ about the schema.}
+ @argument[papszOptions]{NULL terminated list of options (may be NULL).}
+ @argument[pfnProgress]{a GDALProgressFunc() compatible callback
+ function for reporting progress or NULL.}
+ @argument[pProgressArg]{argument to be passed to pfnProgress. May be
+ NULL.}
 
  @return{an error code if there was an error or the execution was
  interrupted, OGRERR_NONE otherwise.}
 
  Since: OGR 1.10"
-(	pLayerInput ogr-layer-h)
-		(pLayerMethod ogr-layer-h)
-		(pLayerResult ogr-layer-h)
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressArg
-	)
+  (pLayerInput ogr-layer-h)
+  (pLayerMethod ogr-layer-h)
+  (pLayerResult ogr-layer-h)
+  (papszOptions (:pointer :string))	; char **
+  (pfnProgress :pointer)		; GDALProgressFunc
+  (pProgressArg :pointer))		; void *
+(export 'ogr-l-update)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun (OGR_L_Clip) ogr-err
-
-
-Clip off areas that are not covered by the method layer.
+(cffi:defcfun ("OGR_L_Clip" ogr-l-clip) ogr-err
+  "Clip off areas that are not covered by the method layer.
 
  The result layer contains features whose geometries represent areas
  that are in the input layer and in the method layer. The features in
@@ -1279,20 +1282,20 @@ The recognized list of options is :
  @return{an error code if there was an error or the execution was
  interrupted, OGRERR_NONE otherwise.}
 
- Since: OGR 1.10
+ Since: OGR 1.10"
 
-(	pLayerInput ogr-layer-h)
-		(pLayerMethod ogr-layer-h)
-		(pLayerResult ogr-layer-h)
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressArg
-	)
+  (pLayerInput ogr-layer-h)
+  (pLayerMethod ogr-layer-h)
+  (pLayerResult ogr-layer-h)
+  (papszOptions (:pointer :string))	; char **
+  (pfnProgress :pointer)		; GDALProgressFunc
+  (pProgressArg :pointer))		; void *
+(export 'ogr-l-clip)
+
 ;; --------------------------------------------------------
 
-(cffi:defcfun ( OGR_L_Erase) ogr-err
-
-"Remove areas that are covered by the method layer.
+(cffi:defcfun ("OGR_L_Erase" ogr-l-erase) ogr-err
+  "Remove areas that are covered by the method layer.
 
  The result layer contains features whose geometries represent areas
  that are in the input layer but not in the method layer. The features
@@ -1303,7 +1306,8 @@ The recognized list of options is :
  Note: For best performance use the minimum amount of features in the
  method layer and copy it into a memory layer.
 
- This method relies on GEOS support. Do not use unless the GEOS support is compiled in.
+ This method relies on GEOS support. Do not use unless the GEOS
+ support is compiled in.
 
 The recognized list of options is :
  SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature could not be inserted.
@@ -1327,12 +1331,12 @@ The recognized list of options is :
  interrupted, OGRERR_NONE otherwise.}
 
  Since: OGR 1.10"
-(pLayerInput ogr-layer-h)
-		(pLayerMethod ogr-layer-h)
-		(pLayerResult ogr-layer-h)
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressArg
-	)
+  (pLayerInput ogr-layer-h)
+  (pLayerMethod ogr-layer-h)
+  (pLayerResult ogr-layer-h)
+  (papszOptions (:pointer :string))	; char **
+  (pfnProgress :pointer)		; GDALProgressFunc
+  (pProgressArg :pointer))		; void *
+(export 'ogr-l-erase)
 
 ;; EOF
