@@ -32,7 +32,8 @@ Master: http://www.gdal.org"
     ((:module "src"
 	      :components ((:file "gdal-package")
 			   (:file "gdal-core")
-			   (:file "gdal-dataset"))))
+			   (:file "gdal-dataset")
+			   (:file "gdal-rasterband"))))
     :depends-on (:cffi
 		 :trivial-garbage))
 
