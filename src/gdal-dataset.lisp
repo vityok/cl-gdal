@@ -1,4 +1,4 @@
-;;; -*- package: GDAL; Syntax: Common-lisp; Base: 10 -*-
+;;; -*- package: CL-GDAL; Syntax: Common-lisp; Base: 10 -*-
 
 (in-package :cl-gdal)
 

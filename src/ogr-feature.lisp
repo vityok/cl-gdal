@@ -1,6 +1,6 @@
-;;; -*- package: OGR; Syntax: Common-lisp; Base: 10 -*-
+;;; -*- package: CL-OGR; Syntax: Common-lisp; Base: 10 -*-
 
-(in-package :ogr)
+(in-package :cl-ogr)
 
 ;; --------------------------------------------------------
 
