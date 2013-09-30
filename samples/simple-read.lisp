@@ -45,7 +45,7 @@
 
 	 (setf hGeometry (ogr:OGR-F-Get-Geometry-Ref hFeature))
 	 (if (and (not (cffi:null-pointer-p hGeometry))
-		  (eql (ogr:wkbFlatten (ogr:OGR-G-Get-Geometry-Type hGeometry))
+		  (eql (ogr:wkb-flatten (ogr:OGR-G-Get-Geometry-Type hGeometry))
 		       :wkbPoint))
 	     (format t "~a,~a~%" (ogr:OGR-G-GetX hGeometry 0) (ogr:OGR-G-GetY hGeometry 0) )
 	     (format t "no point geometry~%"))
