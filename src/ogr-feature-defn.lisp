@@ -59,6 +59,7 @@
  @argument[hNewField]{handle to the new field definition.}"
   (hDefn ogr-feature-defn-h)
   (hNewField ogr-field-defn-h))
+(export 'ogr-fd-add-field-defn)
 
 ;; --------------------------------------------------------
 
@@ -84,6 +85,7 @@
  Since: GDAL 2.0"
   (hDefn ogr-feature-defn-h)
   (hNewGeomField OGR-Geom-Field-Defn-H))
+(export 'ogr-fd-add-geom-field-defn)
 
 ;; --------------------------------------------------------
 
@@ -101,6 +103,7 @@
 
  @return{handle to the newly created feature definition.}"
   (pszName :string))
+(export 'ogr-fd-create)
 
 ;; --------------------------------------------------------
 
@@ -124,6 +127,7 @@
 Since: OGR 1.9.0"
   (hDefn ogr-feature-defn-h)
   (iField :int))
+(export 'ogr-fd-delete-field-defn)
 
 ;; --------------------------------------------------------
 
@@ -148,6 +152,7 @@ Since: OGR 1.9.0"
  Since: GDAL 2.0"
   (hDefn ogr-feature-defn-h)
   (iGeomField :int))
+(export 'ogr-fd-delete-geom-field-defn)
 
 ;; --------------------------------------------------------
 
@@ -162,6 +167,7 @@ Since: OGR 1.9.0"
 
  @return{the updated reference count.}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-dereference)
 
 ;; --------------------------------------------------------
 
@@ -174,6 +180,7 @@ Since: OGR 1.9.0"
 
  @argument[hDefn]{handle to the feature definition to be destroyed.}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-destroy)
 
 ;; --------------------------------------------------------
 
@@ -193,6 +200,7 @@ Since: OGR 1.9.0"
  @return{the field index, or -1 if no match found.}"
   (hDefn ogr-feature-defn-h)
   (pszFieldName :string))
+(export 'ogr-fd-get-field-index)
 
 ;; --------------------------------------------------------
 
@@ -208,6 +216,7 @@ Since: OGR 1.9.0"
 
  Since: GDAL 2.0"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-get-geom-field-count)
 
 ;; --------------------------------------------------------
 
@@ -229,6 +238,7 @@ Since: OGR 1.9.0"
  Since: GDAL 2.0"
   (hDefn ogr-feature-defn-h)
   (iGeomField :int))
+(export 'ogr-fd-get-geom-field-defn)
 
 ;; --------------------------------------------------------
 
@@ -248,6 +258,7 @@ Since: OGR 1.9.0"
  @return{the geometry field index, or -1 if no match found.}"
   (hDefn ogr-feature-defn-h)
   (pszGeomFieldName :string))
+(export 'ogr-fd-get-geom-field-index)
 
 ;; --------------------------------------------------------
 
@@ -265,6 +276,7 @@ Since: OGR 1.9.0"
 
  @return{the base type for all geometry related to this definition.}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-get-geom-type)
 
 ;; --------------------------------------------------------
 
@@ -280,6 +292,7 @@ Since: OGR 1.9.0"
  @return{the name. This name is internal and should not be modified,
  or freed.}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-get-name)
 
 ;; --------------------------------------------------------
 
@@ -294,6 +307,7 @@ Since: OGR 1.9.0"
 
  @return{the current reference count.}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-get-reference-count)
 
 ;; --------------------------------------------------------
 
@@ -311,6 +325,7 @@ Since: OGR 1.9.0"
 
  @return{ignore state}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-is-geometry-ignored)
 
 ;; --------------------------------------------------------
 
@@ -328,6 +343,7 @@ Since: OGR 1.9.0"
  Since: OGR 2.0"
   (hFDefn ogr-feature-defn-h)
   (hOtherFDefn ogr-feature-defn-h))
+(export 'ogr-fd-is-same)
 
 ;; --------------------------------------------------------
 
@@ -342,6 +358,7 @@ Since: OGR 1.9.0"
 
  @return{ignore state}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-is-style-ignored)
 
 ;; --------------------------------------------------------
 
@@ -359,6 +376,7 @@ Since: OGR 1.9.0"
 
  @return{the updated reference count.}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-reference)
 
 ;; --------------------------------------------------------
 
@@ -370,6 +388,7 @@ Since: OGR 1.9.0"
 
  @argument[hDefn]{handle to the feature definition to be released.}"
   (hDefn ogr-feature-defn-h))
+(export 'ogr-fd-release)
 
 ;; --------------------------------------------------------
 
@@ -387,6 +406,7 @@ Since: OGR 1.9.0"
  @argument[bIgnore]{ignore state}"
   (hDefn ogr-feature-defn-h)
   (bIgnore :int))
+(export 'ogr-fd-set-geometry-ignored)
 
 ;; --------------------------------------------------------
 
@@ -411,6 +431,7 @@ Since: OGR 1.9.0"
  @argument[eType]{the new type to assign.}"
   (hDefn ogr-feature-defn-h)
   (eType ogr-wkb-geometry-type))
+(export 'ogr-fd-set-geom-type)
 
 ;; --------------------------------------------------------
 
@@ -425,5 +446,6 @@ Since: OGR 1.9.0"
  @argument[bIgnore]{ignore state}"
   (hDefn ogr-feature-defn-h)
   (bIgnore :int))
+(export 'OGR_FD_SetStyleIgnored)
 
 ;; EOF
