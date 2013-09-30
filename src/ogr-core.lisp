@@ -60,7 +60,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum OGR-Field-Type
+(cffi:defcenum ogr-field-type
   "List of feature field types. This list is likely to be extended in
 the future ... avoid coding applications based on the assumption that
 all field types can be known. "
@@ -79,7 +79,7 @@ all field types can be known. "
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum OGR-Err
+(cffi:defcenum ogr-err
     "Errors are defined as macro constants, but we define is an
 enumeration with set constant values."
   (:NONE                0)
@@ -94,7 +94,7 @@ enumeration with set constant values."
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum OGR-wkb-Geometry-Type
+(cffi:defcenum ogr-wkb-geometry-type
     "List of well known binary geometry types. These are used within the
 BLOBs but are also returned from OGRGeometry::getGeometryType() to
 identify the type of a geometry object."
@@ -120,6 +120,10 @@ identify the type of a geometry object."
   (:wkbMultiLineString25D #x80000005)	; 2.5D extension as per 99-402
   (:wkbMultiPolygon25D #x80000006)	; 2.5D extension as per 99-402
   (:wkbGeometryCollection25D #x80000007)) ; 2.5D extension as per 99-402
+
+;; --------------------------------------------------------
+
+(cffi:defcenum ogr-justification)
 
 ;; --------------------------------------------------------
 
