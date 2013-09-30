@@ -1,7 +1,5 @@
 ;;; -*- package: CL-USER; Syntax: Common-lisp; Base: 10 -*-
 
-(in-package :cl-user)
-
 (cffi:define-foreign-library libgdal
     (:unix (:or "libgdal.so.1" "libgdal.so"))
   (t (:default "libgdal")))
@@ -10,9 +8,9 @@
 
 ;; --------------------------------------------------------
 
-(defpackage :cl-ogr
+(defpackage :cl-gdal
+  (:nicknames :gdal)
   (:use :cl)
-  (:nicknames :ogr)
-  (:export #:data-source))
+  (:export #:GDAL-All-Register))
 
 ;; EOF
