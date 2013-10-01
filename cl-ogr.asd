@@ -31,7 +31,7 @@ OGR is a part of the GDAL library."
 			   (:file "ogr-feature")
 			   (:file "ogr-field")
 			   (:file "ogr-geometry")
-			   ;; (:file "ogr-geom-field")
+			   (:file "ogr-geom-field")
 			   (:file "ogr-layer")
 			   ;; (:file "ogr-sfdriver")
 			   ;; (:file "ogr-style-manager")
