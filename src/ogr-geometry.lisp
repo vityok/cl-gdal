@@ -1,8 +1,8 @@
-;;; -*- package: OGR; Syntax: Common-lisp; Base: 10 -*-
+;;; -*- package: CL-OGR; Syntax: Common-lisp; Base: 10 -*-
 
 ;; OGRGeometry <ogr_api.h>
 
-(in-package :ogr)
+(in-package :cl-ogr)
 
 ;; --------------------------------------------------------
 
@@ -1748,9 +1748,31 @@ OGR 1.8.0"
 
  @return{:NONE if successful, or :FAILURE if the index is out of
  range.}"
-  (hGeom :pointer)			; OGRGeometryH
+  (hGeom ogr-geometry-h)
   (iGeom :int)
   (bDelete :int))
-(export 'OGR-G-Remove-Geometry)
+(export 'ogr-g-remove-geometry)
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("OGRBuildPolygonFromEdges" ogr-build-polygon-from-edges) ogr-geometry-h
+  "Build a ring from a bunch of arcs.
+
+ @argument[hLines]{handle to an OGRGeometryCollection (or
+ OGRMultiLineString) containing the line string geometries to be built
+ into rings.}
+
+ @argument[bBestEffort]{not yet implemented???.}
+ @argument[bAutoClose]{indicates if the ring should be close when first and last points of the ring are the same.}
+ @argument[dfTolerance]{tolerance into which two arcs are considered close enough to be joined.}
+ @argument[peErr]{OGRERR_NONE on success, or OGRERR_FAILURE on failure.}
+
+ @return{an handle to the new geometry, a polygon.}"
+  (hLines OGR-Geometry-H)
+  (bBestEffort :int)
+  (bAutoClose :int)
+  (dfTolerance :double)
+  (peErr (:pointer ogr-err)))
+(export 'ogr-build-polygon-from-edges)
 
 ;; EOF
