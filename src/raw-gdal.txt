@@ -1,9 +1,7 @@
 -*- Mode: lisp -*-
 
-CPLErr GDALAddDerivedBandPixelFunc
-
-
- This adds a pixel function to the global list of available pixel
+(cffi:defcfun ("GDALAddDerivedBandPixelFunc" gdal-add-derived-band-pixel-func) cpl-err
+  "This adds a pixel function to the global list of available pixel
  functions for derived bands.
 
  Pixel functions must be registered in this way before a derived band
@@ -13,107 +11,123 @@ CPLErr GDALAddDerivedBandPixelFunc
  that it will apply, and if a pixel function matching the name is not
  found the IRasterIO() call will do nothing.
 
-Parameters:	pszFuncName 	Name used to access pixel function
-	pfnNewFunction 	Pixel function associated with name. An existing pixel function registered with the same name will be replaced with the new one.
+ @argument[pszFuncName]{Name used to access pixel function}
+ @argument[pfnNewFunction]{Pixel function associated with name. An
+ existing pixel function registered with the same name will be
+ replaced with the new one.}
 
-@return{CE_None, invalid (NULL) parameters are currently ignored.
-(	const char * 	pszFuncName,
-		GDALDerivedPixelFunc 	pfnNewFunction
-	)
-
-;; --------------------------------------------------------
-
-void GDALApplyGeoTransform
-
-
-Apply GeoTransform to x/y coordinate.
-
-Applies the following computation, converting a (pixel,line) coordinate into a georeferenced (geo_x,geo_y) location.
-
-*pdfGeoX = padfGeoTransform[0] + dfPixel * padfGeoTransform[1] + dfLine * padfGeoTransform[2]; *pdfGeoY = padfGeoTransform[3] + dfPixel * padfGeoTransform[4] + dfLine * padfGeoTransform[5];
-Parameters:	padfGeoTransform 	Six coefficient GeoTransform to apply.
-	dfPixel 	Input pixel position.
-	dfLine 	Input line position.
-	pdfGeoX 	output location where geo_x (easting/longitude) location is placed.
-	pdfGeoY 	output location where geo_y (northing/latitude) location is placed.
-
-(	double * 	padfGeoTransform,
-		double 	dfPixel,
-		double 	dfLine,
-		double * 	pdfGeoX,
-		double * 	pdfGeoY
-	)
+ @return{CE_None, invalid (NULL) parameters are currently ignored.}"
+  (pszFuncName :string)
+  (pfnNewFunctio GDALDerivedPixelFunc))
 
 ;; --------------------------------------------------------
 
-int GDALCheckVersion
+(cffi:defcfun ("GDALApplyGeoTransform" gdal-apply-geo-transform) :void
+  "Apply GeoTransform to x/y coordinate.
 
+ Applies the following computation, converting a (pixel,line)
+ coordinate into a georeferenced (geo_x,geo_y) location.
 
-Return TRUE if GDAL library version at runtime matches nVersionMajor.nVersionMinor.
+ *pdfGeoX = padfGeoTransform[0] + dfPixel * padfGeoTransform[1] + dfLine * padfGeoTransform[2];
+ *pdfGeoY = padfGeoTransform[3] + dfPixel * padfGeoTransform[4] + dfLine * padfGeoTransform[5];
 
-The purpose of this method is to ensure that calling code will run with the GDAL version it is compiled for. It is primarly intented for external plugins.
-Parameters:	nVersionMajor 	Major version to be tested against
-	nVersionMinor 	Minor version to be tested against
-	pszCallingComponentName 	If not NULL, in case of version mismatch, the method will issue a failure mentionning the name of the calling component.
-
-@return{TRUE if GDAL library version at runtime matches nVersionMajor.nVersionMinor, FALSE otherwise.
-GDALColorTableH GDALCloneColorTable 	(	GDALColorTableH 	hTable	 )
-
-
-Make a copy of a color table.
-
-This function is the same as the C++ method GDALColorTable::Clone()
-(	int 	nVersionMajor,
-		int 	nVersionMinor,
-		const char * 	pszCallingComponentName
-	)
+ @argument[padfGeoTransform]{Six coefficient GeoTransform to apply.}
+ @argument[dfPixel]{Input pixel position.}
+ @argument[dfLine]{Input line position.}
+ @argument[pdfGeoX]{output location where geo_x (easting/longitude) location is placed.}
+ @argument[pdfGeoY]{output location where geo_y (northing/latitude) location is placed.}"
+  (padfGeoTransform (:pointer :double))
+  (dfPixel :double)
+  (dfLine :double)
+  (pdfGeoX (:pointer :double))
+  (pdfGeoY (:pointer :double)))
 
 ;; --------------------------------------------------------
 
-void GDALCopyBits
+(cffi:defcfun ("GDALCheckVersion" gdal-check-version) :int
+  "Return TRUE if GDAL library version at runtime matches
+ nVersionMajor.nVersionMinor.
 
+ The purpose of this method is to ensure that calling code will run
+ with the GDAL version it is compiled for. It is primarly intented for
+ external plugins.
 
-Bitwise word copying.
+ @argument[nVersionMajor]{Major version to be tested against}
+ @argument[nVersionMinor]{Minor version to be tested against}
+ @argument[pszCallingComponentName]{If not NULL, in case of version
+ mismatch, the method will issue a failure mentionning the name of the
+ calling component.}
 
-A function for moving sets of partial bytes around. Loosely speaking this is a bitswise analog to GDALCopyWords().
-
-It copies nStepCount \"words\" where each word is nBitCount bits long. The nSrcStep and nDstStep are the number of bits from the start of one word to the next (same as nBitCount if they are packed). The nSrcOffset and nDstOffset are the offset into the source and destination buffers to start at, also measured in bits.
-
-All bit offsets are assumed to start from the high order bit in a byte (ie. most significant bit first). Currently this function is not very optimized, but it may be improved for some common cases in the future as needed.
-Parameters:	pabySrcData 	the source data buffer.
-	nSrcOffset 	the offset (in bits) in pabySrcData to the start of the first word to copy.
-	nSrcStep 	the offset in bits from the start one source word to the start of the next.
-	pabyDstData 	the destination data buffer.
-	nDstOffset 	the offset (in bits) in pabyDstData to the start of the first word to copy over.
-	nDstStep 	the offset in bits from the start one word to the start of the next.
-	nBitCount 	the number of bits in a word to be copied.
-	nStepCount 	the number of words to copy.
-(	const GByte * 	pabySrcData,
-		int 	nSrcOffset,
-		int 	nSrcStep,
-		GByte * 	pabyDstData,
-		int 	nDstOffset,
-		int 	nDstStep,
-		int 	nBitCount,
-		int 	nStepCount
-	)
+ @return{TRUE if GDAL library version at runtime matches
+ nVersionMajor.nVersionMinor, FALSE otherwise.}"
+  (nVersionMajor :int)
+  (nVersionMinor :int)
+  (pszCallingComponentNam :string))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALCopyDatasetFiles
+(cffi:defcfun ("GDALCloneColorTable" gdal-clone-color-table) GDALColorTableH
+  "Make a copy of a color table.
+
+This function is the same as the C++ method GDALColorTable::Clone()"
+  (hTable GDALColorTableH))
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("GDALCopyBits" gdal-copy-bits) :void
+  "Bitwise word copying.
+
+ A function for moving sets of partial bytes around. Loosely speaking
+ this is a bitswise analog to GDALCopyWords().
+
+ It copies nStepCount \"words\" where each word is nBitCount bits
+ long. The nSrcStep and nDstStep are the number of bits from the start
+ of one word to the next (same as nBitCount if they are packed). The
+ nSrcOffset and nDstOffset are the offset into the source and
+ destination buffers to start at, also measured in bits.
+
+ All bit offsets are assumed to start from the high order bit in a
+ byte (ie. most significant bit first). Currently this function is not
+ very optimized, but it may be improved for some common cases in the
+ future as needed.
+
+ @argument[pabySrcData]{the source data buffer.}
+ @argument[nSrcOffset]{the offset (in bits) in pabySrcData to the
+ start of the first word to copy.}
+ @argument[nSrcStep]{the offset in bits from the start one source word
+ to the start of the next.}
+ @argument[pabyDstData]{the destination data buffer.}
+ @argument[nDstOffset]{the offset (in bits) in pabyDstData to the
+ start of the first word to copy over.}
+ @argument[nDstStep]{the offset in bits from the start one word to the
+ start of the next.}
+ @argument[nBitCount]{the number of bits in a word to be copied.}
+ @argument[nStepCount]{the number of words to copy.}"
+  (pabySrcData (:pointer GByte))
+  (nSrcOffset int)
+  (nSrcStep int)
+  (pabyDstData (:pointer GByte))
+  (nDstOffset int)
+  (nDstStep int)
+  (nBitCount int)
+  (nStepCoun int))
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("GDALCopyDatasetFiles" GDALCopyDatasetFiles) CPLErr
 
 
 Copy the files of a dataset.
 See also:
 GDALDriver::CopyFiles()
-(	GDALDriverH 	hDriver,
-		const char * 	pszNewName,
-		const char * 	pszOldName
+(	(hDriver GDALDriverH)
+		(pszNewName :string)
+		(pszOldNam :string)
 	)
 
 ;; --------------------------------------------------------
 
-void GDALCopyWords
+(cffi:defcfun ("GDALCopyWords" GDALCopyWords) :void
 
 
 Copy pixel words from buffer to buffer.
@@ -135,13 +149,13 @@ Copy pixel words from buffer to buffer.
  occuring on word boundaries. It is assumed that all values are in
  native machine byte order.
 
-Parameters:	pSrcData 	Pointer to source data to be converted.
-	eSrcType 	the source data type (see GDALDataType enum)
-	nSrcPixelOffset 	Source pixel offset, in bytes
-	pDstData 	Pointer to buffer where destination data should go
-	eDstType 	the destination data type (see GDALDataType enum)
-	nDstPixelOffset 	Destination pixel offset, in bytes
-	nWordCount 	number of words to be copied
+ @argument[pSrcData]{Pointer to source data to be converted.}
+ @argument[eSrcType]{the source data type (see GDALDataType enum)}
+ @argument[nSrcPixelOffset]{Source pixel offset, in bytes}
+ @argument[pDstData]{Pointer to buffer where destination data should go}
+ @argument[eDstType]{the destination data type (see GDALDataType enum)}
+ @argument[nDstPixelOffset]{Destination pixel offset, in bytes}
+ @argument[nWordCount]{number of words to be copied}
 
  Note: When adding a new data type to GDAL, you must do the following
  to support it properly within the GDALCopyWords function: 1. Add the
@@ -154,77 +168,77 @@ Parameters:	pSrcData 	Pointer to source data to be converted.
  handled (cases like the float -> int32 case, where the min/max)
  values are subject to roundoff error.
 
-(	void * 	pSrcData,
-		GDALDataType 	eSrcType,
-		int 	nSrcPixelOffset,
-		void * 	pDstData,
-		GDALDataType 	eDstType,
-		int 	nDstPixelOffset,
-		int 	nWordCount
+(	void * pSrcData,
+		(eSrcType GDALDataType)
+		(nSrcPixelOffset int)
+		void * pDstData,
+		(eDstType GDALDataType)
+		(nDstPixelOffset int)
+		(nWordCoun int)
 	)
 
 ;; --------------------------------------------------------
 
-GDALDatasetH GDALCreate
+(cffi:defcfun ("GDALCreate" GDALCreate) GDALDatasetH
 
 
 Create a new dataset with this driver.
 See also:
 GDALDriver::Create()
-(	GDALDriverH 	hDriver,
-		const char * 	pszFilename,
-		int 	nXSize,
-		int 	nYSize,
-		int 	nBands,
-		GDALDataType 	eBandType,
-		char ** 	papszOptions
+(	(hDriver GDALDriverH)
+		(pszFilename :string)
+		(nXSize int)
+		(nYSize int)
+		(nBands int)
+		(eBandType GDALDataType)
+		char ** papszOptions
 	)
 
 ;; --------------------------------------------------------
 
-void GDALCreateColorRamp
+(cffi:defcfun ("GDALCreateColorRamp" GDALCreateColorRamp) :void
 
 
 Create color ramp.
 
 This function is the same as the C++ method GDALColorTable::CreateColorRamp()
-(	GDALColorTableH 	hTable,
-		int 	nStartIndex,
-		const GDALColorEntry * 	psStartColor,
-		int 	nEndIndex,
-		const GDALColorEntry * 	psEndColor
+(	(hTable GDALColorTableH)
+		(nStartIndex int)
+		const GDALColorEntry * psStartColor,
+		(nEndIndex int)
+		const GDALColorEntry * psEndColor
 	)
 
 ;; --------------------------------------------------------
 
-GDALColorTableH GDALCreateColorTable
+(cffi:defcfun ("GDALCreateColorTable" GDALCreateColorTable) GDALColorTableH
 
 
 Construct a new color table.
 
 This function is the same as the C++ method GDALColorTable::GDALColorTable()
-(	GDALPaletteInterp 	eInterp	 )
+(	(eInterp	  GDALPaletteInterp)
 
 ;; --------------------------------------------------------
 
-GDALDatasetH GDALCreateCopy 	
+(cffi:defcfun ("GDALCreateCopy" GDALCreateCopy) GDALDatasetH
 
 
 Create a copy of a dataset.
 See also:
 GDALDriver::CreateCopy()
-(	GDALDriverH 	hDriver,
-		const char * 	pszFilename,
-		GDALDatasetH 	hSrcDS,
-		int 	bStrict,
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
+(	(hDriver GDALDriverH)
+		(pszFilename :string)
+		(hSrcDS GDALDatasetH)
+		(bStrict int)
+		char ** papszOptions,
+		(pfnProgress GDALProgressFunc)
+		void * pProgressData
 	)
 
 ;; --------------------------------------------------------
 
-GDALRasterAttributeTableH GDALCreateRasterAttributeTable 	
+(cffi:defcfun ("GDALCreateRasterAttributeTable" GDALCreateRasterAttributeTable) GDALRasterAttributeTableH
 
 
 Construct empty table.
@@ -232,79 +246,83 @@ Construct empty table.
  This function is the same as the C++ method
  GDALDefaultRasterAttributeTable::GDALDefaultRasterAttributeTable()
 
-(	void 		 )
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-int GDALDataTypeIsComplex
+(cffi:defcfun ("GDALDataTypeIsComplex" GDALDataTypeIsComplex) int
 
 
 Is data type complex?
-@return{TRUE if the passed type is complex (one of GDT_CInt16, GDT_CInt32, GDT_CFloat32 or GDT_CFloat64), that is it consists of a real and imaginary component.
 
-(	GDALDataType 	eDataType	 )
+ @return{TRUE if the passed type is complex (one of GDT_CInt16,
+ GDT_CInt32, GDT_CFloat32 or GDT_CFloat64), that is it consists of a
+ real and imaginary component.}
+
+(	(eDataType	  GDALDataType)
 
 ;; --------------------------------------------------------
 
-GDALDataType GDALDataTypeUnion
+(cffi:defcfun ("GDALDataTypeUnion" GDALDataTypeUnion) GDALDataType
 
 
-Return the smallest data type that can fully express both input data types.
+ Return the smallest data type that can fully express both input data
+ types.
 
 
-Parameters:	eType1 	first data type.
-	eType2 	second data type.
+ @argument[eType1]{first data type.}
+ @argument[eType2]{second data type.}
 
-@return{a data type able to express eType1 and eType2.
+ @return{a data type able to express eType1 and eType2.}
 
-(	GDALDataType 	eType1,
-		GDALDataType 	eType2
+(	(eType1 GDALDataType)
+		(eType GDALDataType)
 	)
 ;; --------------------------------------------------------
 
-double GDALDecToPackedDMS
+(cffi:defcfun ("GDALDecToPackedDMS" GDALDecToPackedDMS) double
 
 
 Convert decimal degrees into packed DMS value (DDDMMMSSS.SS).
 
 See CPLDecToPackedDMS().
-(	double 	dfDec	 )
+(	(dfDec	  double)
 
 ;; --------------------------------------------------------
 
-CPLErr GDALDeleteDataset
+(cffi:defcfun ("GDALDeleteDataset" GDALDeleteDataset) CPLErr
 
 
 Delete named dataset.
 See also:
 GDALDriver::Delete()
-(	GDALDriverH 	hDriver,
-		const char * 	pszFilename
+(	(hDriver GDALDriverH)
+		(pszFilenam :string)
 	)
 
 ;; --------------------------------------------------------
 
-void GDALDeregisterDriver
+(cffi:defcfun ("GDALDeregisterDriver" GDALDeregisterDriver) :void
 
 
 Deregister the passed driver.
 See also:
 GDALDriverManager::GetDeregisterDriver()
-(	GDALDriverH 	hDriver	 )
+(	(hDriver	  GDALDriverH)
 
 ;; --------------------------------------------------------
 
-void GDALDestroyColorTable
+(cffi:defcfun ("GDALDestroyColorTable" GDALDestroyColorTable) :void
 
 
 Destroys a color table.
 
 This function is the same as the C++ method GDALColorTable::~GDALColorTable()
-(	GDALColorTableH 	hTable	 )
+(	(hTable	  GDALColorTableH)
 
 ;; --------------------------------------------------------
 
-void GDALDestroyDriver
+(cffi:defcfun ("GDALDestroyDriver" GDALDestroyDriver) :void
 
 
 Destroy a GDALDriver.
@@ -314,34 +332,38 @@ Destroy a GDALDriver.
  not be called on a driver that is registered with the
  GDALDriverManager.
 
-Parameters:	hDriver 	the driver to destroy.
-(	GDALDriverH 	hDriver	 )
+@argument[hDriver]{the driver to destroy.}
+(	(hDriver	  GDALDriverH)
 
 ;; --------------------------------------------------------
 
-void GDALDestroyDriverManager
+(cffi:defcfun ("GDALDestroyDriverManager" GDALDestroyDriverManager) :void
 
 
 Destroy the driver manager.
 
 Incidently unloads all managed drivers.
 
-NOTE: This function is not thread safe. It should not be called while other threads are actively using GDAL.
-(	void 		 )
+ NOTE: This function is not thread safe. It should not be called while
+ other threads are actively using GDAL.
+
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-void GDALDestroyRasterAttributeTable
+(cffi:defcfun ("GDALDestroyRasterAttributeTable" GDALDestroyRasterAttributeTable) :void
 
 
 Destroys a RAT.
 
-This function is the same as the C++ method GDALRasterAttributeTable::~GDALRasterAttributeTable()
-(	GDALRasterAttributeTableH 	hRAT	 )
+ This function is the same as the C++ method
+ GDALRasterAttributeTable::~GDALRasterAttributeTable()
+
+(	(hRAT	  GDALRasterAttributeTableH)
 
 ;; --------------------------------------------------------
 
-int GDALDumpOpenDatasets
+(cffi:defcfun ("GDALDumpOpenDatasets" GDALDumpOpenDatasets) int
 
 
 List open datasets.
@@ -352,196 +374,248 @@ List open datasets.
  counting issues. The information reported includes the dataset name,
  referenced count, shared status, driver name, size, and band count.
 
-(	FILE * 	fp	 )
+(	FILE * fp	 )
 
 ;; --------------------------------------------------------
 
-int GDALFlushCacheBlock
+(cffi:defcfun ("GDALFlushCacheBlock" GDALFlushCacheBlock) int
 
 
 Try to flush one cached raster block.
 
-This function will search the first unlocked raster block and will flush it to release the associated memory.
-@return{TRUE if one block was flushed, FALSE if there are no cached blocks or if they are currently locked.
-(	void 		 )
+ This function will search the first unlocked raster block and will
+ flush it to release the associated memory.
+
+ @return{TRUE if one block was flushed, FALSE if there are no cached
+ blocks or if they are currently locked.}
+
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-int GDALGCPsToGeoTransform
-
+(cffi:defcfun ("GDALGCPsToGeoTransform" GDALGCPsToGeoTransform) int
 
 Generate Geotransform from GCPs.
 
-Given a set of GCPs perform first order fit as a geotransform.
+ Given a set of GCPs perform first order fit as a geotransform.
 
-Due to imprecision in the calculations the fit algorithm will often return non-zero rotational coefficients even if given perfectly non-rotated inputs. A special case has been implemented for corner corner coordinates given in TL, TR, BR, BL order. So when using this to get a geotransform from 4 corner coordinates, pass them in this order.
-Parameters:	nGCPCount 	the number of GCPs being passed in.
-	pasGCPs 	the list of GCP structures.
-	padfGeoTransform 	the six double array in which the affine geotransformation will be returned.
-	bApproxOK 	If FALSE the function will fail if the geotransform is not essentially an exact fit (within 0.25 pixel) for all GCPs.
+ Due to imprecision in the calculations the fit algorithm will often
+ return non-zero rotational coefficients even if given perfectly
+ non-rotated inputs. A special case has been implemented for corner
+ corner coordinates given in TL, TR, BR, BL order. So when using this
+ to get a geotransform from 4 corner coordinates, pass them in this
+ order.
 
-@return{TRUE on success or FALSE if there aren't enough points to prepare a geotransform, the pointers are ill-determined or if bApproxOK is FALSE and the fit is poor.
-(	int 	nGCPCount,
-		const GDAL_GCP * 	pasGCPs,
-		double * 	padfGeoTransform,
-		int 	bApproxOK
+ @argument[nGCPCount]{the number of GCPs being passed in.}
+ @argument[pasGCPs]{the list of GCP structures.}
+ @argument[padfGeoTransform]{the six double array in which the affine
+ geotransformation will be returned.}
+ @argument[bApproxOK]{If FALSE the function will fail if the
+ geotransform is not essentially an exact fit (within 0.25 pixel) for
+ all GCPs.}
+
+ @return{TRUE on success or FALSE if there aren't enough points to
+ prepare a geotransform, the pointers are ill-determined or if
+ bApproxOK is FALSE and the fit is poor.}
+
+(	(nGCPCount int)
+		const GDAL_GCP * pasGCPs,
+		(:pointer :double) padfGeoTransform,
+		(bApproxO int)
 	)
 
 ;; --------------------------------------------------------
 
-int GDALGeneralCmdLineProcessor
+(cffi:defcfun ("GDALGeneralCmdLineProcessor" GDALGeneralCmdLineProcessor) int
 
 
 General utility option processing.
 
-This function is intended to provide a variety of generic commandline options for all GDAL commandline utilities. It takes care of the following commandline options:
+ This function is intended to provide a variety of generic commandline
+ options for all GDAL commandline utilities. It takes care of the
+ following commandline options:
 
 --version: report version of GDAL in use. --build: report build info about GDAL in use. --license: report GDAL license info. --formats: report all format drivers configured. --format [format]: report details of one format driver. --optfile filename: expand an option file into the argument list. --config key value: set system configuration option. --debug [on/off/value]: set debug level. --mempreload dir: preload directory contents into /vsimem --pause: Pause for user input (allows time to attach debugger) --locale [locale]: Install a locale using setlocale() (debugging) --help-general: report detailed help on general options.
 
-The argument array is replaced \"in place\" and should be freed with CSLDestroy() when no longer needed. The typical usage looks something like the following. Note that the formats should be registered so that the --formats and --format options will work properly.
+ The argument array is replaced \"in place\" and should be freed with
+ CSLDestroy() when no longer needed. The typical usage looks something
+ like the following. Note that the formats should be registered so
+ that the --formats and --format options will work properly.
 
 int main( int argc, char ** argv ) { GDALAllRegister();
 
 argc = GDALGeneralCmdLineProcessor( argc, &argv, 0 ); if( argc < 1 ) exit( -argc );
-Parameters:	nArgc 	number of values in the argument list.
-	ppapszArgv 	pointer to the argument list array (will be updated in place).
-	nOptions 	unused for now.
 
-@return{updated nArgc argument count. Return of 0 requests terminate without error, return of -1 requests exit with error code.
-(	int 	nArgc,
-		char *** 	ppapszArgv,
-		int 	nOptions
+ @argument[nArgc]{number of values in the argument list.}
+ @argument[ppapszArgv]{pointer to the argument list array (will be updated in place).}
+ @argument[nOptions]{unused for now.}
+
+ @return{updated nArgc argument count. Return of 0 requests terminate
+ without error, return of -1 requests exit with error code.}
+
+(	(nArgc int)
+		char *** ppapszArgv,
+		(nOption int)
 	)
 
 ;; --------------------------------------------------------
 
-GDALAsyncStatusType GDALGetAsyncStatusTypeByName
+(cffi:defcfun ("GDALGetAsyncStatusTypeByName" GDALGetAsyncStatusTypeByName) GDALAsyncStatusType
 
 
 Get AsyncStatusType by symbolic name.
 
-Returns a data type corresponding to the given symbolic name. This function is opposite to the GDALGetAsyncStatusTypeName().
-Parameters:	pszName 	string containing the symbolic name of the type.
+ Returns a data type corresponding to the given symbolic name. This
+ function is opposite to the GDALGetAsyncStatusTypeName().
+
+@argument[pszName]{string containing the symbolic name of the type.}
 
 @return{GDAL AsyncStatus type.
-(	const char * 	pszName	 )
+(	(pszName	  :string)
 
 ;; --------------------------------------------------------
 
-const char* GDALGetAsyncStatusTypeName
+(cffi:defcfun ("GDALGetAsyncStatusTypeName" GDALGetAsyncStatusTypeName) :string
 
 
 Get name of AsyncStatus data type.
 
-Returns a symbolic name for the AsyncStatus data type. This is essentially the the enumerated item name with the GARIO_ prefix removed. So GARIO_COMPLETE returns \"COMPLETE\". The returned strings are static strings and should not be modified or freed by the application. These strings are useful for reporting datatypes in debug statements, errors and other user output.
-Parameters:	eAsyncStatusType 	type to get name of.
+ Returns a symbolic name for the AsyncStatus data type. This is
+ essentially the the enumerated item name with the GARIO_ prefix
+ removed. So GARIO_COMPLETE returns \"COMPLETE\". The returned strings
+ are static strings and should not be modified or freed by the
+ application. These strings are useful for reporting datatypes in
+ debug statements, errors and other user output.
+
+@argument[eAsyncStatusType]{type to get name of.}
 
 @return{string corresponding to type.
-(	GDALAsyncStatusType 	eAsyncStatusType	 )
+(	(eAsyncStatusType	  GDALAsyncStatusType)
 
 ;; --------------------------------------------------------
 
-int GDALGetCacheMax
+(cffi:defcfun ("GDALGetCacheMax" GDALGetCacheMax) int
 
 
 Get maximum cache memory.
 
-Gets the maximum amount of memory available to the GDALRasterBlock caching system for caching GDAL read/write imagery.
+ Gets the maximum amount of memory available to the GDALRasterBlock
+ caching system for caching GDAL read/write imagery.
 
-The first type this function is called, it will read the GDAL_CACHEMAX configuation option to initialize the maximum cache memory.
+ The first type this function is called, it will read the
+ GDAL_CACHEMAX configuation option to initialize the maximum cache
+ memory.
 
-This function cannot return a value higher than 2 GB. Use GDALGetCacheMax64() to get a non-truncated value.
-@return{maximum in bytes.
-(	void 		 )
+ This function cannot return a value higher than 2 GB. Use
+ GDALGetCacheMax64() to get a non-truncated value.
+
+ @return{maximum in bytes.}
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-GIntBig GDALGetCacheMax64
+(cffi:defcfun ("GDALGetCacheMax64" GDALGetCacheMax64) GIntBig
 
 
 Get maximum cache memory.
 
-Gets the maximum amount of memory available to the GDALRasterBlock caching system for caching GDAL read/write imagery.
+ Gets the maximum amount of memory available to the GDALRasterBlock
+ caching system for caching GDAL read/write imagery.
 
-The first type this function is called, it will read the GDAL_CACHEMAX configuation option to initialize the maximum cache memory.
-@return{maximum in bytes.
+ The first type this function is called, it will read the
+ GDAL_CACHEMAX configuation option to initialize the maximum cache
+ memory.
+
+@return{maximum in bytes.}
+
 Since:
 GDAL 1.8.0
-(	void 		 )
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-int GDALGetCacheUsed
+(cffi:defcfun ("GDALGetCacheUsed" GDALGetCacheUsed) int
 
 
 Get cache memory used.
-@return{the number of bytes of memory currently in use by the GDALRasterBlock memory caching.
-(	void 		 )
+
+ @return{the number of bytes of memory currently in use by the
+ GDALRasterBlock memory caching.}
+
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-GIntBig GDALGetCacheUsed64
+(cffi:defcfun ("GDALGetCacheUsed64" GDALGetCacheUsed64) GIntBig
 
 
 Get cache memory used.
-@return{the number of bytes of memory currently in use by the GDALRasterBlock memory caching.
+
+ @return{the number of bytes of memory currently in use by the
+ GDALRasterBlock memory caching.}
+
 Since:
 GDAL 1.8.0
-(	void 		 )
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-const GDALColorEntry* GDALGetColorEntry
+(cffi:defcfun ("GDALGetColorEntry" GDALGetColorEntry) const GDALColorEntry*
 
 
 Fetch a color entry from table.
 
 This function is the same as the C++ method GDALColorTable::GetColorEntry()
-(	GDALColorTableH 	hTable,
-		int 	i
+
+(	(hTable GDALColorTableH)
+		(i int)
 	)
 
 ;; --------------------------------------------------------
 
-int GDALGetColorEntryAsRGB
+(cffi:defcfun ("GDALGetColorEntryAsRGB" GDALGetColorEntryAsRGB) int
 
 
 Fetch a table entry in RGB format.
 
 This function is the same as the C++ method GDALColorTable::GetColorEntryAsRGB()
-(	GDALColorTableH 	hTable,
-		int 	i,
-		GDALColorEntry * 	poEntry
+(	(hTable GDALColorTableH)
+		(i int)
+		GDALColorEntry * poEntry
 	)
 
 ;; --------------------------------------------------------
 
-int GDALGetColorEntryCount
+(cffi:defcfun ("GDALGetColorEntryCount" GDALGetColorEntryCount) int
 
 
 Get number of color entries in table.
 
 This function is the same as the C++ method GDALColorTable::GetColorEntryCount()
-(	GDALColorTableH 	hTable	 )
+(	(hTable	  GDALColorTableH)
 
 ;; --------------------------------------------------------
 
-GDALColorInterp GDALGetColorInterpretationByName
+(cffi:defcfun ("GDALGetColorInterpretationByName" GDALGetColorInterpretationByName) GDALColorInterp
 
 
 Get color interpreation by symbolic name.
 
-Returns a color interpreation corresponding to the given symbolic name. This function is opposite to the GDALGetColorInterpretationName().
-Parameters:	pszName 	string containing the symbolic name of the color interpretation.
+ Returns a color interpreation corresponding to the given symbolic
+ name. This function is opposite to the
+ GDALGetColorInterpretationName().
 
-@return{GDAL color interpretation.
+@argument[pszName]{string containing the symbolic name of the color interpretation.}
+
+ @return{GDAL color interpretation.}
+
 Since:
 GDAL 1.7.0
-(	const char * 	pszName	 )
+(	(pszName	  :string)
 
 ;; --------------------------------------------------------
 
-const char* GDALGetColorInterpretationName
+(cffi:defcfun ("GDALGetColorInterpretationName" GDALGetColorInterpretationName) :string
 
 
 Get name of color interpretation.
@@ -552,27 +626,32 @@ Get name of color interpretation.
  returns \"Red\". The returned strings are static strings and should not
  be modified or freed by the application.
 
-Parameters:	eInterp 	color interpretation to get name of.
+@argument[eInterp]{color interpretation to get name of.}
 
-@return{string corresponding to color interpretation or NULL pointer if invalid enumerator given.
-(	GDALColorInterp 	eInterp	 )
+ @return{string corresponding to color interpretation or NULL pointer
+ if invalid enumerator given.}
+
+(	(eInterp	  GDALColorInterp)
 
 ;; --------------------------------------------------------
 
-GDALDataType GDALGetDataTypeByName
+(cffi:defcfun ("GDALGetDataTypeByName" GDALGetDataTypeByName) GDALDataType
 
 
 Get data type by symbolic name.
 
-Returns a data type corresponding to the given symbolic name. This function is opposite to the GDALGetDataTypeName().
-Parameters:	pszName 	string containing the symbolic name of the type.
+ Returns a data type corresponding to the given symbolic name. This
+ function is opposite to the GDALGetDataTypeName().
 
-@return{GDAL data type.
-(	const char * 	pszName	 )
+ @argument[pszName]{string containing the symbolic name of the type.}
+
+@return{GDAL data type.}
+
+(	(pszName :string)
 
 ;; --------------------------------------------------------
 
-const char* GDALGetDataTypeName
+(cffi:defcfun ("GDALGetDataTypeName" GDALGetDataTypeName) :string
 
 
 Get name of data type.
@@ -584,158 +663,165 @@ Get name of data type.
  for reporting datatypes in debug statements, errors and other user
  output.
 
-Parameters:	eDataType 	type to get name of.
+ @argument[eDataType]{type to get name of.}
 
-@return{string corresponding to existing data type or NULL pointer if invalid type given.
-(	GDALDataType 	eDataType	 )
+ @return{string corresponding to existing data type or NULL pointer if
+ invalid type given.}
+
+(	(eDataType	  GDALDataType)
 
 ;; --------------------------------------------------------
 
-int GDALGetDataTypeSize
+(cffi:defcfun ("GDALGetDataTypeSize" GDALGetDataTypeSize) int
 
 
 Get data type size in bits.
 
 Returns the size of a a GDT_* type in bits, not bytes!
-Parameters:	eDataType 	type, such as GDT_Byte.
 
-@return{the number of bits or zero if it is not recognised.
-(	GDALDataType 	eDataType	 )
+ @argument[eDataType]{type, such as GDT_Byte.}
+
+ @return{the number of bits or zero if it is not recognised.}
+
+(	(eDataType	  GDALDataType)
 
 ;; --------------------------------------------------------
 
-const char* GDALGetDescription
+(cffi:defcfun ("GDALGetDescription" GDALGetDescription) :string
 
 
 Fetch object description.
 See also:
 GDALMajorObject::GetDescription()
-(	GDALMajorObjectH 	hObject	 )
+(	(hObject GDALMajorObjectH)
 
 ;; --------------------------------------------------------
 
-GDALDriverH GDALGetDriver
+(cffi:defcfun ("GDALGetDriver" GDALGetDriver) GDALDriverH
 
 
-Fetch driver by index.
+"Fetch driver by index.
 See also:
-GDALDriverManager::GetDriver()
-(	int 	iDriver	 )
+GDALDriverManager::GetDriver()"
+	(iDrive int))
 
 ;; --------------------------------------------------------
 
-GDALDriverH GDALGetDriverByName
+(cffi:defcfun ("GDALGetDriverByName" GDALGetDriverByName) GDALDriverH
 
 
 Fetch a driver based on the short name.
 See also:
 GDALDriverManager::GetDriverByName()
-(	const char * 	pszName	 )
+	(pszNam :string))
 
 ;; --------------------------------------------------------
 
-int GDALGetDriverCount
+(cffi:defcfun ("GDALGetDriverCount" GDALGetDriverCount) int
 
 
 Fetch the number of registered drivers.
 See also:
 GDALDriverManager::GetDriverCount()
-(	void 		 )
+(	void 	 )
 
 ;; --------------------------------------------------------
 
-const char* GDALGetDriverCreationOptionList
+(cffi:defcfun ("GDALGetDriverCreationOptionList" GDALGetDriverCreationOptionList) :string
 
 
 Return the list of creation options of the driver.
 
-Return the list of creation options of the driver used by Create() and CreateCopy() as an XML string
-Parameters:	hDriver 	the handle of the driver
+ Return the list of creation options of the driver used by Create()
+ and CreateCopy() as an XML string
 
-@return{an XML string that describes the list of creation options or empty string. The returned string should not be freed and is owned by the driver.
-(	GDALDriverH 	hDriver	 )
+ @argument[hDriver]{the handle of the driver}
+
+ @return{an XML string that describes the list of creation options or
+ empty string. The returned string should not be freed and is owned by
+ the driver.}
+
+	(hDrive GDALDriverH))
 
 ;; --------------------------------------------------------
 
-const char* GDALGetDriverHelpTopic
+(cffi:defcfun ("GDALGetDriverHelpTopic" GDALGetDriverHelpTopic) :string
 
 
-Return the URL to the help that describes the driver.
+"Return the URL to the help that describes the driver.
 
 That URL is relative to the GDAL documentation directory.
 
-For the GeoTIFF driver, this is \"frmt_gtiff.html\"
-Parameters:	hDriver 	the handle of the driver
+ For the GeoTIFF driver, this is \"frmt_gtiff.html\"
 
-@return{the URL to the help that describes the driver or NULL. The returned string should not be freed and is owned by the driver.
-(	GDALDriverH 	hDriver	 )
+ @argument[hDriver]{the handle of the driver}
+
+ @return{the URL to the help that describes the driver or NULL. The
+ returned string should not be freed and is owned by the driver.}"
+
+	(hDrive GDALDriverH))
 
 ;; --------------------------------------------------------
 
-const char* GDALGetDriverLongName
+(cffi:defcfun ("GDALGetDriverLongName" GDALGetDriverLongName) :string
 
 
 Return the long name of a driver.
 
-For the GeoTIFF driver, this is \"GeoTIFF\"
-Parameters:	hDriver 	the handle of the driver
+ For the GeoTIFF driver, this is \"GeoTIFF\"
 
-@return{the long name of the driver or empty string. The returned string should not be freed and is owned by the driver.
-(	GDALDriverH 	hDriver	 )
+ @argument[hDriver]{the handle of the driver}
+
+ @return{the long name of the driver or empty string. The returned
+ string should not be freed and is owned by the driver.}
+
+	(hDriver GDALDriverH))
 
 ;; --------------------------------------------------------
 
-const char* GDALGetDriverShortName
+(cffi:defcfun ("GDALGetDriverShortName" GDALGetDriverShortName) :string
 
 
 Return the short name of a driver.
 
 This is the string that can be passed to the GDALGetDriverByName() function.
 
-For the GeoTIFF driver, this is \"GTiff\"
-Parameters:	hDriver 	the handle of the driver
+ For the GeoTIFF driver, this is \"GTiff\"
 
-@return{the short name of the driver. The returned string should not be freed and is owned by the driver.
-(	GDALDriverH 	hDriver	 )
+ @argument[hDriver]{the handle of the driver}
 
-;; --------------------------------------------------------
+ @return{the short name of the driver. The returned string should not
+ be freed and is owned by the driver.}
 
-char** GDALGetMetadata
-
-
-Fetch metadata.
-See also:
-GDALMajorObject::GetMetadata()
-(	GDALMajorObjectH 	hObject,
-		const char * 	pszDomain
-	)
+	(hDrive GDALDriverH))
 
 ;; --------------------------------------------------------
 
-const char* GDALGetMetadataItem
-
-
-Fetch single metadata item.
-See also:
-GDALMajorObject::GetMetadataItem()
-(	GDALMajorObjectH 	hObject,
-		const char * 	pszName,
-		const char * 	pszDomain
-	)
+(cffi:defcfun ("GDALGetMetadata" GDALGetMetadata) (:pointer :string)
+  "Fetch metadata."
+  (hObject GDALMajorObjectH)
+  (pszDomai :string))
 
 ;; --------------------------------------------------------
 
-GDALPaletteInterp GDALGetPaletteInterpretation
-
-
-Fetch palette interpretation.
-
-This function is the same as the C++ method GDALColorTable::GetPaletteInterpretation()
-(	GDALColorTableH 	hTable	 )
+(cffi:defcfun ("GDALGetMetadataItem" GDALGetMetadataItem) :string
+  "Fetch single metadata item."
+  (hObject GDALMajorObjectH)
+  (pszName :string)
+  (pszDomai :string))
 
 ;; --------------------------------------------------------
 
-const char* GDALGetPaletteInterpretationName
+(cffi:defcfun ("GDALGetPaletteInterpretation" GDALGetPaletteInterpretation) GDALPaletteInterp
+"Fetch palette interpretation.
+
+ This function is the same as the C++ method
+ GDALColorTable::GetPaletteInterpretation()"
+	(hTabl GDALColorTableH))
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("GDALGetPaletteInterpretationName" GDALGetPaletteInterpretationName) :string
 
 
 Get name of palette interpretation.
@@ -745,19 +831,23 @@ Get name of palette interpretation.
  returns \"Gray\". The returned strings are static strings and should
  not be modified or freed by the application.
 
-Parameters:	eInterp 	palette interpretation to get name of.
+ @argument[eInterp]{palette interpretation to get name of.}
 
-@return{string corresponding to palette interpretation.
-(	GDALPaletteInterp 	eInterp	 )
+ @return{string corresponding to palette interpretation.}
+	(eInter GDALPaletteInterp))
 
 ;; --------------------------------------------------------
 
-GDALDriverH GDALIdentifyDriver
+(cffi:defcfun ("GDALIdentifyDriver" GDALIdentifyDriver) GDALDriverH
 
 
 Identify the driver that can open a raster file.
 
-This function will try to identify the driver that can open the passed file name by invoking the Identify method of each registered GDALDriver in turn. The first driver that successful identifies the file name will be returned. If all drivers fail then NULL is returned.
+ This function will try to identify the driver that can open the
+ passed file name by invoking the Identify method of each registered
+ GDALDriver in turn. The first driver that successful identifies the
+ file name will be returned. If all drivers fail then NULL is
+ returned.
 
  In order to reduce the need for such searches touch the operating
  system file system machinery, it is possible to give an optional list
@@ -767,413 +857,389 @@ This function will try to identify the driver that can open the passed file name
  output of CPLReadDir() on the parent directory. If the target object
  does not have filesystem semantics then the file list should be NULL.
 
-Parameters:	pszFilename 	the name of the file to access. In the case of exotic drivers this may not refer to a physical file, but instead contain information for the driver on how to access a dataset.
-	papszFileList 	an array of strings, whose last element is the NULL pointer. These strings are filenames that are auxiliary to the main filename. The passed value may be NULL.
+ @argument[pszFilename]{the name of the file to access. In the case of
+ exotic drivers this may not refer to a physical file, but instead
+ contain information for the driver on how to access a dataset.}
+ @argument[papszFileList]{an array of strings, whose last element is
+ the NULL pointer. These strings are filenames that are auxiliary to
+ the main filename. The passed value may be NULL.}
 
-@return{A GDALDriverH handle or NULL on failure. For C++ applications this handle can be cast to a GDALDriver *.
-(	const char * 	pszFilename,
-		char ** 	papszFileList
+ @return{A GDALDriverH handle or NULL on failure. For C++ applications
+ this handle can be cast to a GDALDriver *.}
+
+	(pszFilename :string)
+		char ** papszFileList
 	)
 
 ;; --------------------------------------------------------
 
-int GDALInvGeoTransform
+(cffi:defcfun ("GDALInvGeoTransform" GDALInvGeoTransform) int
 
 
 Invert Geotransform.
 
-This function will invert a standard 3x2 set of GeoTransform coefficients. This converts the equation from being pixel to geo to being geo to pixel.
-Parameters:	gt_in 	Input geotransform (six doubles - unaltered).
-	gt_out 	Output geotransform (six doubles - updated).
+ This function will invert a standard 3x2 set of GeoTransform
+ coefficients. This converts the equation from being pixel to geo to
+ being geo to pixel.
 
-@return{TRUE on success or FALSE if the equation is uninvertable.
-(	double * 	gt_in,
-		double * 	gt_out
+ @argument[gt_in][Input geotransform (six doubles - unaltered).}
+ @argument[gt_out]{Output geotransform (six doubles - updated).}
+
+ @return{TRUE on success or FALSE if the equation is uninvertable.}
+
+(	(:pointer :double) gt_in,
+		(:pointer :double) gt_out
 	)
 
 ;; --------------------------------------------------------
 
-int GDALLoadWorldFile
+(cffi:defcfun ("GDALLoadWorldFile" GDALLoadWorldFile) int
 
 
 Read ESRI world file.
 
-This function reads an ESRI style world file, and formats a geotransform from its contents.
+ This function reads an ESRI style world file, and formats a
+ geotransform from its contents.
 
-The world file contains an affine transformation with the parameters in a different order than in a geotransform array.
+ The world file contains an affine transformation with the parameters
+ in a different order than in a geotransform array.
+
  geotransform[1] : width of pixel
  geotransform[4] : rotational coefficient, zero for north up images.
  geotransform[2] : rotational coefficient, zero for north up images.
  geotransform[5] : height of pixel (but negative)
  geotransform[0] + 0.5 * geotransform[1] + 0.5 * geotransform[2] : x offset to center of top left pixel.
  geotransform[3] + 0.5 * geotransform[4] + 0.5 * geotransform[5] : y offset to center of top left pixel.
-Parameters:	pszFilename 	the world file name.
-	padfGeoTransform 	the six double array into which the geotransformation should be placed.
 
-@return{TRUE on success or FALSE on failure.
-(	const char * 	pszFilename,
-		double * 	padfGeoTransform
+ @argument[pszFilename]{the world file name.}
+ @argument[padfGeoTransform]{the six double array into which the
+ geotransformation should be placed.}
+
+@return{TRUE on success or FALSE on failure.}
+
+	(pszFilename :string)
+		(:pointer :double) padfGeoTransform
 	)
 
 ;; --------------------------------------------------------
 
-double GDALPackedDMSToDec
+(cffi:defcfun ("GDALPackedDMSToDec" GDALPackedDMSToDec) double
 
 
 Convert a packed DMS value (DDDMMMSSS.SS) into decimal degrees.
 
 See CPLPackedDMSToDec().
-(	double 	dfPacked	 )
+	(dfPacke double))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRasterBandCopyWholeRaster
+(cffi:defcfun ("GDALRasterBandCopyWholeRaster" GDALRasterBandCopyWholeRaster) CPLErr
 
 
 Copy all raster band raster data.
 
-This function copies the complete raster contents of one band to another similarly configured band. The source and destination bands must have the same width and height. The bands do not have to have the same data type.
+ This function copies the complete raster contents of one band to
+ another similarly configured band. The source and destination bands
+ must have the same width and height. The bands do not have to have
+ the same data type.
 
-It implements efficient copying, in particular \"chunking\" the copy in substantial blocks.
+ It implements efficient copying, in particular \"chunking\" the copy
+ in substantial blocks.
 
-Currently the only papszOptions value supported is : \"COMPRESSED=YES\" to force alignment on target dataset block sizes to achieve best compression. More options may be supported in the future.
-Parameters:	hSrcBand 	the source band
-	hDstBand 	the destination band
-	papszOptions 	transfer hints in \"StringList\" Name=Value format.
-	pfnProgress 	progress reporting function.
-	pProgressData 	callback data for progress function.
+ Currently the only papszOptions value supported is :
+ \"COMPRESSED=YES\" to force alignment on target dataset block sizes
+ to achieve best compression. More options may be supported in the
+ future.
 
-@return{CE_None on success, or CE_Failure on failure.
-(	GDALRasterBandH 	hSrcBand,
-		GDALRasterBandH 	hDstBand,
-		char ** 	papszOptions,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
+ @argument[hSrcBand]{the source band}
+ @argument[hDstBand]{the destination band}
+ @argument[papszOptions]{transfer hints in \"StringList\" Name=Value format.}
+ @argument[pfnProgress]{progress reporting function.}
+ @argument[pProgressData]{callback data for progress function.}
+
+ @return{CE_None on success, or CE_Failure on failure.}
+(	(hSrcBand GDALRasterBandH)
+		(hDstBand GDALRasterBandH)
+		char ** papszOptions,
+		(pfnProgress GDALProgressFunc)
+		void * pProgressData
 	)
 
 ;; --------------------------------------------------------
 
-int GDALRATChangesAreWrittenToFile
+(cffi:defcfun ("GDALRATChangesAreWrittenToFile" GDALRATChangesAreWrittenToFile) int
 
 
-Determine whether changes made to this RAT are reflected directly in the dataset.
+ Determine whether changes made to this RAT are reflected directly in
+ the dataset.
 
-This function is the same as the C++ method GDALRasterAttributeTable::ChangesAreWrittenToFile()
-(	GDALRasterAttributeTableH 	hRAT	 )
+ This function is the same as the C++ method
+ GDALRasterAttributeTable::ChangesAreWrittenToFile()
+
+	(hRAT GDALRasterAttributeTableH))
 
 ;; --------------------------------------------------------
 
-GDALRasterAttributeTableH GDALRATClone
+(cffi:defcfun ("GDALRATClone" GDALRATClone) GDALRasterAttributeTableH
 
 
 Copy Raster Attribute Table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::Clone()
-(	GDALRasterAttributeTableH 	hRAT	 )
+	(hRAT GDALRasterAttributeTableH))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRATCreateColumn
+(cffi:defcfun ("GDALRATCreateColumn" GDALRATCreateColumn) CPLErr
 
 
 Create new column.
 
 This function is the same as the C++ method GDALRasterAttributeTable::CreateColumn()
-(	GDALRasterAttributeTableH 	hRAT,
-		const char * 	pszFieldName,
-		GDALRATFieldType 	eFieldType,
-		GDALRATFieldUsage 	eFieldUsage
-	)
+	(hRAT GDALRasterAttributeTableH)
+		(pszFieldName :string)
+		(eFieldType GDALRATFieldType)
+		(eFieldUsage GDALRATFieldUsage))
 
 ;; --------------------------------------------------------
 
-void GDALRATDumpReadable
+(cffi:defcfun ("GDALRATDumpReadable" GDALRATDumpReadable) :void
 
 
 Dump RAT in readable form.
 
 This function is the same as the C++ method GDALRasterAttributeTable::DumpReadable()
-(	GDALRasterAttributeTableH 	hRAT,
-		FILE * 	fp
+(	(hRAT GDALRasterAttributeTableH)
+		FILE * fp
 	)
 
 ;; --------------------------------------------------------
 
-int GDALRATGetColOfUsage
+(cffi:defcfun ("GDALRATGetColOfUsage" GDALRATGetColOfUsage) int
+  "Fetch column index for given usage.
 
-
-Fetch column index for given usage.
-
-This function is the same as the C++ method GDALRasterAttributeTable::GetColOfUsage()
-(	GDALRasterAttributeTableH 	hRAT,
-		GDALRATFieldUsage 	eUsage
-	)
+ This function is the same as the C++ method
+ GDALRasterAttributeTable::GetColOfUsage()"
+  (hRAT GDALRasterAttributeTableH)
+  (eUsage GDALRATFieldUsage))
 
 ;; --------------------------------------------------------
 
-int GDALRATGetColumnCount
+(cffi:defcfun ("GDALRATGetColumnCount" GDALRATGetColumnCount) int
 
 
 Fetch table column count.
 
-This function is the same as the C++ method GDALRasterAttributeTable::GetColumnCount()
-(	GDALRasterAttributeTableH 	hRAT	 )
+ This function is the same as the C++ method
+ GDALRasterAttributeTable::GetColumnCount()
+
+	(hRAT	  GDALRasterAttributeTableH))
 
 ;; --------------------------------------------------------
 
-int GDALRATGetLinearBinning
+(cffi:defcfun ("GDALRATGetLinearBinning" GDALRATGetLinearBinning) int
 
 
 Get linear binning information.
 
 This function is the same as the C++ method GDALRasterAttributeTable::GetLinearBinning()
-(	GDALRasterAttributeTableH 	hRAT,
-		double * 	pdfRow0Min,
-		double * 	pdfBinSize
+
+(hRAT GDALRasterAttributeTableH)
+		(:pointer :double) pdfRow0Min,
+		(:pointer :double) pdfBinSize
 	)
 
 ;; --------------------------------------------------------
 
-const char* GDALRATGetNameOfCol
+(cffi:defcfun ("GDALRATGetNameOfCol" GDALRATGetNameOfCol) :string
+  "Fetch name of indicated column.
 
-
-Fetch name of indicated column.
-
-This function is the same as the C++ method GDALRasterAttributeTable::GetNameOfCol()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iCol
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::GetNameOfCol()"
+  (hRAT GDALRasterAttributeTableH)
+  (iCol int))
 
 ;; --------------------------------------------------------
 
-int GDALRATGetRowCount
-
-
+(cffi:defcfun ("GDALRATGetRowCount" GDALRATGetRowCount) int
 Fetch row count.
 
 This function is the same as the C++ method GDALRasterAttributeTable::GetRowCount()
-(	GDALRasterAttributeTableH 	hRAT	 )
+	(hRAT	  GDALRasterAttributeTableH))
 
 ;; --------------------------------------------------------
 
-int GDALRATGetRowOfValue
-
-
+(cffi:defcfun ("GDALRATGetRowOfValue" GDALRATGetRowOfValue) int
 Get row for pixel value.
 
 This function is the same as the C++ method GDALRasterAttributeTable::GetRowOfValue()
-(	GDALRasterAttributeTableH 	hRAT,
-		double 	dfValue
-	)
+	(hRAT GDALRasterAttributeTableH)
+		(dfValue double))
 
 ;; --------------------------------------------------------
 
-GDALRATFieldType GDALRATGetTypeOfCol
-
-
+(cffi:defcfun ("GDALRATGetTypeOfCol" GDALRATGetTypeOfCol) GDALRATFieldType
 Fetch column type.
 
 This function is the same as the C++ method GDALRasterAttributeTable::GetTypeOfCol()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iCol
-	)
+
+	(hRAT GDALRasterAttributeTableH)
+		(iCol int))
 
 ;; --------------------------------------------------------
 
-GDALRATFieldUsage GDALRATGetUsageOfCol
-
+(cffi:defcfun ("GDALRATGetUsageOfCol" GDALRATGetUsageOfCol) GDALRATFieldUsage
 
 Fetch column usage value.
 
 This function is the same as the C++ method GDALRasterAttributeTable::GetUsageOfColetNameOfCol()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iCol
-	)
+
+	(hRAT GDALRasterAttributeTableH)
+		(iCol int))
 
 ;; --------------------------------------------------------
 
-double GDALRATGetValueAsDouble
+(cffi:defcfun ("GDALRATGetValueAsDouble" GDALRATGetValueAsDouble) double
+  "Fetch field value as a double.
 
-
-Fetch field value as a double.
-
-This function is the same as the C++ method GDALRasterAttributeTable::GetValueAsDouble()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iRow,
-		int 	iField
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::GetValueAsDouble()"
+  (hRAT GDALRasterAttributeTableH)
+  (iRow int)
+  (iField int))
 
 ;; --------------------------------------------------------
 
-int GDALRATGetValueAsInt
+(cffi:defcfun ("GDALRATGetValueAsInt" GDALRATGetValueAsInt) int
+  "Fetch field value as a integer.
 
-
-Fetch field value as a integer.
-
-This function is the same as the C++ method GDALRasterAttributeTable::GetValueAsInt()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iRow,
-		int 	iField
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::GetValueAsInt()"
+  (hRAT GDALRasterAttributeTableH)
+  (iRow int)
+  (iField int))
 
 ;; --------------------------------------------------------
 
-const char* GDALRATGetValueAsString
+(cffi:defcfun ("GDALRATGetValueAsString" GDALRATGetValueAsString) :string
+  "Fetch field value as a string.
 
-
-Fetch field value as a string.
-
-This function is the same as the C++ method GDALRasterAttributeTable::GetValueAsString()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iRow,
-		int 	iField
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::GetValueAsString()"
+  (hRAT GDALRasterAttributeTableH)
+  (iRow int)
+  (iField int))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRATInitializeFromColorTable
+(cffi:defcfun ("GDALRATInitializeFromColorTable" GDALRATInitializeFromColorTable) CPLErr
+  "Initialize from color table.
 
-
-Initialize from color table.
-
-This function is the same as the C++ method GDALRasterAttributeTable::InitializeFromColorTable()
-(	GDALRasterAttributeTableH 	hRAT,
-		GDALColorTableH 	hCT
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::InitializeFromColorTable()"
+  (hRAT GDALRasterAttributeTableH)
+  (hCT GDALColorTableH))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRATSetLinearBinning
+(cffi:defcfun ("GDALRATSetLinearBinning" GDALRATSetLinearBinning) CPLErr
+  "Set linear binning information.
 
-
-Set linear binning information.
-
-This function is the same as the C++ method GDALRasterAttributeTable::SetLinearBinning()
-(	GDALRasterAttributeTableH 	hRAT,
-		double 	dfRow0Min,
-		double 	dfBinSize
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::SetLinearBinning()"
+  (hRAT GDALRasterAttributeTableH)
+  (dfRow0Min double)
+  (dfBinSize double))
 
 ;; --------------------------------------------------------
 
-void GDALRATSetRowCount
+(cffi:defcfun ("GDALRATSetRowCount" GDALRATSetRowCount) :void
+  "Set row count.
 
-
-Set row count.
-
-This function is the same as the C++ method GDALRasterAttributeTable::SetRowCount()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	nNewCount
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::SetRowCount()"
+  (hRAT GDALRasterAttributeTableH)
+  (nNewCount int))
 
 ;; --------------------------------------------------------
 
-void GDALRATSetValueAsDouble
+(cffi:defcfun ("GDALRATSetValueAsDouble" GDALRATSetValueAsDouble) :void
+  "Set field value from double.
 
-
-Set field value from double.
-
-This function is the same as the C++ method GDALRasterAttributeTable::SetValue()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iRow,
-		int 	iField,
-		double 	dfValue
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::SetValue()"
+  (hRAT GDALRasterAttributeTableH)
+  (iRow int)
+  (iField int)
+  (dfValue double))
 
 ;; --------------------------------------------------------
 
-void GDALRATSetValueAsInt
+(cffi:defcfun ("GDALRATSetValueAsInt" GDALRATSetValueAsInt) :void
+  "Set field value from integer.
 
-
-Set field value from integer.
-
-This function is the same as the C++ method GDALRasterAttributeTable::SetValue()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iRow,
-		int 	iField,
-		int 	nValue
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::SetValue()"
+  (hRAT GDALRasterAttributeTableH)
+  (iRow int)
+  (iField int)
+  (nValue int))
 
 ;; --------------------------------------------------------
 
-void GDALRATSetValueAsString
+(cffi:defcfun ("GDALRATSetValueAsString" GDALRATSetValueAsString) :void
+  "Set field value from string.
 
-
-Set field value from string.
-
-This function is the same as the C++ method GDALRasterAttributeTable::SetValue()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	iRow,
-		int 	iField,
-		const char * 	pszValue
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::SetValue()"
+  (hRAT GDALRasterAttributeTableH)
+  (iRow int)
+  (iField int)
+  (pszValue :string))
 
 ;; --------------------------------------------------------
 
-GDALColorTableH GDALRATTranslateToColorTable
+(cffi:defcfun ("GDALRATTranslateToColorTable" GDALRATTranslateToColorTable) GDALColorTableH
+  "Translate to a color table.
 
-
-Translate to a color table.
-
-This function is the same as the C++ method GDALRasterAttributeTable::TranslateToColorTable()
-(	GDALRasterAttributeTableH 	hRAT,
-		int 	nEntryCount
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::TranslateToColorTable()"
+  (hRAT GDALRasterAttributeTableH)
+  (nEntryCount int))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRATValuesIOAsDouble
+(cffi:defcfun ("GDALRATValuesIOAsDouble" GDALRATValuesIOAsDouble) CPLErr
+  "Read or Write a block of doubles to/from the Attribute Table.
 
-
-Read or Write a block of doubles to/from the Attribute Table.
-
-This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
-(	GDALRasterAttributeTableH 	hRAT,
-		GDALRWFlag 	eRWFlag,
-		int 	iField,
-		int 	iStartRow,
-		int 	iLength,
-		double * 	pdfData
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()"
+  (hRAT GDALRasterAttributeTableH)
+  (eRWFlag GDALRWFlag)
+  (iField int)
+  (iStartRow int)
+  (iLength int)
+  (pdfData (:pointer :double)))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRATValuesIOAsInteger
+(cffi:defcfun ("GDALRATValuesIOAsInteger" GDALRATValuesIOAsInteger) CPLErr
+  "Read or Write a block of ints to/from the Attribute Table.
 
-
-Read or Write a block of ints to/from the Attribute Table.
-
-This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
-(	GDALRasterAttributeTableH 	hRAT,
-		GDALRWFlag 	eRWFlag,
-		int 	iField,
-		int 	iStartRow,
-		int 	iLength,
-		int * 	pnData
-	)
+This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()"
+  (hRAT GDALRasterAttributeTableH)
+  (eRWFlag GDALRWFlag)
+  (iField int)
+  (iStartRow int)
+  (iLength int)
+  (pnData (:pointer :int)))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRATValuesIOAsString
-
-
+(cffi:defcfun ("GDALRATValuesIOAsString" GDALRATValuesIOAsString) CPLErr
 Read or Write a block of strings to/from the Attribute Table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
-(	GDALRasterAttributeTableH 	hRAT,
-		GDALRWFlag 	eRWFlag,
-		int 	iField,
-		int 	iStartRow,
-		int 	iLength,
-		char ** 	papszStrList
+	(hRAT GDALRasterAttributeTableH)
+		(eRWFlag GDALRWFlag)
+		(iField int)
+		(iStartRow int)
+		(iLength int)
+		char ** papszStrList
 	)
 
 ;; --------------------------------------------------------
 
-int GDALReadWorldFile
-
-
-Read ESRI world file.
+(cffi:defcfun ("GDALReadWorldFile" GDALReadWorldFile) int
+  "Read ESRI world file.
 
  This function reads an ESRI style world file, and formats a
  geotransform from its contents. It does the same as
@@ -1183,28 +1249,30 @@ Read ESRI world file.
  internally try the unix style and windows style world file extensions
  (eg. for .tif these would be .tfw and .tifw).
 
-The world file contains an affine transformation with the parameters in a different order than in a geotransform array.
+ The world file contains an affine transformation with the parameters
+ in a different order than in a geotransform array.
+
  geotransform[1] : width of pixel
  geotransform[4] : rotational coefficient, zero for north up images.
  geotransform[2] : rotational coefficient, zero for north up images.
  geotransform[5] : height of pixel (but negative)
  geotransform[0] + 0.5 * geotransform[1] + 0.5 * geotransform[2] : x offset to center of top left pixel.
  geotransform[3] + 0.5 * geotransform[4] + 0.5 * geotransform[5] : y offset to center of top left pixel.
-Parameters:	pszBaseFilename 	the target raster file.
-	pszExtension 	the extension to use (ie. \".wld\") or NULL to derive it from the pszBaseFilename
-	padfGeoTransform 	the six double array into which the geotransformation should be placed.
 
-@return{TRUE on success or FALSE on failure.
-(	const char * 	pszBaseFilename,
-		const char * 	pszExtension,
-		double * 	padfGeoTransform
-	)
+ @argument[pszBaseFilename]{the target raster file.}
+ @argument[pszExtension]{the extension to use (ie. \".wld\") or NULL
+ to derive it from the pszBaseFilename}
+ @argument[padfGeoTransform]{the six double array into which the
+ geotransformation should be placed.}
+
+@return{TRUE on success or FALSE on failure.}"
+  (pszBaseFilename :string)
+  (pszExtension :string)
+  (padfGeoTransform (:pointer :double)))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRegenerateOverviews
-
-
+(cffi:defcfun ("GDALRegenerateOverviews" GDALRegenerateOverviews) CPLErr
 Generate downsampled overviews.
 
  This function will generate one or more overview images from a base
@@ -1213,50 +1281,57 @@ Generate downsampled overviews.
  can also be used to generate downsampled images in one file from
  another outside the overview architecture.
 
-The output bands need to exist in advance.
+ The output bands need to exist in advance.
 
-The full set of resampling algorithms is documented in GDALDataset::BuildOverviews().
+ The full set of resampling algorithms is documented in
+ GDALDataset::BuildOverviews().
 
  This function will honour properly NODATA_VALUES tuples (special
  dataset metadata) so that only a given RGB triplet (in case of a RGB
  image) will be considered as the nodata value and not each value of
  the triplet independantly per band.
 
-Parameters:	hSrcBand 	the source (base level) band.
-	nOverviewCount 	the number of downsampled bands being generated.
-	pahOvrBands 	the list of downsampled bands to be generated.
-	pszResampling 	Resampling algorithm (eg. \"AVERAGE\").
-	pfnProgress 	progress report function.
-	pProgressData 	progress function callback data.
+ @argument[hSrcBand]{the source (base level) band.}
+ @argument[nOverviewCount]{the number of downsampled bands being generated.}
+ @argument[pahOvrBands]{the list of downsampled bands to be generated.}
+ @argument[pszResampling]{Resampling algorithm (eg. \"AVERAGE\").}
+ @argument[pfnProgress]{progress report function.}
+ @argument[pProgressData]{progress function callback data.}
 
-@return{CE_None on success or CE_Failure on failure.
-(	GDALRasterBandH 	hSrcBand,
-		int 	nOverviewCount,
-		GDALRasterBandH * 	pahOvrBands,
-		const char * 	pszResampling,
-		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
+@return{CE_None on success or CE_Failure on failure.}
+
+	(hSrcBand GDALRasterBandH)
+		(nOverviewCount int)
+		GDALRasterBandH * pahOvrBands,
+		(pszResampling :string)
+		(pfnProgress GDALProgressFunc)
+		void * pProgressData
 	)
 
 ;; --------------------------------------------------------
 
-int GDALRegisterDriver
+(cffi:defcfun ("GDALRegisterDriver" GDALRegisterDriver) int
 
 
 Register a driver for use.
 See also:
 GDALDriverManager::GetRegisterDriver()
-(	GDALDriverH 	hDriver	 )
+	(hDrive GDALDriverH))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALRenameDataset
-
-
+(cffi:defcfun ("GDALRenameDataset" GDALRenameDataset) CPLErr
 Rename a dataset.
 See also:
 GDALDriver::Rename()
-void GDALSetCacheMax 	(	int 	nNewSizeInBytes	 )
+(	GDALDriverH hDriver,
+		:string pszNewName,
+		:string pszOldName
+	)
+
+;; --------------------------------------------------------
+
+void GDALSetCacheMax (	int nNewSizeInBytes	 )
 
 
 Set maximum cache memory.
@@ -1265,19 +1340,16 @@ Set maximum cache memory.
  permitted to use for GDALRasterBlock caching. The unit of the value
  is bytes.
 
-The maximum value is 2GB, due to the use of a signed 32 bit integer. Use GDALSetCacheMax64() to be able to set a higher value.
-Parameters:	nNewSizeInBytes 	the maximum number of bytes for caching.
-(	GDALDriverH 	hDriver,
-		const char * 	pszNewName,
-		const char * 	pszOldName
-	)
+ The maximum value is 2GB, due to the use of a signed 32 bit
+ integer. Use GDALSetCacheMax64() to be able to set a higher value.
+
+@argument[nNewSizeInBytes]{the maximum number of bytes for caching.}
+
 
 ;; --------------------------------------------------------
 
-void GDALSetCacheMax64
-
-
-Set maximum cache memory.
+(cffi:defcfun ("GDALSetCacheMax64" GDALSetCacheMax64) :void
+  "Set maximum cache memory.
 
  This function sets the maximum amount of memory that GDAL is
  permitted to use for GDALRasterBlock caching. The unit of the value
@@ -1289,70 +1361,57 @@ Set maximum cache memory.
  attempt to check the consistency of the passed value with the
  effective capabilities of the OS.
 
-Parameters:	nNewSizeInBytes 	the maximum number of bytes for caching.
+@argument[nNewSizeInBytes]{the maximum number of bytes for caching.}
 
 Since:
-GDAL 1.8.0
-(	GIntBig 	nNewSizeInBytes	 )
+GDAL 1.8.0"
+  (nNewSizeInBytes GIntBig))
 
 ;; --------------------------------------------------------
 
-void GDALSetColorEntry
-
-
+(cffi:defcfun ("GDALSetColorEntry" GDALSetColorEntry) :void
 Set entry in color table.
 
 This function is the same as the C++ method GDALColorTable::SetColorEntry()
-(	GDALColorTableH 	hTable,
-		int 	i,
-		const GDALColorEntry * 	poEntry
+	(hTable GDALColorTableH)
+		(i int)
+		const GDALColorEntry * poEntry
 	)
 
 ;; --------------------------------------------------------
 
-void GDALSetDescription
-
-
-Set object description.
+(cffi:defcfun ("GDALSetDescription" GDALSetDescription) :void
+  "Set object description.
 See also:
-GDALMajorObject::SetDescription()
-(	GDALMajorObjectH 	hObject,
-		const char * 	pszNewDesc
-	)
+GDALMajorObject::SetDescription()"
+  (hObject GDALMajorObjectH)
+  (pszNewDesc :string))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALSetMetadata
-
-
-Set metadata.
+(cffi:defcfun ("GDALSetMetadata" GDALSetMetadata) CPLErr
+"Set metadata.
 See also:
-GDALMajorObject::SetMetadata()
-(	GDALMajorObjectH 	hObject,
-		char ** 	papszMD,
-		const char * 	pszDomain
-	)
+GDALMajorObject::SetMetadata()"
+	(hObject GDALMajorObjectH)
+		char ** papszMD,
+		(pszDomain :string))
 
 ;; --------------------------------------------------------
 
-CPLErr GDALSetMetadataItem
-
-
-Set single metadata item.
+(cffi:defcfun ("GDALSetMetadataItem" GDALSetMetadataItem) CPLErr
+  "Set single metadata item.
 See also:
-GDALMajorObject::SetMetadataItem()
-(	GDALMajorObjectH 	hObject,
-		const char * 	pszName,
-		const char * 	pszValue,
-		const char * 	pszDomain
-	)
+GDALMajorObject::SetMetadataItem()"
+  (hObject GDALMajorObjectH)
+  (pszName :string)
+  (pszValue :string)
+  (pszDomain :string))
 
 ;; --------------------------------------------------------
 
-void GDALSwapWords
-
-
-Byte swap words in-place.
+(cffi:defcfun ("GDALSwapWords" GDALSwapWords) :void
+"Byte swap words in-place.
 
  This function will byte swap a set of 2, 4 or 8 byte words \"in place\"
  in a memory array. No assumption is made that the words being swapped
@@ -1361,42 +1420,54 @@ Byte swap words in-place.
  little endian. Use The macros like CPL_SWAP32() to byte swap single
  values without the overhead of a function call.
 
-Parameters:	pData 	pointer to start of data buffer.
-	nWordSize 	size of words being swapped in bytes. Normally 2, 4 or 8.
-	nWordCount 	the number of words to be swapped in this call.
-	nWordSkip 	the byte offset from the start of one word to the start of the next. For packed buffers this is the same as nWordSize.
-(	void * 	pData,
-		int 	nWordSize,
-		int 	nWordCount,
-		int 	nWordSkip
-	)
+ @argument[pData]{pointer to start of data buffer.}
+ @argument[nWordSize]{size of words being swapped in bytes. Normally 2, 4 or 8.}
+ @argument[nWordCount]{the number of words to be swapped in this call.}
+ @argument[nWordSkip]{the byte offset from the start of one word to
+ the start of the next. For packed buffers this is the same as
+ nWordSize.}"
+
+	void * pData,
+		(nWordSize int)
+		(nWordCount int)
+		(nWordSkip int))
 
 ;; --------------------------------------------------------
 
-int GDALValidateCreationOptions
+(cffi:defcfun ("GDALValidateCreationOptions" GDALValidateCreationOptions) int
+"Validate the list of creation options that are handled by a driver.
 
+ This is a helper method primarily used by Create() and CreateCopy()
+ to validate that the passed in list of creation options is compatible
+ with the GDAL_DMD_CREATIONOPTIONLIST metadata item defined by some
+ drivers.
 
-Validate the list of creation options that are handled by a driver.
-
-This is a helper method primarily used by Create() and CreateCopy() to validate that the passed in list of creation options is compatible with the GDAL_DMD_CREATIONOPTIONLIST metadata item defined by some drivers.
 See also:
 GDALGetDriverCreationOptionList()
 
-If the GDAL_DMD_CREATIONOPTIONLIST metadata item is not defined, this function will return TRUE. Otherwise it will check that the keys and values in the list of creation options are compatible with the capabilities declared by the GDAL_DMD_CREATIONOPTIONLIST metadata item. In case of incompatibility a (non fatal) warning will be emited and FALSE will be returned.
-Parameters:	hDriver 	the handle of the driver with whom the lists of creation option must be validated
-	papszCreationOptions 	the list of creation options. An array of strings, whose last element is a NULL pointer
+ If the GDAL_DMD_CREATIONOPTIONLIST metadata item is not defined, this
+ function will return TRUE. Otherwise it will check that the keys and
+ values in the list of creation options are compatible with the
+ capabilities declared by the GDAL_DMD_CREATIONOPTIONLIST metadata
+ item. In case of incompatibility a (non fatal) warning will be emited
+ and FALSE will be returned.
 
-@return{TRUE if the list of creation options is compatible with the Create() and CreateCopy() method of the driver, FALSE otherwise.
-(	GDALDriverH 	hDriver,
-		char ** 	papszCreationOptions
+ @argument[hDriver]{the handle of the driver with whom the lists of
+ creation option must be validated}
+ @argument[papszCreationOptions]{the list of creation options. An
+ array of strings, whose last element is a NULL pointer}
+
+ @return{TRUE if the list of creation options is compatible with the
+ Create() and CreateCopy() method of the driver, FALSE otherwise.}"
+
+	(hDriver GDALDriverH)
+		char ** papszCreationOptions
 	)
 
 ;; --------------------------------------------------------
 
-const char* GDALVersionInfo
-
-
-Get runtime version information.
+(cffi:defcfun ("GDALVersionInfo" GDALVersionInfo) :string
+  "Get runtime version information.
 
 Available pszRequest values:
  \"VERSION_NUM\": Returns GDAL_VERSION_NUM formatted as a string. ie. \"1170\" Note: starting with GDAL 1.10, this string will be longer than 4 characters.
@@ -1405,35 +1476,38 @@ Available pszRequest values:
  \"--version\": Returns one line version message suitable for use in response to --version requests. ie. \"GDAL 1.1.7, released 2002/04/16\"
  \"LICENSE\": Returns the content of the LICENSE.TXT file from the GDAL_DATA directory. Before GDAL 1.7.0, the returned string was leaking memory but this is now resolved. So the result should not been freed by the caller.
  \"BUILD_INFO\": List of NAME=VALUE pairs separated by newlines with information on build time options.
-Parameters:	pszRequest 	the type of version info desired, as listed above.
 
-@return{an internal string containing the requested information.
-(	const char * 	pszRequest	 )
+@argument[pszRequest]{the type of version info desired, as listed above.}
+
+ @return{an internal string containing the requested information.}"
+  (pszRequest :string))
 
 ;; --------------------------------------------------------
 
-int GDALWriteWorldFile
-
-
-Write ESRI world file.
+(cffi:defcfun ("GDALWriteWorldFile" GDALWriteWorldFile) int
+  "Write ESRI world file.
 
 This function writes an ESRI style world file from the passed geotransform.
 
-The world file contains an affine transformation with the parameters in a different order than in a geotransform array.
+ The world file contains an affine transformation with the parameters
+ in a different order than in a geotransform array.
+
  geotransform[1] : width of pixel
  geotransform[4] : rotational coefficient, zero for north up images.
  geotransform[2] : rotational coefficient, zero for north up images.
  geotransform[5] : height of pixel (but negative)
  geotransform[0] + 0.5 * geotransform[1] + 0.5 * geotransform[2] : x offset to center of top left pixel.
  geotransform[3] + 0.5 * geotransform[4] + 0.5 * geotransform[5] : y offset to center of top left pixel.
-Parameters:	pszBaseFilename 	the target raster file.
-	pszExtension 	the extension to use (ie. \".wld\"). Must not be NULL
-	padfGeoTransform 	the six double array from which the geotransformation should be read.
 
-@return{TRUE on success or FALSE on failure.
-(	const char * 	pszBaseFilename,
-		const char * 	pszExtension,
-		double * 	padfGeoTransform
-	)
+ @argument[pszBaseFilename]{the target raster file.}
+ @argument[pszExtension]{the extension to use (ie. \".wld\"). Must not
+ be NULL}
+ @argument[padfGeoTransform]{the six double array from which the
+ geotransformation should be read.}
+
+@return{TRUE on success or FALSE on failure.}"
+  (pszBaseFilename :string)
+  (pszExtension :string)
+  (padfGeoTransform (:pointer :double)))
 
 ;; EOF
