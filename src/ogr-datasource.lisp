@@ -159,14 +159,14 @@ Parameters:	hDS 	The dataset handle.
 
 Example:
 ...
-
+@begin{pre}
         OGRLayerH *hLayer;
         char     **papszOptions;
 
         if( OGR_DS_TestCapability( hDS, ODsCCreateLayer ) )
-        {
+        (
             ...
-        }
+        )
 
         papszOptions = CSLSetNameValue( papszOptions, \"DIM\", \"2\" );
         hLayer = OGR_DS_CreateLayer( hDS, \"NewLayer\", NULL, wkbUnknown,
@@ -174,9 +174,10 @@ Example:
         CSLDestroy( papszOptions );
 
         if( hLayer == NULL )
-        {
+        (
             ...
-        }"
+        )
+@end{pre}"
   (hDS :pointer)			; OGRDataSourceH
   (pszName :string)			; const char *
   (hSpatialRef :pointer)		; OGRSpatialReferenceH

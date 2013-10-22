@@ -24,6 +24,7 @@ OGR is a part of the GDAL library."
     :serial t
     :components
     ((:module "src"
+              :serial t
 	      :components ((:file "ogr-package")
 			   (:file "ogr-core")
 			   (:file "ogr-datasource")

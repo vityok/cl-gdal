@@ -433,7 +433,7 @@ OGR 1.8.0"
 
  @return{:NONE if all goes well, otherwise any of
  :NOT_ENOUGH_DATA, :UNSUPPORTED_GEOMETRY_TYPE, or
- :CORRUPT_DATA may be returned."
+ :CORRUPT_DATA may be returned.}"
   (cffi:foreign-enum-keyword
    'ogr-err
    (%OGR-G-Import-From-Wkt hGeom ppszSrcText)))
@@ -550,7 +550,7 @@ OGR 1.8.0"
 
  @argument[pszGML]{The GML fragment for the geometry.}
 
- @return{a geometry on succes, or NULL on error."
+ @return{a geometry on succes, or NULL on error.}"
   (pszGML :string))			; const char *
 (export 'OGR-G-Create-From-GML)
 
@@ -712,8 +712,8 @@ OGR 1.8.0"
  @argument[hGeom]{handle on the geometry to get spatial reference
  from.}
 
- @return{a reference to the spatial reference geometry."
-  (hGeom :pointer))			; OGRGeometryH
+ @return{a reference to the spatial reference geometry.}"
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Get-Spatial-Reference)
 
 ;; --------------------------------------------------------
@@ -906,7 +906,7 @@ OGR 1.8.0"
 
  @argument[hOther]{the other geometry to compare.}
 
- @return{TRUE if they are disjoint, otherwise FALSE."
+ @return{TRUE if they are disjoint, otherwise FALSE.}"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
 (export 'OGR-G-Disjoint)
@@ -929,7 +929,7 @@ OGR 1.8.0"
 
  @argument[hOther]{the other geometry to compare.}
 
- @return{TRUE if they are touching, otherwise FALSE."
+ @return{TRUE if they are touching, otherwise FALSE.}"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
 (export 'OGR-G-Touches)
@@ -975,14 +975,14 @@ OGR 1.8.0"
 
  @argument[hOther]{the other geometry to compare.}
 
- @return{TRUE if hThis is within hOther, otherwise FALSE."
+ @return{TRUE if hThis is within hOther, otherwise FALSE.}"
   (hThis :pointer)			; OGRGeometryH
   (hOther :pointer))			; OGRGeometryH
 (export 'OGR-G-Within)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Contains" OGR-G-Contains) :int
+(cffi:defcfun ("OGR_G_Contains" ogr-g-contains) :int
   "Test for containment.
 
  Tests if this geometry contains the other geometry.
@@ -999,9 +999,9 @@ OGR 1.8.0"
  @argument[hOther]{the other geometry to compare.}
 
  @return{TRUE if hThis contains hOther geometry, otherwise FALSE.}"
-  (hThis :pointer)			   ; OGRGeometryH
-  (hOther :pointer))			   ; OGRGeometryH
-(export 'OGR-G-Contains)
+  (hThis ogr-geometry-h)
+  (hOther ogr-geometry-h))
+(export 'ogr-g-contains)
 
 ;; --------------------------------------------------------
 
@@ -1102,7 +1102,7 @@ OGR 1.8.0"
  @argument[nQuadSegs]{the number of segments used to approximate a 90
  degree (quadrant) of curvature.}
 
- @return{the newly created geometry, or NULL if an error occurs."
+ @return{the newly created geometry, or NULL if an error occurs.}"
   (hTarget :pointer)			; OGRGeometryH
   (dfDist :double)
   (nQuadSegs :int))

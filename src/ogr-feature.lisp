@@ -46,7 +46,7 @@
 
  This function is the same as the C++ method OGRFeature::GetDefnRef().
 
- @argument[hFeat]{handle to the feature to get the feature definition from.
+ @argument[hFeat]{handle to the feature to get the feature definition from.}
 
  @return{an handle to the feature definition object on which feature depends.}"
   (hFeat ogr-feature-h))
@@ -594,7 +594,7 @@ This function currently on has an effect of OFTStringList fields.
  This method currently only has an effect for OFTDate, OFTTime and
  OFTDateTime fields.
 
- @argument[hFeat]{handle to the feature that owned the field.
+ @argument[hFeat]{handle to the feature that owned the field.}
  @argument[iField]{the field to set, from 0 to GetFieldCount()-1.}
  @argument[nYear]{(including century)}
  @argument[nMonth]{(1-12)}
@@ -831,7 +831,7 @@ This function is the same as the C++ OGRFeature::SetGeomField().
 
  This function is the same as the C++ method OGRFeature::SetFrom().
 
- @argument[hFeat]{handle to the feature to set to.
+ @argument[hFeat]{handle to the feature to set to.}
  @argument[hOtherFeat]{handle to the feature from which geometry, and
  field values will be copied.}
  @argument[panMap]{Array of the indices of the destination feature's
@@ -894,7 +894,7 @@ This function is the same as the C++ OGRFeature::SetGeomField().
  This function is the same as the C++ method
  OGRFeature::SetStyleStringDirectly().
 
- @argument[hFeat]{handle to the feature to set style to.
+ @argument[hFeat]{handle to the feature to set style to.}
  @argument[pszStyle]{the style string to apply to this feature, cannot
  be NULL.}"
   (hFeat ogr-feature-h)

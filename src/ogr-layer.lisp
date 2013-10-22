@@ -16,7 +16,7 @@
 
  @argument[hLayer]{handle to the layer.}
 
- @return{the layer name (must not been freed)
+ @return{the layer name (must not been freed)}
 
  Since: OGR 1.8.0"
   (hLayer ogr-layer-h))
@@ -237,7 +237,7 @@
 
  @argument[hLayer]{handle to the layer on which attribute query will
  be executed.}
- @argument[pszQuery][query in restricted SQL WHERE format, or NULL to
+ @argument[pszQuery]{query in restricted SQL WHERE format, or NULL to
  clear the current query.}
 
  @return{OGRERR_NONE if successfully installed, or an error code if
@@ -593,8 +593,9 @@ OLCStringsAsUTF8 / \"StringsAsUTF8\": TRUE if values of OFTString fields are ass
 OLCTransactions / \"Transactions\": TRUE if the StartTransaction(), CommitTransaction() and RollbackTransaction() methods work in a meaningful way, otherwise FALSE.
 
 This function is the same as the C++ method OGRLayer::TestCapability().
-@argument[hLayer 	handle to the layer to get the capability from.
-	pszCap 	the name of the capability to test.
+
+@argument[hLayer]{handle to the layer to get the capability from.}
+@argument[pszCap]{the name of the capability to test.}
 
  @return{TRUE if the layer has the requested capability, or FALSE
  otherwise. OGRLayers will return FALSE for any unrecognised
