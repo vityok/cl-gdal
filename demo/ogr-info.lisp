@@ -11,7 +11,9 @@
 ;; Load:
 ;;
 ;; sbcl --load ogr-info.lisp --eval '(ogr-info-demo:main)'
+;; lx86cl --load ogr-info.lisp --eval '(ogr-info-demo:main)'
 
+(ql:quickload :cffi)
 (ql:quickload :cl-ogr)
 (ql:quickload :cl-cffi-gtk)
 (ql:quickload :cl-cffi-gtk-gobject)
@@ -21,6 +23,19 @@
   (:export #:main))
 
 (in-package :ogr-info-demo)
+
+;; --------------------------------------------------------
+
+(defun inspect-ogr-file (shp)
+  (format t "inspecting file: ~a~%" shp)
+  (let ((hDS (ogr:ogr-open shp 0 (cffi:null-pointer))))
+    (when (cffi:null-pointer-p hds)
+      (error "Failed to open file"))
+    (format t "it contains: ~a layers~%" (ogr:ogr-ds-get-layer-count hds))
+
+    (loop for i from 0 below (ogr:ogr-ds-get-layer-count hds) do
+         (let ((layer (ogr:ogr-ds-get-layer hds i)))
+           (format t "layer[~a]: ~a~%" i (ogr:ogr-l-get-name layer))))))
 
 ;; --------------------------------------------------------
 
@@ -35,7 +50,7 @@
          (button (make-instance 'gtk-button
                                 :label "Select a file for save ..."
                                 :image
-                                (gtk-image-new-from-stock "gtk-save"
+                                (gtk-image-new-from-stock "gtk-open"
                                                           :button))))
      ;; Handle the signal "destroy" for the window.
      (g-signal-connect window "destroy"
@@ -46,14 +61,13 @@
      (g-signal-connect button "clicked"
                        (lambda (widget)
                          (declare (ignore widget))
-                         (let ((dialog (gtk-file-chooser-dialog-new "Speichern"
+                         (let ((dialog (gtk-file-chooser-dialog-new "Open GIS file"
                                                                     nil
                                                                     :open
                                                                     "gtk-open" :accept
                                                                     "gtk-cancel" :cancel)))
                            (when (eq (gtk-dialog-run dialog) :accept)
-                             (format t "Saved to file ~A~%"
-                                     (gtk-file-chooser-get-filename dialog)))
+                             (inspect-ogr-file (gtk-file-chooser-get-filename dialog)))
                            (gtk-widget-destroy dialog))))
      (gtk-container-add window button)
      (gtk-widget-show-all window))))
@@ -61,5 +75,8 @@
 ;; --------------------------------------------------------
 
 (defun main ()
+  (ogr:ogr-register-all)
+
   (example-file-chooser-dialog)
+  (join-gtk-main)
   )

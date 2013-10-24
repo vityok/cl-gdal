@@ -14,7 +14,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_GetLayerCount" OGR-DS-Get-Layer-Count) :int
+(cffi:defcfun ("OGR_DS_GetLayerCount" ogr-ds-get-layer-count) :int
   "Get the number of layers in this data source.
 
  This function is the same as the C++ method
@@ -49,7 +49,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_GetLayer" OGR-DS-Get-Layer) :pointer ; OGRLayerH
+(cffi:defcfun ("OGR_DS_GetLayer" ogr-ds-get-layer) :pointer ; OGRLayerH
   "Fetch a layer by index.
 
  The returned layer remains owned by the OGRDataSource and should not
@@ -69,7 +69,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_Destroy" OGR-DS-Destroy) :void
+(cffi:defcfun ("OGR_DS_Destroy" ogr-ds-destroy) :void
   "Closes opened datasource and releases allocated resources.
 
  This method is the same as the C++ method OGRDataSource::DestroyDataSource().
@@ -80,7 +80,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_GetName" OGR-DS-Get-Name) :string ; const char *
+(cffi:defcfun ("OGR_DS_GetName" ogr-ds-get-name) :string ; const char *
   "Returns the name of the data source.
 
  This string should be sufficient to open the data source if passed to
@@ -187,7 +187,7 @@ Example:
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_CopyLayer" OGR-DS-Copy-Layer) :pointer ; OGRLayerH
+(cffi:defcfun ("OGR_DS_CopyLayer" ogr-ds-copy-layer) ogr-layer-h
   "Duplicate an existing layer.
 
  This function creates a new layer, duplicate the field definitions of
@@ -214,7 +214,7 @@ Example:
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_TestCapability" OGR-DS-Test-Capability) :int
+(cffi:defcfun ("OGR_DS_TestCapability" ogr-ds-test-capability) :int
   "Test if capability is available.
 
  One of the following data source capability names can be passed into
@@ -239,13 +239,13 @@ Example:
  @argument[pszCapability]{the capability to test.}
 
  @return{TRUE if capability available otherwise FALSE.}"
-  (hDS :pointer)			; OGRDataSourceH
-  (pszCapability :string))		; const char *
-(export 'OGR-DS-Test-Capability)
+  (hDS ogr-data-source-h)
+  (pszCapability :string))
+(export 'ogr-ds-test-capability)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_ExecuteSQL" OGR-DS-Execute-SQL) :pointer ; OGRLayerH
+(cffi:defcfun ("OGR_DS_ExecuteSQL" ogr-ds-execute-sql) ogr-layer-h
   "Execute an SQL statement against the data store.
 
  The result of an SQL query is either NULL for statements that are in
@@ -277,15 +277,15 @@ Example:
 
  @return{an handle to a OGRLayer containing the results of the
  query. Deallocate with OGR_DS_ReleaseResultSet().}"
-  (hDS :pointer)			; OGRDataSourceH
-  (pszSQLCommand :string)		; const char *
-  (hSpatialFilter :pointer)		; OGRGeometryH
-  (pszDialect :string))			; const char *
+  (hDS ogr-data-source-h)
+  (pszSQLCommand :string)
+  (hSpatialFilter ogr-geometry-h)
+  (pszDialect :string))
 (export 'OGR-DS-Execute-SQL)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_ReleaseResultSet" OGR-DS-Release-Result-Set) :void
+(cffi:defcfun ("OGR_DS_ReleaseResultSet" ogr-ds-release-result-set) :void
   "Release results of OGR_DS_ExecuteSQL().
 
  This function should only be used to deallocate OGRLayers resulting
@@ -364,7 +364,7 @@ Example:
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGRRegisterDriver" OGR-Register-Driver) :void
+(cffi:defcfun ("OGRRegisterDriver" ogr-register-driver) :void
   "Add a driver to the list of registered drivers.
 
  If the passed driver is already registered (based on handle
@@ -444,7 +444,7 @@ Example:
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGRGetOpenDS" OGR-Get-Open-DS) :pointer ; OGRDataSourceH
+(cffi:defcfun ("OGRGetOpenDS" ogr-get-open-ds) :pointer ; OGRDataSourceH
   "Return the iDS th datasource opened.
 
  This function is the same as the C++ method

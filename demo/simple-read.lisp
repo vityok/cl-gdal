@@ -28,8 +28,8 @@
 
     (loop :for hFeature = (ogr:OGR-L-Get-Next-Feature hLayer)
        :until (cffi:null-pointer-p hFeature) :do
-       (let ((hFDefn (ogr:OGR-L-Get-Layer-Defn hLayer))	; OGRFeatureDefnH
-	     (hGeometry))				; OGRGeometryH
+       (let ((hFDefn (ogr:OGR-L-Get-Layer-Defn hLayer))
+	     (hGeometry))
 
 	 (loop :for iField :from 0 :below (ogr:OGR-FD-Get-Field-Count hFDefn)
 	    :for hFieldDefn = (ogr:OGR-FD-Get-Field-Defn hFDefn iField ) :do
