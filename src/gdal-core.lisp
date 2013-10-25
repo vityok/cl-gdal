@@ -4,14 +4,20 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum GDAL-Access
-  "Flag indicating read/write, or read-only access to data."
-  :GA_ReadOnly				; Read only (no update) access
-  :GA_Update)				; Read/write access.
+(cffi:defctype gdal-raster-band-h :pointer "GDALRasterBandH")
+(cffi:defctype gdal-color-table-h :pointer "GDALColorTableH")
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum GDAL-Color-Interp
+(cffi:defcenum gdal-access
+  "Flag indicating read/write, or read-only access to data."
+  :GA_ReadOnly				; Read only (no update) access
+  :GA_Update)				; Read/write access.
+(export 'gdal-access)
+
+;; --------------------------------------------------------
+
+(cffi:defcenum gdal-color-interp
   "Types of color interpretation for raster bands."
   :GCI_GrayIndex	       ; Greyscale
   :GCI_PaletteIndex	       ; Paletted (see associated color table)
@@ -30,10 +36,11 @@
   :GCI_YCbCr_CbBand	       ; Cb Chroma
   :GCI_YCbCr_CrBand	       ; Cr Chroma
   :GCI_Max)		       ; Max current value
+(export 'gdal-color-interp)
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum GDAL-Data-Type
+(cffi:defcenum gdal-data-type
   "Pixel data types"
   :GDT_Unknown			     ; Unknown or unspecified type
   :GDT_Byte			     ; Eight bit unsigned integer
@@ -47,27 +54,30 @@
   :GDT_CInt32			     ; Complex Int32
   :GDT_CFloat32			     ; Complex Float32
   :GDT_CFloat64)		     ; Complex Float64
+(export 'gdal-data-type)
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum GDAL-Palette-Interp
+(cffi:defcenum gdal-palette-interp
   "Types of color interpretations for a GDALColorTable."
   :GPI_Gray   ; Grayscale (in GDALColorEntry.c1)
   :GPI_RGB    ; Red, Green, Blue and Alpha in (in c1, c2, c3 and c4)
   :GPI_CMYK   ; Cyan, Magenta, Yellow and Black (in c1, c2, c3 and c4)
   :GPI_HLS)   ; Hue, Lightness and Saturation (in c1, c2, and c3)
+(export 'gdal-palette-interp)
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum GDAL-RAT-Field-Type
+(cffi:defcenum gdal-rat-field-type
   "Field type of raster attribute table."
   :GFT_Integer			       ; Integer field
   :GFT_Real			       ; Floating point (double) field
   :GFT_String)			       ; String field
+(export 'gdal-rat-field-type)
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum GDAL-RAT-Field-Usage
+(cffi:defcenum gdal-rat-field-usage
   "Field usage of raster attribute table."
   :GFU_Generic			    ; General purpose field.
   :GFU_PixelCount		    ; Histogram pixel count
@@ -88,13 +98,15 @@
   :GFU_BlueMax			    ; Color Range Blue Maximum
   :GFU_AlphaMax			    ; Color Range Alpha Maximum
   :GFU_MaxCount)		    ; Maximum GFU value
+(export 'gdal-rat-field-usage)
 
 ;; --------------------------------------------------------
 
-(cffi:defcenum GDAL-RW-Flag
+(cffi:defcenum gdal-rw-flag
   "Read/Write flag for RasterIO() method"
   :GF_Read				; Read data
   :GF_Write)				; Write data
+(export 'gdal-rw-flag)
 
 ;; --------------------------------------------------------
 

@@ -3,198 +3,167 @@
 (in-package :cl-gdal)
 
 ;; --------------------------------------------------------
-void GDALComputeRasterMinMax 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALComputeRasterMinMax" GDAL-Compute-Raster-Min-Max) :void
+"Compute the min/max values for a band."
+(hBand gdal-raster-band-h)
 		int 	bApproxOK,
 		double 	adfMinMax[2]
 	)
 
-
-Compute the min/max values for a band.
-See also:
-GDALRasterBand::ComputeRasterMinMax()
 ;; --------------------------------------------------------
 
-CPLErr GDALComputeRasterStatistics 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALComputeRasterStatistics" GDALComputeRasterStatistics) CPLErr
+"Compute image statistics."
+(hBand gdal-raster-band-h)
 		int 	bApproxOK,
-		double * 	pdfMin,
-		double * 	pdfMax,
-		double * 	pdfMean,
-		double * 	pdfStdDev,
+		(:pointer :double) 	pdfMin,
+		(:pointer :double) 	pdfMax,
+		(:pointer :double) 	pdfMean,
+		(:pointer :double) 	pdfStdDev,
 		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
+		:pointer 	pProgressData
 	)
 
-
-Compute image statistics.
-See also:
-GDALRasterBand::ComputeStatistics()
 ;; --------------------------------------------------------
-CPLErr GDALCreateMaskBand 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALCreateMaskBand" GDALCreateMaskBand) CPLErr
+"Adds a mask band to the current band."
+(hBand gdal-raster-band-h)
 		int 	nFlags
 	)
 
-
-Adds a mask band to the current band.
-See also:
-GDALRasterBand::CreateMaskBand()
-
 ;; --------------------------------------------------------
 
-CPLErr GDALFillRaster 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALFillRaster" GDALFillRaster) CPLErr
+"Fill this band with a constant value."
+(hBand gdal-raster-band-h)
 		double 	dfRealValue,
 		double 	dfImaginaryValue
 	)
 
+;; --------------------------------------------------------
 
-Fill this band with a constant value.
-See also:
-GDALRasterBand::Fill()
+(cffi:defcfun ("GDALFlushRasterCache" GDALFlushRasterCache) CPLErr
+
+
+"Flush raster data cache."
+(hBand gdal-raster-band-h	 )
 
 ;; --------------------------------------------------------
 
-CPLErr GDALFlushRasterCache 	(	GDALRasterBandH 	hBand	 )
-
-
-Flush raster data cache.
-See also:
-GDALRasterBand::FlushCache()
+(cffi:defcfun ("GDALGetBandDataset" GDALGetBandDataset) GDALDatasetH
+"Fetch the owning dataset handle."
+(hBand gdal-raster-band-h	 )
 
 ;; --------------------------------------------------------
 
-GDALDatasetH GDALGetBandDataset 	(	GDALRasterBandH 	hBand	 )
+(cffi:defcfun ("GDALGetBandNumber" GDALGetBandNumber) int
+"Fetch the band number."
+(hBand gdal-raster-band-h	 )
 
-
-Fetch the owning dataset handle.
-See also:
-GDALRasterBand::GetDataset()
 ;; --------------------------------------------------------
-int GDALGetBandNumber 	(	GDALRasterBandH 	hBand	 )
 
-
-Fetch the band number.
-See also:
-GDALRasterBand::GetBand()
-;; --------------------------------------------------------
-void GDALGetBlockSize 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALGetBlockSize" GDALGetBlockSize) void
+"Fetch the \"natural\" block size of this band."
+(hBand gdal-raster-band-h)
 		int * 	pnXSize,
 		int * 	pnYSize
 	)
 
-
-Fetch the "natural" block size of this band.
-See also:
-GDALRasterBand::GetBlockSize()
-
 ;; --------------------------------------------------------
 
-CPLErr GDALGetDefaultHistogram 	(	GDALRasterBandH 	hBand,
-		double * 	pdfMin,
-		double * 	pdfMax,
+(cffi:defcfun ("GDALGetDefaultHistogram" GDALGetDefaultHistogram) CPLErr
+"Fetch default raster histogram."
+(hBand gdal-raster-band-h)
+		(:pointer :double) 	pdfMin,
+		(:pointer :double) 	pdfMax,
 		int * 	pnBuckets,
 		int ** 	ppanHistogram,
 		int 	bForce,
 		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
+		:pointer 	pProgressData
 	)
 
+;; --------------------------------------------------------
 
-Fetch default raster histogram.
-See also:
-GDALRasterBand::GetDefaultHistogram()
+(cffi:defcfun ("GDALGetDefaultRAT" GDALGetDefaultRAT) GDALRasterAttributeTableH
+"Fetch default Raster Attribute Table."
+(hBand gdal-raster-band-h	 )
 
 ;; --------------------------------------------------------
 
-GDALRasterAttributeTableH GDALGetDefaultRAT 	(	GDALRasterBandH 	hBand	 )
-
-
-Fetch default Raster Attribute Table.
-See also:
-GDALRasterBand::GetDefaultRAT()
+(cffi:defcfun ("GDALGetMaskBand" GDALGetMaskBand) gdal-raster-band-h
+"Return the mask band associated with the band."
+(hBand gdal-raster-band-h	 )
 
 ;; --------------------------------------------------------
 
-GDALRasterBandH GDALGetMaskBand 	(	GDALRasterBandH 	hBand	 )
+(cffi:defcfun ("GDALGetMaskFlags" GDALGetMaskFlags) int
+"Return the status flags of the mask band associated with the band."
+(hBand gdal-raster-band-h	 )
 
-
-Return the mask band associated with the band.
-See also:
-GDALRasterBand::GetMaskBand()
-;; --------------------------------------------------------
-int GDALGetMaskFlags 	(	GDALRasterBandH 	hBand	 )
-
-
-Return the status flags of the mask band associated with the band.
-See also:
-GDALRasterBand::GetMaskFlags()
 ;; --------------------------------------------------------
 
-GDALRasterBandH GDALGetOverview 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALGetOverview" GDALGetOverview) gdal-raster-band-h
+"Fetch overview raster band object."
+(hBand gdal-raster-band-h)
 		int 	i
 	)
 
-
-Fetch overview raster band object.
-See also:
-GDALRasterBand::GetOverview()
 ;; --------------------------------------------------------
-int GDALGetOverviewCount 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetOverviewCount" GDALGetOverviewCount) int
+"Return the number of overview layers available."
+(hBand gdal-raster-band-h	 )
 
-Return the number of overview layers available.
-See also:
-GDALRasterBand::GetOverviewCount()
 ;; --------------------------------------------------------
-GDALAccess GDALGetRasterAccess 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterAccess" GDALGetRasterAccess) GDALAccess
+"Find out if we have update permission for this band."
+(hBand gdal-raster-band-h	 )
 
-Find out if we have update permission for this band.
-See also:
-GDALRasterBand::GetAccess()
 ;; --------------------------------------------------------
-int GDALGetRasterBandXSize 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterBandXSize" GDALGetRasterBandXSize) int
+"Fetch XSize of raster."
+(hBand gdal-raster-band-h	 )
 
-Fetch XSize of raster.
-See also:
-GDALRasterBand::GetXSize()
 ;; --------------------------------------------------------
-int GDALGetRasterBandYSize 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterBandYSize" GDALGetRasterBandYSize) int
+"Fetch YSize of raster."
+(hBand gdal-raster-band-h	 )
 
-Fetch YSize of raster.
-See also:
-GDALRasterBand::GetYSize()
 ;; --------------------------------------------------------
-char** GDALGetRasterCategoryNames 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterCategoryNames" GDALGetRasterCategoryNames) (:pointer :string)
+"Fetch the list of category names for this raster."
+(hBand gdal-raster-band-h	 )
 
-Fetch the list of category names for this raster.
-See also:
-GDALRasterBand::GetCategoryNames()
 ;; --------------------------------------------------------
-GDALColorInterp GDALGetRasterColorInterpretation 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterColorInterpretation" GDALGetRasterColorInterpretation) GDALColorInterp
+"How should this band be interpreted as color?"
+(hBand gdal-raster-band-h	 )
 
-How should this band be interpreted as color?
-See also:
-GDALRasterBand::GetColorInterpretation()
 ;; --------------------------------------------------------
-GDALColorTableH GDALGetRasterColorTable 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterColorTable" GDALGetRasterColorTable) gdal-color-table-h
+"Fetch the color table associated with band."
+(hBand gdal-raster-band-h	 )
 
-Fetch the color table associated with band.
-See also:
-GDALRasterBand::GetColorTable()
-GDALDataset::GetRasterCount().
 ;; --------------------------------------------------------
-GDALDataType GDALGetRasterDataType 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterDataType" GDALGetRasterDataType) GDALDataType
+"Fetch the pixel data type for this band."
+(hBand gdal-raster-band-h	 )
 
-Fetch the pixel data type for this band.
-See also:
-GDALRasterBand::GetRasterDataType()
 ;; --------------------------------------------------------
-CPLErr GDALGetRasterHistogram 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALGetRasterHistogram" GDALGetRasterHistogram) CPLErr
+"Compute raster histogram."
+(hBand gdal-raster-band-h)
 		double 	dfMin,
 		double 	dfMax,
 		int 	nBuckets,
@@ -202,98 +171,87 @@ CPLErr GDALGetRasterHistogram 	(	GDALRasterBandH 	hBand,
 		int 	bIncludeOutOfRange,
 		int 	bApproxOK,
 		GDALProgressFunc 	pfnProgress,
-		void * 	pProgressData
+		:pointer 	pProgressData
 	)
 
-
-Compute raster histogram.
-See also:
-GDALRasterBand::GetHistogram()
 ;; --------------------------------------------------------
-double GDALGetRasterMaximum 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALGetRasterMaximum" GDALGetRasterMaximum) double
+"Fetch the maximum value for this band."
+(hBand gdal-raster-band-h)
 		int * 	pbSuccess
 	)
 
-
-Fetch the maximum value for this band.
-See also:
-GDALRasterBand::GetMaximum()
 ;; --------------------------------------------------------
-double GDALGetRasterMinimum 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALGetRasterMinimum" GDALGetRasterMinimum) double
+"Fetch the minimum value for this band."
+(hBand gdal-raster-band-h)
 		int * 	pbSuccess
 	)
 
-
-Fetch the minimum value for this band.
-See also:
-GDALRasterBand::GetMinimum()
 ;; --------------------------------------------------------
-double GDALGetRasterNoDataValue 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALGetRasterNoDataValue" GDALGetRasterNoDataValue) double
+"Fetch the no data value for this band."
+(hBand gdal-raster-band-h)
 		int * 	pbSuccess
 	)
 
-
-Fetch the no data value for this band.
-See also:
-GDALRasterBand::GetNoDataValue()
 ;; --------------------------------------------------------
-double GDALGetRasterOffset 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALGetRasterOffset" GDALGetRasterOffset) double
+"Fetch the raster value offset."
+(hBand gdal-raster-band-h)
 		int * 	pbSuccess
 	)
 
-
-Fetch the raster value offset.
-See also:
-GDALRasterBand::GetOffset()
 ;; --------------------------------------------------------
 
-GDALRasterBandH GDALGetRasterSampleOverview 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALGetRasterSampleOverview" GDALGetRasterSampleOverview) gdal-raster-band-h
+"Fetch best sampling overview."
+(hBand gdal-raster-band-h)
 		int 	nDesiredSamples
 	)
 
-
-Fetch best sampling overview.
-See also:
-GDALRasterBand::GetRasterSampleOverview()
 ;; --------------------------------------------------------
-double GDALGetRasterScale 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALGetRasterScale" GDALGetRasterScale) double
+"Fetch the raster value scale."
+(hBand gdal-raster-band-h)
 		int * 	pbSuccess
 	)
 
-
-Fetch the raster value scale.
-See also:
-GDALRasterBand::GetScale()
 ;; --------------------------------------------------------
-CPLErr GDALGetRasterStatistics 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALGetRasterStatistics" GDALGetRasterStatistics) CPLErr
+"Fetch image statistics."
+(hBand gdal-raster-band-h)
 		int 	bApproxOK,
 		int 	bForce,
-		double * 	pdfMin,
-		double * 	pdfMax,
-		double * 	pdfMean,
-		double * 	pdfStdDev
+		(:pointer :double) 	pdfMin,
+		(:pointer :double) 	pdfMax,
+		(:pointer :double) 	pdfMean,
+		(:pointer :double) 	pdfStdDev
 	)
 
-
-Fetch image statistics.
-See also:
-GDALRasterBand::GetStatistics()
 ;; --------------------------------------------------------
-const char* GDALGetRasterUnitType 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALGetRasterUnitType" GDALGetRasterUnitType) :string
+"Return raster unit type."
+(hBand gdal-raster-band-h))
 
-Return raster unit type.
-See also:
-GDALRasterBand::GetUnitType()
 ;; --------------------------------------------------------
-int GDALHasArbitraryOverviews 	(	GDALRasterBandH 	hBand	 )
 
+(cffi:defcfun ("GDALHasArbitraryOverviews" GDALHasArbitraryOverviews) :int
+  "Check for arbitrary overviews."
+  (hBand gdal-raster-band-h))
 
-Check for arbitrary overviews.
-See also:
-GDALRasterBand::HasArbitraryOverviews()
 ;; --------------------------------------------------------
-CPLErr GDALRasterAdviseRead 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALRasterAdviseRead" GDALRasterAdviseRead) CPLErr
+"Advise driver of upcoming read requests."
+(hBand gdal-raster-band-h)
 		int 	nXOff,
 		int 	nYOff,
 		int 	nXSize,
@@ -304,18 +262,17 @@ CPLErr GDALRasterAdviseRead 	(	GDALRasterBandH 	hBand,
 		char ** 	papszOptions
 	)
 
-
-Advise driver of upcoming read requests.
-See also:
-GDALRasterBand::AdviseRead()
 ;; --------------------------------------------------------
-CPLErr GDALRasterIO 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALRasterIO" GDALRasterIO) CPLErr
+"Read/write a region of image data for this band."
+(hBand gdal-raster-band-h)
 		GDALRWFlag 	eRWFlag,
 		int 	nXOff,
 		int 	nYOff,
 		int 	nXSize,
 		int 	nYSize,
-		void * 	pData,
+		:pointer 	pData,
 		int 	nBufXSize,
 		int 	nBufYSize,
 		GDALDataType 	eBufType,
@@ -323,131 +280,111 @@ CPLErr GDALRasterIO 	(	GDALRasterBandH 	hBand,
 		int 	nLineSpace
 	)
 
-
-Read/write a region of image data for this band.
-See also:
-GDALRasterBand::RasterIO()
 ;; --------------------------------------------------------
-CPLErr GDALReadBlock 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALReadBlock" GDALReadBlock) CPLErr
+"Read a block of image data efficiently."
+(hBand gdal-raster-band-h)
 		int 	nXOff,
 		int 	nYOff,
-		void * 	pData
+		:pointer 	pData
 	)
 
-
-Read a block of image data efficiently.
-See also:
-GDALRasterBand::ReadBlock()
 ;; --------------------------------------------------------
-CPLErr GDALSetDefaultHistogram 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALSetDefaultHistogram" GDALSetDefaultHistogram) CPLErr
+"Set default histogram."
+(hBand gdal-raster-band-h)
 		double 	dfMin,
 		double 	dfMax,
 		int 	nBuckets,
 		int * 	panHistogram
 	)
 
-
-Set default histogram.
-See also:
-GDALRasterBand::SetDefaultHistogram()
 ;; --------------------------------------------------------
 
-CPLErr GDALSetDefaultRAT 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALSetDefaultRAT" GDALSetDefaultRAT) CPLErr
+"Set default Raster Attribute Table."
+(hBand gdal-raster-band-h)
 		GDALRasterAttributeTableH 	hRAT
 	)
 
-
-Set default Raster Attribute Table.
-See also:
-GDALRasterBand::GDALSetDefaultRAT()
 ;; --------------------------------------------------------
-CPLErr GDALSetRasterCategoryNames 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALSetRasterCategoryNames" GDALSetRasterCategoryNames) CPLErr
+"Set the category names for this band."
+(hBand gdal-raster-band-h)
 		char ** 	papszNames
 	)
 
-
-Set the category names for this band.
-See also:
-GDALRasterBand::SetCategoryNames()
 ;; --------------------------------------------------------
 
-CPLErr GDALSetRasterColorInterpretation 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALSetRasterColorInterpretation" GDALSetRasterColorInterpretation) CPLErr
+"Set color interpretation of a band."
+(hBand gdal-raster-band-h)
 		GDALColorInterp 	eColorInterp
 	)
 
-
-Set color interpretation of a band.
-See also:
-GDALRasterBand::SetColorInterpretation()
 ;; --------------------------------------------------------
-CPLErr GDALSetRasterColorTable 	(	GDALRasterBandH 	hBand,
-		GDALColorTableH 	hCT
-	)
 
+(cffi:defcfun ("GDALSetRasterColorTable" GDALSetRasterColorTable) CPLErr
+  "Set the raster color table."
+  (hBand gdal-raster-band-h)
+  (hCT gdal-color-table-h))
 
-Set the raster color table.
-See also:
-GDALRasterBand::SetColorTable()
+;; --------------------------------------------------------
 
-CPLErr GDALSetRasterNoDataValue 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALSetRasterNoDataValue" GDALSetRasterNoDataValue) CPLErr
+"Set the no data value for this band."
+(hBand gdal-raster-band-h)
 		double 	dfValue
 	)
 
-
-Set the no data value for this band.
-See also:
-GDALRasterBand::SetNoDataValue()
 ;; --------------------------------------------------------
-CPLErr GDALSetRasterOffset 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALSetRasterOffset" GDALSetRasterOffset) CPLErr
+"Set scaling offset."
+(hBand gdal-raster-band-h)
 		double 	dfNewOffset
 	)
 
-
-Set scaling offset.
-See also:
-GDALRasterBand::SetOffset()
 ;; --------------------------------------------------------
-CPLErr GDALSetRasterScale 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALSetRasterScale" GDALSetRasterScale) CPLErr
+"Set scaling ratio."
+(hBand gdal-raster-band-h)
 		double 	dfNewOffset
 	)
 
-
-Set scaling ratio.
-See also:
-GDALRasterBand::SetScale()
 ;; --------------------------------------------------------
-CPLErr GDALSetRasterStatistics 	(	GDALRasterBandH 	hBand,
+
+(cffi:defcfun ("GDALSetRasterStatistics" GDALSetRasterStatistics) CPLErr
+"Set statistics on band."
+(hBand gdal-raster-band-h)
 		double 	dfMin,
 		double 	dfMax,
 		double 	dfMean,
 		double 	dfStdDev
 	)
 
-
-Set statistics on band.
-See also:
-GDALRasterBand::SetStatistics()
 ;; --------------------------------------------------------
-CPLErr GDALSetRasterUnitType 	(	GDALRasterBandH 	hBand,
-		const char * 	pszNewValue
+
+(cffi:defcfun ("GDALSetRasterUnitType" GDALSetRasterUnitType) CPLErr
+"Set unit type.
+
+Since: GDAL 1.8.0"
+(hBand gdal-raster-band-h)
+		:string 	pszNewValue
 	)
 
-
-Set unit type.
-See also:
-GDALRasterBand::SetUnitType()
-Since: GDAL 1.8.0
-
 ;; --------------------------------------------------------
 
-CPLErr GDALWriteBlock 	(	GDALRasterBandH 	hBand,
+(cffi:defcfun ("GDALWriteBlock" GDALWriteBlock) CPLErr
+"Write a block of image data efficiently."
+(hBand gdal-raster-band-h)
 		int 	nXOff,
 		int 	nYOff,
-		void * 	pData
+		:pointer 	pData
 	)
 
-
-Write a block of image data efficiently.
-See also:
-GDALRasterBand::WriteBlock()
 ;; EOF

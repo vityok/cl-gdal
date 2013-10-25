@@ -30,10 +30,12 @@ Master: http://www.gdal.org"
     :serial t
     :components
     ((:module "src"
+	      :serial t
 	      :components ((:file "gdal-package")
 			   (:file "gdal-core")
 			   (:file "gdal-dataset")
-			   (:file "gdal-rasterband"))))
+			   (:file "gdal-rasterband")
+			   (:file "gdal-common"))))
     :depends-on (:cffi
 		 :trivial-garbage))
 

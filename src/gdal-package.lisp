@@ -11,6 +11,6 @@
 (defpackage :cl-gdal
   (:nicknames :gdal)
   (:use :cl)
-  (:export #:GDAL-All-Register))
+  (:export #:gdal-all-register))
 
 ;; EOF
