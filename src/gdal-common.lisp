@@ -1,4 +1,8 @@
--*- Mode: lisp -*-
+;;; -*- package: CL-GDAL; Syntax: Common-lisp; Base: 10 -*-
+
+(in-package :cl-gdal)
+
+;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALAddDerivedBandPixelFunc" gdal-add-derived-band-pixel-func) cpl-err
   "This adds a pixel function to the global list of available pixel
@@ -104,17 +108,17 @@ This function is the same as the C++ method GDALColorTable::Clone()"
  @argument[nBitCount]{the number of bits in a word to be copied.}
  @argument[nStepCount]{the number of words to copy.}"
   (pabySrcData (:pointer GByte))
-  (nSrcOffset int)
-  (nSrcStep int)
+  (nSrcOffset :int)
+  (nSrcStep :int)
   (pabyDstData (:pointer GByte))
-  (nDstOffset int)
-  (nDstStep int)
-  (nBitCount int)
-  (nStepCoun int))
+  (nDstOffset :int)
+  (nDstStep :int)
+  (nBitCount :int)
+  (nStepCoun :int))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALCopyDatasetFiles" GDALCopyDatasetFiles) CPLErr
+(cffi:defcfun ("GDALCopyDatasetFiles" gdal-copy-dataset-files) CPLErr
 
 
 Copy the files of a dataset.
@@ -435,7 +439,18 @@ General utility option processing.
  options for all GDAL commandline utilities. It takes care of the
  following commandline options:
 
---version: report version of GDAL in use. --build: report build info about GDAL in use. --license: report GDAL license info. --formats: report all format drivers configured. --format [format]: report details of one format driver. --optfile filename: expand an option file into the argument list. --config key value: set system configuration option. --debug [on/off/value]: set debug level. --mempreload dir: preload directory contents into /vsimem --pause: Pause for user input (allows time to attach debugger) --locale [locale]: Install a locale using setlocale() (debugging) --help-general: report detailed help on general options.
+--version: report version of GDAL in use.
+--build: report build info about GDAL in use.
+--license: report GDAL license info.
+--formats: report all format drivers configured.
+--format [format]: report details of one format driver.
+--optfile filename: expand an option file into the argument list.
+--config key value: set system configuration option.
+--debug [on/off/value]: set debug level.
+--mempreload dir: preload directory contents into /vsimem
+--pause: Pause for user input (allows time to attach debugger)
+--locale [locale]: Install a locale using setlocale() (debugging)
+--help-general: report detailed help on general options.
 
  The argument array is replaced \"in place\" and should be freed with
  CSLDestroy() when no longer needed. The typical usage looks something
@@ -1331,7 +1346,7 @@ GDALDriver::Rename()
 
 ;; --------------------------------------------------------
 
-void GDALSetCacheMax (	int nNewSizeInBytes	 )
+void GDALSetCacheMax
 
 
 Set maximum cache memory.
@@ -1344,7 +1359,7 @@ Set maximum cache memory.
  integer. Use GDALSetCacheMax64() to be able to set a higher value.
 
 @argument[nNewSizeInBytes]{the maximum number of bytes for caching.}
-
+(	int nNewSizeInBytes	 )
 
 ;; --------------------------------------------------------
 
@@ -1389,13 +1404,13 @@ GDALMajorObject::SetDescription()"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetMetadata" GDALSetMetadata) CPLErr
-"Set metadata.
+(cffi:defcfun ("GDALSetMetadata" gdal-set-metadata) CPLErr
+  "Set metadata.
 See also:
 GDALMajorObject::SetMetadata()"
-	(hObject GDALMajorObjectH)
-		char ** papszMD,
-		(pszDomain :string))
+  (hObject GDALMajorObjectH)
+  (papszMD (:pointer :string))
+  (pszDomain :string))
 
 ;; --------------------------------------------------------
 
@@ -1411,7 +1426,7 @@ GDALMajorObject::SetMetadataItem()"
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALSwapWords" GDALSwapWords) :void
-"Byte swap words in-place.
+  "Byte swap words in-place.
 
  This function will byte swap a set of 2, 4 or 8 byte words \"in place\"
  in a memory array. No assumption is made that the words being swapped
@@ -1427,15 +1442,15 @@ GDALMajorObject::SetMetadataItem()"
  the start of the next. For packed buffers this is the same as
  nWordSize.}"
 
-	void * pData,
-		(nWordSize int)
-		(nWordCount int)
-		(nWordSkip int))
+  (pData (:pointer :void))
+  (nWordSize int)
+  (nWordCount int)
+  (nWordSkip int))
 
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALValidateCreationOptions" GDALValidateCreationOptions) int
-"Validate the list of creation options that are handled by a driver.
+  "Validate the list of creation options that are handled by a driver.
 
  This is a helper method primarily used by Create() and CreateCopy()
  to validate that the passed in list of creation options is compatible
@@ -1460,9 +1475,8 @@ GDALGetDriverCreationOptionList()
  @return{TRUE if the list of creation options is compatible with the
  Create() and CreateCopy() method of the driver, FALSE otherwise.}"
 
-	(hDriver GDALDriverH)
-		char ** papszCreationOptions
-	)
+  (hDriver GDALDriverH)
+  (papszCreationOptions (:pointer :string)))
 
 ;; --------------------------------------------------------
 
