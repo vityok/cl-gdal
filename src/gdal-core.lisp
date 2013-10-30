@@ -6,6 +6,22 @@
 
 (cffi:defctype gdal-raster-band-h :pointer "GDALRasterBandH")
 (cffi:defctype gdal-color-table-h :pointer "GDALColorTableH")
+(cffi:defctype gdal-major-object-h :pointer "GDALMajorObjectH")
+(cffi:defctype gdal-color-table-h :pointer "GDALColorTableH")
+(cffi:defctype gdal-driver-h :pointer "GDALDriverH")
+(cffi:defctype gdal-dataset-h :pointer "GDALDatasetH")
+(cffi:defctype gbyte :ubyte "GByte")
+
+;; --------------------------------------------------------
+
+;; CPLErr
+(cffi:defcenum cpl-err
+    "More functions are defined in the cpl_error.h file."
+  (:CE_None 0)
+  (:CE_Debug 1)
+  (:CE_Warning 2)
+  (:CE_Failure 3)
+  (:CE_Fatal 4))
 
 ;; --------------------------------------------------------
 
@@ -107,6 +123,15 @@
   :GF_Read				; Read data
   :GF_Write)				; Write data
 (export 'gdal-rw-flag)
+
+;; --------------------------------------------------------
+
+(cffi:defcstruct gdal-color-entry
+    "Color tuple."
+  (c1 :short)
+  (c2 :short)
+  (c3 :short)
+  (c4 :short))
 
 ;; --------------------------------------------------------
 

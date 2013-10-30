@@ -22,7 +22,7 @@
 
  @return{CE_None, invalid (NULL) parameters are currently ignored.}"
   (pszFuncName :string)
-  (pfnNewFunctio GDALDerivedPixelFunc))
+  (pfnNewFunction GDALDerivedPixelFunc))
 
 ;; --------------------------------------------------------
 
@@ -70,11 +70,9 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALCloneColorTable" gdal-clone-color-table) GDALColorTableH
-  "Make a copy of a color table.
-
-This function is the same as the C++ method GDALColorTable::Clone()"
-  (hTable GDALColorTableH))
+(cffi:defcfun ("GDALCloneColorTable" gdal-clone-color-table) gdal-color-table-h
+  "Make a copy of a color table."
+  (hTable gdal-color-table-h))
 
 ;; --------------------------------------------------------
 
@@ -118,23 +116,16 @@ This function is the same as the C++ method GDALColorTable::Clone()"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALCopyDatasetFiles" gdal-copy-dataset-files) CPLErr
-
-
-Copy the files of a dataset.
-See also:
-GDALDriver::CopyFiles()
-(	(hDriver GDALDriverH)
-		(pszNewName :string)
-		(pszOldNam :string)
-	)
+(cffi:defcfun ("GDALCopyDatasetFiles" gdal-copy-dataset-files) cpl-err
+  "Copy the files of a dataset."
+  (hDriver gdal-driver-h)
+  (pszNewName :string)
+  (pszOldNam :string))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALCopyWords" GDALCopyWords) :void
-
-
-Copy pixel words from buffer to buffer.
+(cffi:defcfun ("GDALCopyWords" gdal-copy-words) :void
+  "Copy pixel words from buffer to buffer.
 
  This function is used to copy pixel word values from one memory
  buffer to another, with support for conversion between data types,
@@ -154,10 +145,10 @@ Copy pixel words from buffer to buffer.
  native machine byte order.
 
  @argument[pSrcData]{Pointer to source data to be converted.}
- @argument[eSrcType]{the source data type (see GDALDataType enum)}
+ @argument[eSrcType]{the source data type (see gdal-data-type enum)}
  @argument[nSrcPixelOffset]{Source pixel offset, in bytes}
  @argument[pDstData]{Pointer to buffer where destination data should go}
- @argument[eDstType]{the destination data type (see GDALDataType enum)}
+ @argument[eDstType]{the destination data type (see gdal-data-type enum)}
  @argument[nDstPixelOffset]{Destination pixel offset, in bytes}
  @argument[nWordCount]{number of words to be copied}
 
@@ -170,33 +161,26 @@ Copy pixel words from buffer to buffer.
  overload the appropriate CopyWord template in the above
  namespace. This will ensure that any conversion issues are
  handled (cases like the float -> int32 case, where the min/max)
- values are subject to roundoff error.
-
-(	void * pSrcData,
-		(eSrcType GDALDataType)
-		(nSrcPixelOffset int)
-		void * pDstData,
-		(eDstType GDALDataType)
-		(nDstPixelOffset int)
-		(nWordCoun int)
-	)
+ values are subject to roundoff error."
+  (pSrcData :pointer)
+  (eSrcType gdal-data-type)
+  (nSrcPixelOffset :int)
+  (pDstData :pointer)
+  (eDstType gdal-data-type)
+  (nDstPixelOffset :int)
+  (nWordCoun :int))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALCreate" GDALCreate) GDALDatasetH
-
-
-Create a new dataset with this driver.
-See also:
-GDALDriver::Create()
-(	(hDriver GDALDriverH)
-		(pszFilename :string)
-		(nXSize int)
-		(nYSize int)
-		(nBands int)
-		(eBandType GDALDataType)
-		char ** papszOptions
-	)
+(cffi:defcfun ("GDALCreate" GDALCreate) gdal-dataset-h
+  "Create a new dataset with this driver."
+  (hDriver gdal-driver-h)
+  (pszFilename :string)
+  (nXSize :int)
+  (nYSize :int)
+  (nBands :int)
+  (eBandType gdal-data-type)
+  (papszOptions (:pointer :string)))
 
 ;; --------------------------------------------------------
 
@@ -206,39 +190,30 @@ GDALDriver::Create()
 Create color ramp.
 
 This function is the same as the C++ method GDALColorTable::CreateColorRamp()
-(	(hTable GDALColorTableH)
+(	(hTable gdal-color-table-h)
 		(nStartIndex int)
-		const GDALColorEntry * psStartColor,
+		(:pointer gdal-color-entry) psStartColor,
 		(nEndIndex int)
-		const GDALColorEntry * psEndColor
+		(:pointer gdal-color-entry) psEndColor
 	)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALCreateColorTable" GDALCreateColorTable) GDALColorTableH
-
-
-Construct a new color table.
-
-This function is the same as the C++ method GDALColorTable::GDALColorTable()
-(	(eInterp	  GDALPaletteInterp)
+(cffi:defcfun ("GDALCreateColorTable" GDALCreateColorTable) gdal-color-table-h
+"Construct a new color table."
+	(eInterp	  GDALPaletteInterp)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALCreateCopy" GDALCreateCopy) GDALDatasetH
-
-
-Create a copy of a dataset.
-See also:
-GDALDriver::CreateCopy()
-(	(hDriver GDALDriverH)
-		(pszFilename :string)
-		(hSrcDS GDALDatasetH)
-		(bStrict int)
-		char ** papszOptions,
-		(pfnProgress GDALProgressFunc)
-		void * pProgressData
-	)
+(cffi:defcfun ("GDALCreateCopy" gdal-create-copy) gdal-dataset-h
+  "Create a copy of a dataset."
+  (hDriver gdal-driver-h)
+  (pszFilename :string)
+  (hSrcDS gdal-dataset-h)
+  (bStrict int)
+  (papszOptions (:pointer :string))
+  (pfnProgress GDALProgressFunc)
+  (pProgressData :pointer))
 
 ;; --------------------------------------------------------
 
@@ -254,7 +229,7 @@ Construct empty table.
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALDataTypeIsComplex" GDALDataTypeIsComplex) int
+(cffi:defcfun ("gdal-data-typeIsComplex" gdal-data-typeIsComplex) int
 
 
 Is data type complex?
@@ -263,11 +238,11 @@ Is data type complex?
  GDT_CInt32, GDT_CFloat32 or GDT_CFloat64), that is it consists of a
  real and imaginary component.}
 
-(	(eDataType	  GDALDataType)
+(	(eDataType	  gdal-data-type)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALDataTypeUnion" GDALDataTypeUnion) GDALDataType
+(cffi:defcfun ("gdal-data-typeUnion" gdal-data-typeUnion) gdal-data-type
 
 
  Return the smallest data type that can fully express both input data
@@ -279,8 +254,8 @@ Is data type complex?
 
  @return{a data type able to express eType1 and eType2.}
 
-(	(eType1 GDALDataType)
-		(eType GDALDataType)
+(	(eType1 gdal-data-type)
+		(eType gdal-data-type)
 	)
 ;; --------------------------------------------------------
 
@@ -294,13 +269,13 @@ See CPLDecToPackedDMS().
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALDeleteDataset" GDALDeleteDataset) CPLErr
+(cffi:defcfun ("GDALDeleteDataset" GDALDeleteDataset) cpl-err
 
 
 Delete named dataset.
 See also:
 GDALDriver::Delete()
-(	(hDriver GDALDriverH)
+(	(hDriver gdal-driver-h)
 		(pszFilenam :string)
 	)
 
@@ -312,7 +287,7 @@ GDALDriver::Delete()
 Deregister the passed driver.
 See also:
 GDALDriverManager::GetDeregisterDriver()
-(	(hDriver	  GDALDriverH)
+(	(hDriver	  gdal-driver-h)
 
 ;; --------------------------------------------------------
 
@@ -322,7 +297,7 @@ GDALDriverManager::GetDeregisterDriver()
 Destroys a color table.
 
 This function is the same as the C++ method GDALColorTable::~GDALColorTable()
-(	(hTable	  GDALColorTableH)
+(	(hTable	  gdal-color-table-h)
 
 ;; --------------------------------------------------------
 
@@ -337,7 +312,7 @@ Destroy a GDALDriver.
  GDALDriverManager.
 
 @argument[hDriver]{the driver to destroy.}
-(	(hDriver	  GDALDriverH)
+(	(hDriver	  gdal-driver-h)
 
 ;; --------------------------------------------------------
 
@@ -575,46 +550,31 @@ GDAL 1.8.0
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetColorEntry" GDALGetColorEntry) const GDALColorEntry*
-
-
-Fetch a color entry from table.
-
-This function is the same as the C++ method GDALColorTable::GetColorEntry()
-
-(	(hTable GDALColorTableH)
-		(i int)
-	)
+(cffi:defcfun ("GDALGetColorEntry" GDALGetColorEntry)  (:pointer Gdal-Color-Entry)
+  "Fetch a color entry from table."
+  (hTable gdal-color-table-h)
+  (i :int))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetColorEntryAsRGB" GDALGetColorEntryAsRGB) int
-
-
-Fetch a table entry in RGB format.
-
-This function is the same as the C++ method GDALColorTable::GetColorEntryAsRGB()
-(	(hTable GDALColorTableH)
-		(i int)
-		GDALColorEntry * poEntry
-	)
+(cffi:defcfun ("GDALGetColorEntryAsRGB" GDALGetColorEntryAsRGB) :int
+  "Fetch a table entry in RGB format."
+  (hTable gdal-color-table-h)
+  (i :int)
+  (poEntry (:pointer Gdal-Color-Entry)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetColorEntryCount" GDALGetColorEntryCount) int
-
-
-Get number of color entries in table.
-
-This function is the same as the C++ method GDALColorTable::GetColorEntryCount()
-(	(hTable	  GDALColorTableH)
+(cffi:defcfun ("GDALGetColorEntryCount" gdal-get-color-entry-count) :int
+  "Get number of color entries in table."
+  (hTable gdal-color-table-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetColorInterpretationByName" GDALGetColorInterpretationByName) GDALColorInterp
+(cffi:defcfun ("GDALGetColorInterpretationByName" gdal-get-color-interpretation-by-name) GDALColorInterp
 
 
-Get color interpreation by symbolic name.
+"Get color interpreation by symbolic name.
 
  Returns a color interpreation corresponding to the given symbolic
  name. This function is opposite to the
@@ -625,8 +585,8 @@ Get color interpreation by symbolic name.
  @return{GDAL color interpretation.}
 
 Since:
-GDAL 1.7.0
-(	(pszName	  :string)
+GDAL 1.7.0"
+	(pszName	  :string))
 
 ;; --------------------------------------------------------
 
@@ -646,30 +606,25 @@ Get name of color interpretation.
  @return{string corresponding to color interpretation or NULL pointer
  if invalid enumerator given.}
 
-(	(eInterp	  GDALColorInterp)
+	(eInterp	  GDALColorInterp)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetDataTypeByName" GDALGetDataTypeByName) GDALDataType
-
-
-Get data type by symbolic name.
+(cffi:defcfun ("GDALGetDataTypeByName" gdal-get-data-type-by-name) gdal-data-type
+  "Get data type by symbolic name.
 
  Returns a data type corresponding to the given symbolic name. This
  function is opposite to the GDALGetDataTypeName().
 
  @argument[pszName]{string containing the symbolic name of the type.}
 
-@return{GDAL data type.}
-
-(	(pszName :string)
+@return{GDAL data type.}"
+  (pszName :string))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetDataTypeName" GDALGetDataTypeName) :string
-
-
-Get name of data type.
+(cffi:defcfun ("GDALGetDataTypeName" gdal-get-data-type-name) :string
+  "Get name of data type.
 
  Returns a symbolic name for the data type. This is essentially the
  the enumerated item name with the GDT_ prefix removed. So GDT_Byte
@@ -681,24 +636,20 @@ Get name of data type.
  @argument[eDataType]{type to get name of.}
 
  @return{string corresponding to existing data type or NULL pointer if
- invalid type given.}
-
-(	(eDataType	  GDALDataType)
+ invalid type given.}"
+  (eDataType gdal-data-type))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetDataTypeSize" GDALGetDataTypeSize) int
-
-
-Get data type size in bits.
+(cffi:defcfun ("GDALGetDataTypeSize" gdal-get-data-type-size) :int
+  "Get data type size in bits.
 
 Returns the size of a a GDT_* type in bits, not bytes!
 
  @argument[eDataType]{type, such as GDT_Byte.}
 
- @return{the number of bits or zero if it is not recognised.}
-
-(	(eDataType	  GDALDataType)
+ @return{the number of bits or zero if it is not recognised.}"
+  (eDataType gdal-data-type))
 
 ;; --------------------------------------------------------
 
@@ -708,11 +659,11 @@ Returns the size of a a GDT_* type in bits, not bytes!
 Fetch object description.
 See also:
 GDALMajorObject::GetDescription()
-(	(hObject GDALMajorObjectH)
+(	(hObject gdal-major-object-h)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetDriver" GDALGetDriver) GDALDriverH
+(cffi:defcfun ("GDALGetDriver" GDALGetDriver) gdal-driver-h
 
 
 "Fetch driver by index.
@@ -722,7 +673,7 @@ GDALDriverManager::GetDriver()"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetDriverByName" GDALGetDriverByName) GDALDriverH
+(cffi:defcfun ("GDALGetDriverByName" GDALGetDriverByName) gdal-driver-h
 
 
 Fetch a driver based on the short name.
@@ -756,7 +707,7 @@ Return the list of creation options of the driver.
  empty string. The returned string should not be freed and is owned by
  the driver.}
 
-	(hDrive GDALDriverH))
+	(hDrive gdal-driver-h))
 
 ;; --------------------------------------------------------
 
@@ -774,7 +725,7 @@ That URL is relative to the GDAL documentation directory.
  @return{the URL to the help that describes the driver or NULL. The
  returned string should not be freed and is owned by the driver.}"
 
-	(hDrive GDALDriverH))
+	(hDrive gdal-driver-h))
 
 ;; --------------------------------------------------------
 
@@ -790,7 +741,7 @@ Return the long name of a driver.
  @return{the long name of the driver or empty string. The returned
  string should not be freed and is owned by the driver.}
 
-	(hDriver GDALDriverH))
+	(hDriver gdal-driver-h))
 
 ;; --------------------------------------------------------
 
@@ -808,20 +759,20 @@ This is the string that can be passed to the GDALGetDriverByName() function.
  @return{the short name of the driver. The returned string should not
  be freed and is owned by the driver.}
 
-	(hDrive GDALDriverH))
+	(hDrive gdal-driver-h))
 
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALGetMetadata" GDALGetMetadata) (:pointer :string)
   "Fetch metadata."
-  (hObject GDALMajorObjectH)
+  (hObject gdal-major-object-h)
   (pszDomai :string))
 
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALGetMetadataItem" GDALGetMetadataItem) :string
   "Fetch single metadata item."
-  (hObject GDALMajorObjectH)
+  (hObject gdal-major-object-h)
   (pszName :string)
   (pszDomai :string))
 
@@ -832,7 +783,7 @@ This is the string that can be passed to the GDALGetDriverByName() function.
 
  This function is the same as the C++ method
  GDALColorTable::GetPaletteInterpretation()"
-	(hTabl GDALColorTableH))
+	(hTabl gdal-color-table-h))
 
 ;; --------------------------------------------------------
 
@@ -853,7 +804,7 @@ Get name of palette interpretation.
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALIdentifyDriver" GDALIdentifyDriver) GDALDriverH
+(cffi:defcfun ("GDALIdentifyDriver" GDALIdentifyDriver) gdal-driver-h
 
 
 Identify the driver that can open a raster file.
@@ -879,7 +830,7 @@ Identify the driver that can open a raster file.
  the NULL pointer. These strings are filenames that are auxiliary to
  the main filename. The passed value may be NULL.}
 
- @return{A GDALDriverH handle or NULL on failure. For C++ applications
+ @return{A gdal-driver-h handle or NULL on failure. For C++ applications
  this handle can be cast to a GDALDriver *.}
 
 	(pszFilename :string)
@@ -948,7 +899,7 @@ See CPLPackedDMSToDec().
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRasterBandCopyWholeRaster" GDALRasterBandCopyWholeRaster) CPLErr
+(cffi:defcfun ("GDALRasterBandCopyWholeRaster" GDALRasterBandCopyWholeRaster) cpl-err
 
 
 Copy all raster band raster data.
@@ -973,11 +924,11 @@ Copy all raster band raster data.
  @argument[pProgressData]{callback data for progress function.}
 
  @return{CE_None on success, or CE_Failure on failure.}
-(	(hSrcBand GDALRasterBandH)
-		(hDstBand GDALRasterBandH)
+(	(hSrcBand gdal-raster-band-h)
+		(hDstBand gdal-raster-band-h)
 		char ** papszOptions,
 		(pfnProgress GDALProgressFunc)
-		void * pProgressData
+		:pointer pProgressData
 	)
 
 ;; --------------------------------------------------------
@@ -1005,7 +956,7 @@ This function is the same as the C++ method GDALRasterAttributeTable::Clone()
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRATCreateColumn" GDALRATCreateColumn) CPLErr
+(cffi:defcfun ("GDALRATCreateColumn" GDALRATCreateColumn) cpl-err
 
 
 Create new column.
@@ -1143,16 +1094,16 @@ This function is the same as the C++ method GDALRasterAttributeTable::GetValueAs
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRATInitializeFromColorTable" GDALRATInitializeFromColorTable) CPLErr
+(cffi:defcfun ("GDALRATInitializeFromColorTable" GDALRATInitializeFromColorTable) cpl-err
   "Initialize from color table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::InitializeFromColorTable()"
   (hRAT GDALRasterAttributeTableH)
-  (hCT GDALColorTableH))
+  (hCT gdal-color-table-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRATSetLinearBinning" GDALRATSetLinearBinning) CPLErr
+(cffi:defcfun ("GDALRATSetLinearBinning" GDALRATSetLinearBinning) cpl-err
   "Set linear binning information.
 
 This function is the same as the C++ method GDALRasterAttributeTable::SetLinearBinning()"
@@ -1204,7 +1155,7 @@ This function is the same as the C++ method GDALRasterAttributeTable::SetValue()
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRATTranslateToColorTable" GDALRATTranslateToColorTable) GDALColorTableH
+(cffi:defcfun ("GDALRATTranslateToColorTable" GDALRATTranslateToColorTable) gdal-color-table-h
   "Translate to a color table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::TranslateToColorTable()"
@@ -1213,7 +1164,7 @@ This function is the same as the C++ method GDALRasterAttributeTable::TranslateT
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRATValuesIOAsDouble" GDALRATValuesIOAsDouble) CPLErr
+(cffi:defcfun ("GDALRATValuesIOAsDouble" GDALRATValuesIOAsDouble) cpl-err
   "Read or Write a block of doubles to/from the Attribute Table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()"
@@ -1226,7 +1177,7 @@ This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRATValuesIOAsInteger" GDALRATValuesIOAsInteger) CPLErr
+(cffi:defcfun ("GDALRATValuesIOAsInteger" GDALRATValuesIOAsInteger) cpl-err
   "Read or Write a block of ints to/from the Attribute Table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()"
@@ -1239,7 +1190,7 @@ This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRATValuesIOAsString" GDALRATValuesIOAsString) CPLErr
+(cffi:defcfun ("GDALRATValuesIOAsString" GDALRATValuesIOAsString) cpl-err
 Read or Write a block of strings to/from the Attribute Table.
 
 This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
@@ -1287,7 +1238,7 @@ This function is the same as the C++ method GDALRasterAttributeTable::ValuesIO()
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRegenerateOverviews" GDALRegenerateOverviews) CPLErr
+(cffi:defcfun ("GDALRegenerateOverviews" GDALRegenerateOverviews) cpl-err
 Generate downsampled overviews.
 
  This function will generate one or more overview images from a base
@@ -1315,13 +1266,12 @@ Generate downsampled overviews.
 
 @return{CE_None on success or CE_Failure on failure.}
 
-	(hSrcBand GDALRasterBandH)
-		(nOverviewCount int)
-		GDALRasterBandH * pahOvrBands,
+(hSrcBand gdal-raster-band-h)
+(nOverviewCount :int)
+		(pahOvrBands (:pointer gdal-raster-band-h))
 		(pszResampling :string)
 		(pfnProgress GDALProgressFunc)
-		void * pProgressData
-	)
+		 (pProgressData :pointer))
 
 ;; --------------------------------------------------------
 
@@ -1331,25 +1281,22 @@ Generate downsampled overviews.
 Register a driver for use.
 See also:
 GDALDriverManager::GetRegisterDriver()
-	(hDrive GDALDriverH))
+	(hDrive gdal-driver-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRenameDataset" GDALRenameDataset) CPLErr
-Rename a dataset.
-See also:
-GDALDriver::Rename()
-(	GDALDriverH hDriver,
+(cffi:defcfun ("GDALRenameDataset" GDALRenameDataset) cpl-err
+"Rename a dataset."
+
+(hDriver gdal-driver-h)
 		:string pszNewName,
 		:string pszOldName
 	)
 
 ;; --------------------------------------------------------
 
-void GDALSetCacheMax
-
-
-Set maximum cache memory.
+(cffi:defcfun ("GDALSetCacheMax" gdal-set-cache-max) :void
+  "Set maximum cache memory.
 
  This function sets the maximum amount of memory that GDAL is
  permitted to use for GDALRasterBlock caching. The unit of the value
@@ -1358,8 +1305,8 @@ Set maximum cache memory.
  The maximum value is 2GB, due to the use of a signed 32 bit
  integer. Use GDALSetCacheMax64() to be able to set a higher value.
 
-@argument[nNewSizeInBytes]{the maximum number of bytes for caching.}
-(	int nNewSizeInBytes	 )
+ @argument[nNewSizeInBytes]{the maximum number of bytes for caching.}"
+  (nNewSizeInBytes :int))
 
 ;; --------------------------------------------------------
 
@@ -1376,7 +1323,7 @@ Set maximum cache memory.
  attempt to check the consistency of the passed value with the
  effective capabilities of the OS.
 
-@argument[nNewSizeInBytes]{the maximum number of bytes for caching.}
+ @argument[nNewSizeInBytes]{the maximum number of bytes for caching.}
 
 Since:
 GDAL 1.8.0"
@@ -1385,13 +1332,10 @@ GDAL 1.8.0"
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALSetColorEntry" GDALSetColorEntry) :void
-Set entry in color table.
-
-This function is the same as the C++ method GDALColorTable::SetColorEntry()
-	(hTable GDALColorTableH)
-		(i int)
-		const GDALColorEntry * poEntry
-	)
+  "Set entry in color table."
+  (hTable gdal-color-table-h)
+  (i :int)
+  (poEntry (:pointer gdal-color-entry)))
 
 ;; --------------------------------------------------------
 
@@ -1399,26 +1343,24 @@ This function is the same as the C++ method GDALColorTable::SetColorEntry()
   "Set object description.
 See also:
 GDALMajorObject::SetDescription()"
-  (hObject GDALMajorObjectH)
+  (hObject gdal-major-object-h)
   (pszNewDesc :string))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetMetadata" gdal-set-metadata) CPLErr
+(cffi:defcfun ("GDALSetMetadata" gdal-set-metadata) cpl-err
   "Set metadata.
 See also:
 GDALMajorObject::SetMetadata()"
-  (hObject GDALMajorObjectH)
+  (hObject gdal-major-object-h)
   (papszMD (:pointer :string))
   (pszDomain :string))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetMetadataItem" GDALSetMetadataItem) CPLErr
-  "Set single metadata item.
-See also:
-GDALMajorObject::SetMetadataItem()"
-  (hObject GDALMajorObjectH)
+(cffi:defcfun ("GDALSetMetadataItem" GDALSetMetadataItem) cpl-err
+  "Set single metadata item."
+  (hObject gdal-major-object-h)
   (pszName :string)
   (pszValue :string)
   (pszDomain :string))
@@ -1475,7 +1417,7 @@ GDALGetDriverCreationOptionList()
  @return{TRUE if the list of creation options is compatible with the
  Create() and CreateCopy() method of the driver, FALSE otherwise.}"
 
-  (hDriver GDALDriverH)
+  (hDriver gdal-driver-h)
   (papszCreationOptions (:pointer :string)))
 
 ;; --------------------------------------------------------
