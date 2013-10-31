@@ -8,7 +8,7 @@
 (in-package :cl-gdal-asd)
 
 (defsystem :cl-gdal
-    :version "2013.08.25"      ; YYYY.MM.DD -- digits to suit the ASDF
+    :version "2013.8.25"      ; YYYY.MM.DD -- digits to suit the ASDF
     :licence "BSD"
     :description "CL-GDAL is a Common Lisp wrapper for the GDAL library."
     :author "Victor Anyakin <anyakinvictor@yahoo.com>"

@@ -10,7 +10,7 @@
 (cffi:defctype gdal-color-table-h :pointer "GDALColorTableH")
 (cffi:defctype gdal-driver-h :pointer "GDALDriverH")
 (cffi:defctype gdal-dataset-h :pointer "GDALDatasetH")
-(cffi:defctype gbyte :ubyte "GByte")
+(cffi:defctype gbyte :uint8 "GByte")
 
 ;; --------------------------------------------------------
 
@@ -27,8 +27,8 @@
 
 (cffi:defcenum gdal-access
   "Flag indicating read/write, or read-only access to data."
-  :GA_ReadOnly				; Read only (no update) access
-  :GA_Update)				; Read/write access.
+  (:GA_ReadOnly 0)                      ; Read only (no update) access
+  (:GA_Update 1))                       ; Read/write access.
 (export 'gdal-access)
 
 ;; --------------------------------------------------------
@@ -132,6 +132,19 @@
   (c2 :short)
   (c3 :short)
   (c4 :short))
+
+
+;; --------------------------------------------------------
+
+(cffi:defcstruct gdal-gcp
+  "GDAL_GCP Ground Control Point."
+  (pszId :string)          ; Unique identifier, often numeric.
+  (pszInfo :string)        ; Informational message or "".
+  (dfGCPPixel :double)     ; Pixel (x) location of GCP on raster.
+  (dfGCPLine :double)      ; Line (y) location of GCP on raster.
+  (dfGCPX :double)         ; X position of GCP in georeferenced space.
+  (dfGCPY :double)         ; Y position of GCP in georeferenced space
+  (dfGCPZ :double))        ; Elevation of GCP, or zero if not known.
 
 ;; --------------------------------------------------------
 
