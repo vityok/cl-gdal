@@ -7,7 +7,7 @@
 (cffi:defcfun ("GDALComputeRasterMinMax" GDAL-Compute-Raster-Min-Max) :void
 "Compute the min/max values for a band."
 (hBand gdal-raster-band-h)
-		int 	bApproxOK,
+		bApproxOK 	int,
 		double 	adfMinMax[2]
 	)
 
@@ -21,17 +21,15 @@
 		(:pointer :double) 	pdfMax,
 		(:pointer :double) 	pdfMean,
 		(:pointer :double) 	pdfStdDev,
-		GDALProgressFunc 	pfnProgress,
-		:pointer 	pProgressData
-	)
+		((pfnProgress :pointer) GDALProgressFunc)
+		(pProgressData 	:pointer))
 
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALCreateMaskBand" GDALCreateMaskBand) CPLErr
 "Adds a mask band to the current band."
 (hBand gdal-raster-band-h)
-		int 	nFlags
-	)
+		(nFlags :int))
 
 ;; --------------------------------------------------------
 

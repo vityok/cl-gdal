@@ -4,126 +4,109 @@
 
 ;; --------------------------------------------------------
 
-int OGR_SM_AddPart 	(	OGRStyleMgrH 	hSM,
-		OGRStyleToolH 	hST
-	)
-
-
-Add a part (style tool) to the current style.
+(cffi:defcfun ("OGR_SM_AddPart" OGR_SM_AddPart) :int
+  "Add a part (style tool) to the current style.
 
 This function is the same as the C++ method OGRStyleMgr::AddPart().
-@argument[hSM 	handle to the style manager.
+ @argument[hSM]{handle to the style manager.}
  @argument[hST]{the style tool defining the part to add.}
 
-@return{TRUE on success, FALSE on errors.
+ @return{TRUE on success, FALSE on errors.}"
+  (hSM ogr-style-mgr-h)
+  (hST ogr-style-tool-h))
 
 ;; --------------------------------------------------------
 
-int OGR_SM_AddStyle 	(	OGRStyleMgrH 	hSM,
-		:string 	pszStyleName,
-		:string 	pszStyleString
-	)
-
-
-Add a style to the current style table.
+(cffi:defcfun ("OGR_SM_AddStyle" OGR_SM_AddStyle) :int
+  "Add a style to the current style table.
 
 This function is the same as the C++ method OGRStyleMgr::AddStyle().
-@argument[hSM 	handle to the style manager.
+
+ @argument[hSM]{handle to the style manager.}
  @argument[pszStyleName]{the name of the style to add.}
  @argument[pszStyleString]{the style string to use, or NULL to use the
  style stored in the manager.}
 
-@return{TRUE on success, FALSE on errors.
+@return{TRUE on success, FALSE on errors."
+  (hSM ogr-style-mgr-h)
+  (pszStyleName :string)
+  (pszStyleString :string))
 
 ;; --------------------------------------------------------
 
-OGRStyleMgrH OGR_SM_Create 	(	OGRStyleTableH 	hStyleTable	 )
+(cffi:defcfun ("OGR_SM_Create" OGR_SM_Create) ogr-style-mgr-h
+  "OGRStyleMgr factory.
 
+ @argument[hStyleTable]{pointer to OGRStyleTable or NULL if not
+ working with a style table.}
 
-OGRStyleMgr factory.
-
-This function is the same as the C++ method OGRStyleMgr::OGRStyleMgr().
-@argument[hStyleTable 	pointer to OGRStyleTable or NULL if not working with a style table.
-
-@return{an handle to the new style manager object.}
-
-;; --------------------------------------------------------
-
-void OGR_SM_Destroy 	(	OGRStyleMgrH 	hSM	 )
-
-
-Destroy Style Manager.
-
-This function is the same as the C++ method OGRStyleMgr::~OGRStyleMgr().
-@argument[hSM 	handle to the style manager to destroy.
+ @return{an handle to the new style manager object.}"
+  (hStyleTable ogr-style-table-h))
 
 ;; --------------------------------------------------------
 
-OGRStyleToolH OGR_SM_GetPart 	(	OGRStyleMgrH 	hSM,
-		int 	nPartId,
-		:string 	pszStyleString
-	)
+(cffi:defcfun ("OGR_SM_Destroy" OGR_SM_Destroy) :void
+  "Destroy Style Manager.
 
+@argument[hSM]{handle to the style manager to destroy.}"
+  (hSM ogr-style-mgr-h))
 
-Fetch a part (style tool) from the current style.
+;; --------------------------------------------------------
 
-This function is the same as the C++ method OGRStyleMgr::GetPart().
+(cffi:defcfun ("OGR_SM_GetPart" OGR_SM_GetPart) ogr-style-tool-h
+  "Fetch a part (style tool) from the current style.
 
-This function instanciates a new object that should be freed with OGR_ST_Destroy().
-@argument[hSM 	handle to the style manager.
+ This function instanciates a new object that should be freed with
+ OGR_ST_Destroy().
+
+ @argument[hSM]{handle to the style manager.}
  @argument[nPartId]{the part number (0-based index).}
  @argument[pszStyleString]{(optional) the style string on which to
  operate. If NULL then the current style string stored in the style
  manager is used.}
 
- @return{OGRStyleToolH of the requested part (style tools) or NULL on error.}
+ @return{ogr-style-tool-h of the requested part (style tools) or NULL on error.}"
+  (hSM ogr-style-mgr-h)
+  (nPartId :int)
+  (pszStyleString :string))
 
 ;; --------------------------------------------------------
 
-int OGR_SM_GetPartCount 	(	OGRStyleMgrH 	hSM,
-		:string 	pszStyleString
-	)
+(cffi:defcfun ("OGR_SM_GetPartCount" OGR_SM_GetPartCount) :int
+  "Get the number of parts in a style.
 
-
-Get the number of parts in a style.
-
-This function is the same as the C++ method OGRStyleMgr::GetPartCount().
-@argument[hSM 	handle to the style manager.
+ @argument[hSM]{handle to the style manager.}
  @argument[pszStyleString]{(optional) the style string on which to
  operate. If NULL then the current style string stored in the style
  manager is used.}
 
-@return{the number of parts (style tools) in the style.
+@return{the number of parts (style tools) in the style.}"
+  (hSM ogr-style-mgr-h)
+  (pszStyleString :string))
 
 ;; --------------------------------------------------------
 
-const char* OGR_SM_InitFromFeature 	(	OGRStyleMgrH 	hSM,
-		OGRFeatureH 	hFeat
-	)
+(cffi:defcfun ("OGR_SM_InitFromFeature" OGR_SM_InitFromFeature) :string
+  "Initialize style manager from the style string of a feature.
 
-
-Initialize style manager from the style string of a feature.
-
-This function is the same as the C++ method OGRStyleMgr::InitFromFeature().
-@argument[hSM 	handle to the style manager.
+ @argument[hSM]{handle to the style manager.}
  @argument[hFeat]{handle to the new feature from which to read the style.}
 
  @return{a reference to the style string read from the feature, or
- NULL in case of error.}
+ NULL in case of error.}"
+  (hSM ogr-style-mgr-h)
+  (hFeat ogr-feature-h))
 
 ;; --------------------------------------------------------
 
-int OGR_SM_InitStyleString 	(	OGRStyleMgrH 	hSM,
-		:string 	pszStyleString
-	)
+(cffi:defcfun ("OGR_SM_InitStyleString" OGR_SM_InitStyleString) :int
+  "Initialize style manager from the style string.
 
-
-Initialize style manager from the style string.
-
-This function is the same as the C++ method OGRStyleMgr::InitStyleString().
-@argument[hSM 	handle to the style manager.
+ @argument[hSM]{handle to the style manager.}
  @argument[pszStyleString]{the style string to use (can be NULL).}
 
-@return{TRUE on success, FALSE on errors.}
+@return{TRUE on success, FALSE on errors.}"
+  (hSM ogr-style-mgr-h)
+  (pszStyleString :string))
 
 ;; EOF

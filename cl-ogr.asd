@@ -8,7 +8,7 @@
 (in-package :cl-ogr-asd)
 
 (defsystem :cl-ogr
-    :version "2013.08.25"      ; YYYY.MM.DD -- digits to suit the ASDF
+    :version "2013.8.25"      ; YYYY.MM.DD -- digits to suit the ASDF
     :licence "BSD"
     :description "CL-OGR is a minimal Common Lisp wrapper for the OGR library."
     :author "Victor Anyakin <anyakinvictor@yahoo.com>"
@@ -34,11 +34,10 @@ OGR is a part of the GDAL library."
 			   (:file "ogr-geometry")
 			   (:file "ogr-geom-field")
 			   (:file "ogr-layer")
-			   ;; (:file "ogr-sfdriver")
-			   ;; (:file "ogr-style-manager")
-			   ;; (:file "ogr-style-table")
-			   ;; (:file "ogr-style-tool")
-			   )))
+			   (:file "ogr-sfdriver")
+			   (:file "ogr-style-manager")
+			   (:file "ogr-style-table")
+			   (:file "ogr-style-tool"))))
     :depends-on (:cffi
 		 :trivial-garbage))
 

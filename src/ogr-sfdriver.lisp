@@ -4,10 +4,8 @@
 
 ;; --------------------------------------------------------
 
-OGRDataSourceH OGR_Dr_CopyDataSource
-
-
- This function creates a new datasource by copying all the layers from
+(cffi:defcfun ("OGR_Dr_CopyDataSource" ogr-dr-copy-data-source) ogr-data-source-h
+  "This function creates a new datasource by copying all the layers from
  the source datasource.
 
  It is important to call OGR_DS_Destroy() when the datasource is no
@@ -25,19 +23,16 @@ OGRDataSourceH OGR_Dr_CopyDataSource
  following url: http://www.gdal.org/ogr/ogr_formats.html}
 
  @return{NULL is returned on failure, or a new OGRDataSource handle on
- success.}
-(	OGRSFDriverH 	hDriver,
-		OGRDataSourceH 	hSrcDS,
-		:string 	pszNewName,
-		char ** 	papszOptions
-	)
+ success.}"
+  (hDriver ogr-sf-driver-h)
+  (hSrcDS ogr-data-source-h)
+  (pszNewName :string)
+  (papszOptions (:pointer :string)))
 
 ;; --------------------------------------------------------
 
-OGRDataSourceH OGR_Dr_CreateDataSource
-
-
- This function attempts to create a new data source based on the
+(cffi:defcfun ("OGR_Dr_CreateDataSource" OGR_Dr_CreateDataSource) ogr-data-source-h
+  "This function attempts to create a new data source based on the
  passed driver.
 
  The papszOptions argument can be used to control driver specific
@@ -58,18 +53,15 @@ OGRDataSourceH OGR_Dr_CreateDataSource
  following url: http://www.gdal.org/ogr/ogr_formats.html}
 
  @return{NULL is returned on failure, or a new OGRDataSource handle on
- success.}
-(	OGRSFDriverH 	hDriver,
-		:string 	pszName,
-		char ** 	papszOptions
-	)
+ success.}"
+  (hDriver ogr-sf-driver-h)
+  (pszName :string)
+  (papszOptions (:pointer :string)))
 
 ;; --------------------------------------------------------
 
-OGRErr OGR_Dr_DeleteDataSource
-
-
-Delete a datasource.
+(cffi:defcfun ("OGR_Dr_DeleteDataSource" OGR_Dr_DeleteDataSource) ogr-err
+  "Delete a datasource.
 
  Delete (from the disk, in the database, ...) the named
  datasource. Normally it would be safest if the datasource was not
@@ -85,34 +77,29 @@ Delete a datasource.
  @argument[pszDataSource]{the name of the datasource to delete.}
 
  @return{OGRERR_NONE on success, and OGRERR_UNSUPPORTED_OPERATION if
- this is not supported by this driver.}
-(	OGRSFDriverH 	hDriver,
-		:string 	pszDataSource
-	)
+ this is not supported by this driver.}"
+  (hDriver ogr-sf-driver-h)
+  (pszDataSource :string))
 
 ;; --------------------------------------------------------
 
-:string OGR_Dr_GetName
-
-
- Fetch name of driver (file format). This name should be relatively
+(cffi:defcfun ("OGR_Dr_GetName" OGR_Dr_GetName) :string
+  "Fetch name of driver (file format). This name should be relatively
  short (10-40 characters), and should reflect the underlying file
- format. For instance "ESRI Shapefile".
+ format. For instance \"ESRI Shapefile\".
 
  This function is the same as the C++ method OGRSFDriver::GetName().
 
  @argument[hDriver]{handle to the the driver to get the name from.}
 
  @return{driver name. This is an internal string and should not be
- modified or freed.}
-(	OGRSFDriverH 	hDriver	 )
+ modified or freed.}"
+  (hDriver ogr-sf-driver-h))
 
 ;; --------------------------------------------------------
 
-OGRDataSourceH OGR_Dr_Open
-
-
-Attempt to open file with this driver.
+(cffi:defcfun ("OGR_Dr_Open" OGR_Dr_Open) ogr-data-source-h
+  "Attempt to open file with this driver.
 
  This function is the same as the C++ method OGRSFDriver::Open().
 
@@ -122,18 +109,15 @@ Attempt to open file with this driver.
 
  @return{NULL on error or if the pass name is not supported by this
  driver, otherwise an handle to an OGRDataSource. This OGRDataSource
- should be closed by deleting the object when it is no longer needed.}
-(	OGRSFDriverH 	hDriver,
-		:string 	pszName,
-		int 	bUpdate
-	)
+ should be closed by deleting the object when it is no longer needed.}"
+  (hDriver ogr-sf-driver-h)
+  (pszName :string)
+  (bUpdate :int))
 
 ;; --------------------------------------------------------
 
-int OGR_Dr_TestCapability
-
-
-Test if capability is available.
+(cffi:defcfun ("OGR_Dr_TestCapability" OGR_Dr_TestCapability) :int
+  "Test if capability is available.
 
  One of the following data source capability names can be passed into
  this function, and a TRUE or FALSE value will be returned indicating
@@ -154,9 +138,8 @@ ODrCDeleteDataSource: True if this driver supports deleting data sources.
  @argument[hDriver]{handle to the driver to test the capability against.}
  @argument[pszCap]{the capability to test.}
 
- @return{TRUE if capability available otherwise FALSE.}
-(	OGRSFDriverH 	hDriver,
-		:string 	pszCap
-	)
+ @return{TRUE if capability available otherwise FALSE.}"
+  (hDriver ogr-sf-driver-h)
+  (pszCap :string))
 
 ;; EOF
