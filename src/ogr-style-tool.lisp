@@ -187,7 +187,7 @@ Maps to the OGRStyleTool subclasses' SetParamStr() methods.
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_ST_SetUnit" OGR_ST_SetUnit) :void
+(cffi:defcfun ("OGR_ST_SetUnit" ogr-st-setunit) :void
   "Set Style Tool units.
 
 This function is the same as OGRStyleTool::SetUnit()

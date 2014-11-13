@@ -99,7 +99,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateGeometry" OGR-G-Create-Geometry) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_CreateGeometry" ogr-g-create-geometry) ogr-geometry-h ; OGRGeometryH
 "Create an empty geometry of desired type.
 
  This is equivalent to allocating the desired geometry with new, but
@@ -118,7 +118,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ApproximateArcAngles" OGR-G-Approximate-Arc-Angles) :pointer ;OGRGeometryH
+(cffi:defcfun ("OGR_G_ApproximateArcAngles" OGR-G-Approximate-Arc-Angles) ogr-geometry-h ;OGRGeometryH
   "Stroke arc to linestring.
 
 Stroke an arc of a circle to a linestring based on a center point,
@@ -131,15 +131,15 @@ value with the OGR_ARC_STEPSIZE configuration variable.
 See also:
 CPLSetConfigOption()
 
-Parameters:	dfCenterX 	center X
-	dfCenterY 	center Y
-	dfZ 	center Z
-	dfPrimaryRadius 	X radius of ellipse.
-	dfSecondaryRadius 	Y radius of ellipse.
-	dfRotation 	rotation of the ellipse clockwise.
-	dfStartAngle 	angle to first point on arc (clockwise of X-positive)
-	dfEndAngle 	angle to last point on arc (clockwise of X-positive)
-	dfMaxAngleStepSizeDegrees 	the largest step in degrees along the arc, zero to use the default setting.
+@argument[dfCenterX]{center X}
+@argument[dfCenterY]{center Y}
+@argument[fZ]{center Z}
+@argument[fPrimaryRadius]{X radius of ellipse.}
+@argument[fSecondaryRadius]{Y radius of ellipse.}
+@argument[fRotation]{rotation of the ellipse clockwise.}
+@argument[fStartAngle]{angle to first point on arc (clockwise of X-positive)}
+@argument[fEndAngle]{angle to last point on arc (clockwise of X-positive)}
+@argument[fMaxAngleStepSizeDegrees]{the largest step in degrees along the arc, zero to use the default setting.}
 
 Returns:
 OGRLineString geometry representing an approximation of the arc.
@@ -155,11 +155,11 @@ OGR 1.8.0"
   (dfStartAngle :double)
   (dfEndAngle :double)
   (dfMaxAngleStepSizeDegrees :double))
-(export 'OGR-G-Approximate-Arc-Angles)
+(export 'ogr-g-approximate-arc-angles)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ForceToPolygon" OGR-G-Force-To-Polygon) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_ForceToPolygon" ogr-g-force-to-polygon) ogr-geometry-h ; OGRGeometryH
   "Convert to polygon.
 
  This function is the same as the C++ method
@@ -176,7 +176,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun  ("OGR_G_ForceToMultiLineString" OGR_G_ForceToMultiLineString) :pointer ; OGRGeometryH
+(cffi:defcfun  ("OGR_G_ForceToMultiLineString" OGR_G_ForceToMultiLineString) ogr-geometry-h
   "Convert to multilinestring.
 
  This function is the same as the C++ method
@@ -187,11 +187,11 @@ OGR 1.8.0"
  @return{the converted geometry (ownership to caller).}
 
  Since: GDAL/OGR 1.8.0"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))			; OGRGeometryH
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ForceToMultiPolygon" OGR-G-Force-To-Multi-Polygon) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_ForceToMultiPolygon" OGR-G-Force-To-Multi-Polygon) ogr-geometry-h
   "Convert to multipolygon.
 
  This function is the same as the C++ method
@@ -203,11 +203,11 @@ OGR 1.8.0"
  @return{the converted geometry (ownership to caller).}
 
  Since: GDAL/OGR 1.8.0"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ForceToMultiPoint" OGR-G-Force-To-Multi-Point) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_ForceToMultiPoint" ogr-g-force-to-multi-point) ogr-geometry-h
   "Convert to multipoint.
 
  This function is the same as the C++ method
@@ -219,11 +219,11 @@ OGR 1.8.0"
  @return{the converted geometry (ownership to caller).}
 
  Since: GDAL/OGR 1.8.0"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ForceToMultiLineString" OGR-G-Force-To-Multi-Line-String) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_ForceToMultiLineString" OGR-G-Force-To-Multi-Line-String) ogr-geometry-h ; OGRGeometryH
   "Convert to multilinestring.
 
  This function is the same as the C++ method
@@ -252,7 +252,7 @@ OGR 1.8.0"
 
  @argument[hGeom]{handle on the geometry to get the dimension from.}
  @return{0 for points, 1 for lines and 2 for surfaces.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 
 ;; --------------------------------------------------------
 
@@ -270,11 +270,11 @@ OGR 1.8.0"
 
  @return{in practice this will return 2 or 3. It can also return 0 in
  the case of an empty point.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_SetCoordinateDimension" OGR-G-Set-Coordinate-Dimension) :void
+(cffi:defcfun ("OGR_G_SetCoordinateDimension" ogr-g-set-coordinate-dimension) :void
   "Set the coordinate dimension.
 
  This method sets the explicit coordinate dimension. Setting the
@@ -284,15 +284,14 @@ OGR 1.8.0"
 
  @argument[hGeom]{handle on the geometry to set the dimension of the
  coordinates.}
-
  @argument[nNewDimension]{New coordinate dimension value, either 2 or
  3.}"
-  (hGeom :pointer)			; OGRGeometryH
+  (hGeom ogr-geometry-h)
   (nNewDimension :int))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Clone" OGR-G-Clone) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_Clone" ogr-g-clone) ogr-geometry-h
   "Make a copy of this object.
 
  This function relates to the SFCOM IGeometry::clone() method.
@@ -316,7 +315,7 @@ OGR 1.8.0"
  @argument[hGeom]{handle of the geometry to get envelope from.}
  @argument[psEnvelope]{the structure in which to place the results.}"
 
-  (hGeom :pointer)			; OGRGeometryH
+  (hGeom ogr-geometry-h)
   (psEnvelope :pointer))		; OGREnvelope*
 
 
@@ -333,14 +332,14 @@ OGR 1.8.0"
  @argument[psEnvelope]{the structure in which to place the results.}
 
  Since: OGR 1.9.0"
-  (hGeom :pointer)			; OGRGeometryH
+  (hGeom ogr-geometry-h)
   (psEnvelope :pointer))		; OGREnvelope3D*
 
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ImportFromWkb" %OGR-G-Import-From-Wkb) :int ; OGRErr
-  (hGeom :pointer)			; OGRGeometryH
+(cffi:defcfun ("OGR_G_ImportFromWkb" %OGR-G-Import-From-Wkb) ogr-err
+  (hGeom ogr-geometry-h)
   (pabyData :string)			; unsigned char *
   (nSize :int))
 
@@ -368,8 +367,8 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_ExportToWkb" %OGR-G-Export-To-Wkb) :int ; OGRErr
-  (hGeom :pointer)			; OGRGeometryH
+(cffi:defcfun ("OGR_G_ExportToWkb" %OGR-G-Export-To-Wkb) ogr-err
+  (hGeom ogr-geometry-h)
   (eOrder :int)				; OGRwkbByteOrder
   (pabyDstBuffer :string))		; unsigned char *
 
@@ -408,7 +407,7 @@ OGR 1.8.0"
  @argument[hGeom]{handle on the geometry to get the binary size from.}
 
  @return{size of binary representation in bytes.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 
 ;; --------------------------------------------------------
 
@@ -1252,8 +1251,8 @@ OGR 1.8.0"
  if the difference is empty or an error occurs.}
 
  Since: OGR 1.8.0"
-  (hThis :pointer)			; OGRGeometryH
-  (hOther :pointer))			; OGRGeometryH
+  (hThis ogr-geometry-h)
+  (hOther ogr-geometry-h))
 (export 'OGR-G-Sym-Difference)
 
 ;; --------------------------------------------------------
@@ -1276,8 +1275,8 @@ OGR 1.8.0"
 
  @return{the distance between the geometries or -1 if an error
  occurs.}"
-  (hFirst :pointer)			; OGRGeometryH
-  (hOther :pointer))			; OGRGeometryH
+  (hFirst ogr-geometry-h)
+  (hOther ogr-geometry-h))
 (export 'OGR-G-Distance)
 
 ;; --------------------------------------------------------
@@ -1295,7 +1294,7 @@ OGR 1.8.0"
  @return{the lenght or 0.0 for unsupported geometry types.}
 
  Since:OGR 1.8.0"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Length)
 
 ;; --------------------------------------------------------
@@ -1315,7 +1314,7 @@ OGR 1.8.0"
  @return{the area or 0.0 for unsupported geometry types.}
 
  Since: OGR 1.8.0"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Area)
 
 ;; --------------------------------------------------------
@@ -1341,8 +1340,8 @@ OGR 1.8.0"
  CPLE_NotSupported error.
 
  @return{:NONE on success or :FAILURE on error.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hCentroidPoint :pointer))		; OGRGeometryH
+  (hGeom ogr-geometry-h)
+  (hCentroidPoint ogr-geometry-h))
 (export 'OGR-G-Centroid)
 
 ;; --------------------------------------------------------
@@ -1357,7 +1356,7 @@ OGR 1.8.0"
  This function is the same as the CPP method OGRGeometry::empty().
 
  @argument[hGeom]{handle on the geometry to empty.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Empty)
 
 ;; --------------------------------------------------------
@@ -1370,7 +1369,7 @@ OGR 1.8.0"
  @argument[hGeom]{The Geometry to test.}
 
  @return{TRUE if the geometry has no points, otherwise FALSE.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Is-Empty)
 
 ;; --------------------------------------------------------
@@ -1387,7 +1386,7 @@ OGR 1.8.0"
  @argument[hGeom]{The Geometry to test.}
 
  @return{TRUE if the geometry has no points, otherwise FALSE.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Is-Valid)
 
 ;; --------------------------------------------------------
@@ -1409,7 +1408,7 @@ OGR 1.8.0"
  @argument[hGeom]{The Geometry to test.}
 
  @return{TRUE if object is simple, otherwise FALSE.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Is-Simple)
 
 ;; --------------------------------------------------------
@@ -1426,7 +1425,7 @@ OGR 1.8.0"
  @argument[hGeom]{The Geometry to test.}
 
  @return{TRUE if the geometry has no points, otherwise FALSE.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
 (export 'OGR-G-Is-Ring)
 
 ;; --------------------------------------------------------
@@ -1453,15 +1452,15 @@ OGR 1.8.0"
  caller, or NULL on failure.}
 
  Since: OGR 1.9.0"
-  (hTarget :pointer))			; OGRGeometryH
+  (hTarget ogr-geometry-h))
 (export 'OGR-G-Polygonize)
 
 ;; --------------------------------------------------------
 
 #| deprecated
-(cffi:defcfun ("OGR_G_SymmetricDifference" OGR-G-Symmetric-Difference) OGRGeometryH
-(cffi:defcfun double OGR_G_GetArea
-(cffi:defcfun OGRGeometryH OGR_G_GetBoundary
+cffi:defcfun {"OGR_G_SymmetricDifference" OGR-G-Symmetric-Difference} OGRGeometryH
+cffi:defcfun double OGR_G_GetArea
+cffi:defcfun OGRGeometryH OGR_G_GetBoundary
 |#
 
 ;; --------------------------------------------------------
@@ -1693,8 +1692,8 @@ OGR 1.8.0"
  @return{OGRERR_NONE if successful, or
  OGRERR_UNSUPPORTED_GEOMETRY_TYPE if the geometry type is illegal for
  the type of existing geometry.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hNewSubGeom :pointer))		; OGRGeometryH
+  (hGeom ogr-geometry-h)
+  (hNewSubGeom ogr-geometry-h))
 (export 'OGR-G-Add-Geometry)
 
 ;; --------------------------------------------------------
@@ -1722,8 +1721,8 @@ OGR 1.8.0"
  @return{:NONE if successful, or
  :UNSUPPORTED_GEOMETRY_TYPE if the geometry type is illegal for the
  type of geometry container.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hNewSubGeom :pointer))		; OGRGeometryH
+  (hGeom ogr-geometry-h)
+  (hNewSubGeom ogr-geometry-h))
 (export 'OGR-G-Add-Geometry-Directly)
 
 ;; --------------------------------------------------------
@@ -1768,7 +1767,7 @@ OGR 1.8.0"
  @argument[peErr]{OGRERR_NONE on success, or OGRERR_FAILURE on failure.}
 
  @return{an handle to the new geometry, a polygon.}"
-  (hLines OGR-Geometry-H)
+  (hLines ogr-geometry-h)
   (bBestEffort :int)
   (bAutoClose :int)
   (dfTolerance :double)
