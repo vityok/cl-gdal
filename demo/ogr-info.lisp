@@ -31,20 +31,22 @@
     (format t "it contains: ~a layers~%" (ogr:ogr-ds-get-layer-count hds))
 
     (loop for i from 0 below (ogr:ogr-ds-get-layer-count hds) do
-         (let ((layer (ogr:ogr-ds-get-layer hds i))
-	       (envelope nil)) ; make cstruct ogr-envelope and pass pointer to it?
-	   (ogr:ogr-l-get-extent layer envelope 0)
-           (format t "layer[~a]: name=\"~a\", type=(~a)~%"
-		   i
-		   (ogr:ogr-l-get-name layer)
-		   (ogr:ogr-l-get-geom-type layer))
+         (let ((layer (ogr:ogr-ds-get-layer hds i)))
+	   (cffi:with-foreign-object (envelope '(:struct ogr:ogr-envelope)) 
+	     (ogr:ogr-l-get-extent layer envelope 0)
+	     (cffi:with-foreign-slots ((ogr:minx ogr:maxx ogr:miny ogr:maxy) envelope (:struct ogr:ogr-envelope))
+	       (format t "layer[~a]: name=\"~a\", type=(~a), extents=[~a,~a,~a,~a]~%"
+		       i
+		       (ogr:ogr-l-get-name layer)
+		       (ogr:ogr-l-get-geom-type layer)
+		       ogr:minx ogr:miny ogr:maxx ogr:maxy))
 
-	   (format t "has ~a features~%"
-		   (loop
-		      for feature = (ogr:ogr-l-get-next-feature layer) then (ogr:ogr-l-get-next-feature layer)
-		      while (not (cffi:null-pointer-p feature))
-		      count feature
-		      do (ogr:ogr-f-destroy feature)))))))
+	     (format t "has ~a features~%"
+		     (loop
+			for feature = (ogr:ogr-l-get-next-feature layer) then (ogr:ogr-l-get-next-feature layer)
+			while (not (cffi:null-pointer-p feature))
+			count feature
+			do (ogr:ogr-f-destroy feature))))))))
 
 ;; --------------------------------------------------------
 

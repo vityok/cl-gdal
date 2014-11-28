@@ -31,13 +31,18 @@
 
 (cffi:defctype ogr-sf-driver-h :pointer "OGRSFDriverH")
 
-;; todo
 (cffi:defcstruct ogr-envelope
-  "OGREnvelope"
-  (min-x :double)
-  (max-x :double)
-  (min-y :double)
-  (max-y :double))
+  "OGREnvelope is declared either as a class or a plain struct depending on the language."
+  (MinX :double)
+  (MaxX :double)
+  (MinY :double)
+  (MaxY :double))
+
+(export 'ogr-envelope)
+(export 'MinX)
+(export 'MaxX)
+(export 'MinY)
+(export 'MaxY)
 
 ;; --------------------------------------------------------
 

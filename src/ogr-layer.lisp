@@ -510,7 +510,7 @@
 
  @return{OGRERR_NONE on success, OGRERR_FAILURE if extent not known.}"
   (hLayer ogr-layer-h)
-  (psExtent (:pointer ogr-envelope))
+  (psExtent (:pointer (:struct ogr-envelope)))
   (bForce :int))
 (export 'ogr-l-get-extent)
 
