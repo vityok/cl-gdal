@@ -7,7 +7,7 @@
 (cffi:defcfun ("GDALComputeRasterMinMax" GDAL-Compute-Raster-Min-Max) :void
 "Compute the min/max values for a band."
 (hBand gdal-raster-band-h)
-		bApproxOK 	int,
+		(bApproxOK 	:int)
 		double 	adfMinMax[2]
 	)
 
@@ -16,7 +16,7 @@
 (cffi:defcfun ("GDALComputeRasterStatistics" GDALComputeRasterStatistics) CPLErr
 "Compute image statistics."
 (hBand gdal-raster-band-h)
-		int 	bApproxOK,
+		(:int 	bApproxOK)
 		(:pointer :double) 	pdfMin,
 		(:pointer :double) 	pdfMax,
 		(:pointer :double) 	pdfMean,

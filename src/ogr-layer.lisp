@@ -4,7 +4,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_L_GetName" ogr-l-get-name) :string ; const char *
+(cffi:defcfun ("OGR_L_GetName" ogr-l-get-name) :string
   "Return the layer name.
 
  This returns the same content as
@@ -510,7 +510,7 @@
 
  @return{OGRERR_NONE on success, OGRERR_FAILURE if extent not known.}"
   (hLayer ogr-layer-h)
-  (psExtent :pointer)			; OGREnvelope *
+  (psExtent (:pointer ogr-envelope))
   (bForce :int))
 (export 'ogr-l-get-extent)
 

@@ -31,6 +31,14 @@
 
 (cffi:defctype ogr-sf-driver-h :pointer "OGRSFDriverH")
 
+;; todo
+(cffi:defcstruct ogr-envelope
+  "OGREnvelope"
+  (min-x :double)
+  (max-x :double)
+  (min-y :double)
+  (max-y :double))
+
 ;; --------------------------------------------------------
 
 (defclass ogr-class ()
