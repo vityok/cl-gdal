@@ -68,16 +68,15 @@
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("GDALGetDefaultHistogram" gdal-get-default-histogram) cpl-err
-"Fetch default raster histogram."
-(hBand gdal-raster-band-h)
-		(:pointer :double) 	pdfMin,
-		(:pointer :double) 	pdfMax,
-		int * 	pnBuckets,
-		int ** 	ppanHistogram,
-		int 	bForce,
-		GDALProgressFunc 	pfnProgress,
-		:pointer 	pProgressData
-	)
+  "Fetch default raster histogram."
+  (hBand gdal-raster-band-h)
+  (pdfMin (:pointer :double))
+  (pdfMax (:pointer :double))
+  (pnBuckets (:pointer :int))
+  (ppanHistogram (:pointer (:pointer :int)))
+  (bForce :int)
+  (pfnProgress :pointer) ;; GDALProgressFunc
+  (pProgressData :pointer))
 
 ;; --------------------------------------------------------
 
@@ -130,224 +129,206 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterCategoryNames" GDALGetRasterCategoryNames) (:pointer :string)
-"Fetch the list of category names for this raster."
-(hBand gdal-raster-band-h	 )
+(cffi:defcfun ("GDALGetRasterCategoryNames" gdal-get-raster-category-names) (:pointer :string)
+  "Fetch the list of category names for this raster."
+  (hBand gdal-raster-band-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterColorInterpretation" GDALGetRasterColorInterpretation) GDALColorInterp
-"How should this band be interpreted as color?"
-(hBand gdal-raster-band-h	 )
+(cffi:defcfun ("GDALGetRasterColorInterpretation" gdal-get-raster-color-interpretation) gdal-color-interp
+  "How should this band be interpreted as color?"
+  (hBand gdal-raster-band-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterColorTable" GDALGetRasterColorTable) gdal-color-table-h
-"Fetch the color table associated with band."
-(hBand gdal-raster-band-h	 )
+(cffi:defcfun ("GDALGetRasterColorTable" gdal-get-raster-color-table) gdal-color-table-h
+  "Fetch the color table associated with band."
+  (hBand gdal-raster-band-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterDataType" GDALGetRasterDataType) GDALDataType
-"Fetch the pixel data type for this band."
-(hBand gdal-raster-band-h	 )
+(cffi:defcfun ("GDALGetRasterDataType" gdal-get-raster-data-type) gdal-data-type
+  "Fetch the pixel data type for this band."
+  (hBand gdal-raster-band-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterHistogram" GDALGetRasterHistogram) CPLErr
-"Compute raster histogram."
-(hBand gdal-raster-band-h)
-		double 	dfMin,
-		double 	dfMax,
-		int 	nBuckets,
-		int * 	panHistogram,
-		int 	bIncludeOutOfRange,
-		int 	bApproxOK,
-		GDALProgressFunc 	pfnProgress,
-		:pointer 	pProgressData
-	)
+(cffi:defcfun ("GDALGetRasterHistogram" gdal-get-raster-histogram) cpl-err
+  "Compute raster histogram."
+  (hBand gdal-raster-band-h)
+  (dfMin :double)
+  (dfMax :double)
+  (nBuckets :int)
+  (panHistogram (:pointer :int))
+  (bIncludeOutOfRange :int)
+  (bApproxOK :int)
+  (pfnProgress :pointer) ;; GDALProgressFunc
+  (pProgressData :pointer))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterMaximum" GDALGetRasterMaximum) double
-"Fetch the maximum value for this band."
-(hBand gdal-raster-band-h)
-		int * 	pbSuccess
-	)
+(cffi:defcfun ("GDALGetRasterMaximum" gdal-get-raster-maximum) :double
+  "Fetch the maximum value for this band."
+  (hBand gdal-raster-band-h)
+  (pbSuccess (:pointer :int)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterMinimum" GDALGetRasterMinimum) double
-"Fetch the minimum value for this band."
-(hBand gdal-raster-band-h)
-		int * 	pbSuccess
-	)
+(cffi:defcfun ("GDALGetRasterMinimum" gdal-get-raster-minimum) :double
+  "Fetch the minimum value for this band."
+  (hBand gdal-raster-band-h)
+  (pbSuccess (:pointer :int)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterNoDataValue" GDALGetRasterNoDataValue) double
-"Fetch the no data value for this band."
-(hBand gdal-raster-band-h)
-		int * 	pbSuccess
-	)
+(cffi:defcfun ("GDALGetRasterNoDataValue" gdal-get-raster-no-data-value) :double
+  "Fetch the no data value for this band."
+  (hBand gdal-raster-band-h)
+  (pbSuccess (:pointer :int)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterOffset" GDALGetRasterOffset) double
-"Fetch the raster value offset."
-(hBand gdal-raster-band-h)
-		int * 	pbSuccess
-	)
+(cffi:defcfun ("GDALGetRasterOffset" gdal-get-raster-offset) :double
+  "Fetch the raster value offset."
+  (hBand gdal-raster-band-h)
+  (pbSuccess (:pointer :int)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterSampleOverview" GDALGetRasterSampleOverview) gdal-raster-band-h
-"Fetch best sampling overview."
-(hBand gdal-raster-band-h)
-		int 	nDesiredSamples
-	)
+(cffi:defcfun ("GDALGetRasterSampleOverview" gdal-get-raster-sample-overview) gdal-raster-band-h
+  "Fetch best sampling overview."
+  (hBand gdal-raster-band-h)
+  (nDesiredSamples :int))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterScale" GDALGetRasterScale) double
-"Fetch the raster value scale."
-(hBand gdal-raster-band-h)
-		int * 	pbSuccess
-	)
+(cffi:defcfun ("GDALGetRasterScale" gdal-get-raster-scale) :double
+  "Fetch the raster value scale."
+  (hBand gdal-raster-band-h)
+  (pbSuccess (:pointer :int)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterStatistics" GDALGetRasterStatistics) CPLErr
-"Fetch image statistics."
-(hBand gdal-raster-band-h)
-		int 	bApproxOK,
-		int 	bForce,
-		(:pointer :double) 	pdfMin,
-		(:pointer :double) 	pdfMax,
-		(:pointer :double) 	pdfMean,
-		(:pointer :double) 	pdfStdDev
-	)
+(cffi:defcfun ("GDALGetRasterStatistics" gdal-get-raster-statistics) cpl-err
+  "Fetch image statistics."
+  (hBand gdal-raster-band-h)
+  (bApproxOK :int)
+  (bForce :int)
+  (pdfMin (:pointer :double))
+  (pdfMax (:pointer :double))
+  (pdfMean (:pointer :double))
+  (pdfStdDev (:pointer :double)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALGetRasterUnitType" GDALGetRasterUnitType) :string
+(cffi:defcfun ("GDALGetRasterUnitType" gdal-get-raster-unit-type) :string
 "Return raster unit type."
 (hBand gdal-raster-band-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALHasArbitraryOverviews" GDALHasArbitraryOverviews) :int
+(cffi:defcfun ("GDALHasArbitraryOverviews" gdal-has-arbitrary-overviews) :int
   "Check for arbitrary overviews."
   (hBand gdal-raster-band-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRasterAdviseRead" GDALRasterAdviseRead) CPLErr
-"Advise driver of upcoming read requests."
-(hBand gdal-raster-band-h)
-		int 	nXOff,
-		int 	nYOff,
-		int 	nXSize,
-		int 	nYSize,
-		int 	nBufXSize,
-		int 	nBufYSize,
-		GDALDataType 	eDT,
-		char ** 	papszOptions
-	)
+(cffi:defcfun ("GDALRasterAdviseRead" gdal-raster-advise-read) cpl-err
+  "Advise driver of upcoming read requests."
+  (hBand gdal-raster-band-h)
+  (nXOff :int)
+  (nYOff :int)
+  (nXSize :int)
+  (nYSize :int)
+  (nBufXSize :int)
+  (nBufYSize :int)
+  (eDT gdal-data-type)
+  (papszOptions (:pointer :string)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALRasterIO" GDALRasterIO) CPLErr
-"Read/write a region of image data for this band."
-(hBand gdal-raster-band-h)
-		GDALRWFlag 	eRWFlag,
-		int 	nXOff,
-		int 	nYOff,
-		int 	nXSize,
-		int 	nYSize,
-		:pointer 	pData,
-		int 	nBufXSize,
-		int 	nBufYSize,
-		GDALDataType 	eBufType,
-		int 	nPixelSpace,
-		int 	nLineSpace
-	)
+(cffi:defcfun ("GDALRasterIO" gdal-raster-io) cpl-err
+  "Read/write a region of image data for this band."
+  (hBand gdal-raster-band-h)
+  (eRWFlag gdal-rw-flag)
+  (nXOff :int)
+  (nYOff :int)
+  (nXSize :int)
+  (nYSize :int)
+  (pData :pointer)
+  (nBufXSize :int)
+  (nBufYSize :int)
+  (eBufType gdal-data-type)
+  (nPixelSpace :int)
+  (nLineSpace :int))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALReadBlock" GDALReadBlock) CPLErr
-"Read a block of image data efficiently."
-(hBand gdal-raster-band-h)
-		int 	nXOff,
-		int 	nYOff,
-		:pointer 	pData
-	)
+(cffi:defcfun ("GDALReadBlock" gdal-read-block) cpl-err
+  "Read a block of image data efficiently."
+  (hBand gdal-raster-band-h)
+  (nXOff :int)
+  (nYOff :int)
+  (pData :pointer))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetDefaultHistogram" GDALSetDefaultHistogram) CPLErr
-"Set default histogram."
-(hBand gdal-raster-band-h)
-		double 	dfMin,
-		double 	dfMax,
-		int 	nBuckets,
-		int * 	panHistogram
-	)
+(cffi:defcfun ("GDALSetDefaultHistogram" gdal-set-default-histogram) cpl-err
+  "Set default histogram."
+  (hBand gdal-raster-band-h)
+  (dfMin :double)
+  (dfMax :double)
+  (nBuckets :int)
+  (panHistogram (:pointer :int)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetDefaultRAT" GDALSetDefaultRAT) CPLErr
-"Set default Raster Attribute Table."
-(hBand gdal-raster-band-h)
-		GDALRasterAttributeTableH 	hRAT
-	)
+(cffi:defcfun ("GDALSetDefaultRAT" gdal-set-default-rat) cpl-err
+  "Set default Raster Attribute Table."
+  (hBand gdal-raster-band-h)
+  (hRAT gdal-raster-attribute-table-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetRasterCategoryNames" GDALSetRasterCategoryNames) CPLErr
-"Set the category names for this band."
-(hBand gdal-raster-band-h)
-		char ** 	papszNames
-	)
+(cffi:defcfun ("GDALSetRasterCategoryNames" gdal-set-raster-category-names) cpl-err
+  "Set the category names for this band."
+  (hBand gdal-raster-band-h)
+  (papszNames (:pointer :string)))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetRasterColorInterpretation" GDALSetRasterColorInterpretation) CPLErr
-"Set color interpretation of a band."
-(hBand gdal-raster-band-h)
-		GDALColorInterp 	eColorInterp
-	)
+(cffi:defcfun ("GDALSetRasterColorInterpretation" gdal-set-raster-color-interpretation) cpl-err
+  "Set color interpretation of a band."
+  (hBand gdal-raster-band-h)
+  (eColorInterp gdal-color-interp))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetRasterColorTable" GDALSetRasterColorTable) CPLErr
+(cffi:defcfun ("GDALSetRasterColorTable" gdal-set-raster-color-table) cpl-err
   "Set the raster color table."
   (hBand gdal-raster-band-h)
   (hCT gdal-color-table-h))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetRasterNoDataValue" GDALSetRasterNoDataValue) CPLErr
-"Set the no data value for this band."
-(hBand gdal-raster-band-h)
-		double 	dfValue
-	)
+(cffi:defcfun ("GDALSetRasterNoDataValue" gdal-set-raster-no-data-value) cpl-err
+  "Set the no data value for this band."
+  (hBand gdal-raster-band-h)
+  (dfValue :double))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetRasterOffset" GDALSetRasterOffset) CPLErr
-"Set scaling offset."
-(hBand gdal-raster-band-h)
-		double 	dfNewOffset
-	)
+(cffi:defcfun ("GDALSetRasterOffset" gdal-set-raster-offset) cpl-err
+  "Set scaling offset."
+  (hBand gdal-raster-band-h)
+  (dfNewOffset :double))
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("GDALSetRasterScale" GDALSetRasterScale) CPLErr
-"Set scaling ratio."
-(hBand gdal-raster-band-h)
-		double 	dfNewOffset
-	)
+(cffi:defcfun ("GDALSetRasterScale" gdal-set-raster-scale) cpl-err
+  "Set scaling ratio."
+  (hBand gdal-raster-band-h)
+  (dfNewOffset :double))
 
 ;; --------------------------------------------------------
 

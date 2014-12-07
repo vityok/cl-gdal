@@ -11,6 +11,8 @@
 (cffi:defctype gdal-driver-h :pointer "GDALDriverH")
 (cffi:defctype gdal-dataset-h :pointer "GDALDatasetH")
 (cffi:defctype gbyte :uint8 "GByte")
+(cffi:defctype gdal-raster-attribute-table-h :pointer "GDALRasterAttributeTableH")
+(cffi:defctype g-int-big :long-long "GIntBig")
 
 ;; --------------------------------------------------------
 
@@ -30,6 +32,17 @@
   (:GA_ReadOnly 0)                      ; Read only (no update) access
   (:GA_Update 1))                       ; Read/write access.
 (export 'gdal-access)
+
+;; --------------------------------------------------------
+
+(cffi:defcenum gdal-async-status-type
+"status of the asynchronous stream"
+  (:GARIO_PENDING 0)
+  (:GARIO_UPDATE 1)
+  (:GARIO_ERROR 2)
+  (:GARIO_COMPLETE 3) 
+  (:GARIO_TypeCount 4))
+(export 'gdal-async-status-type)
 
 ;; --------------------------------------------------------
 
