@@ -13,14 +13,15 @@
 ;; sbcl --load ogr-info-gtk.lisp --eval '(ogr-info-demo:main)'
 ;; lx86cl --load ogr-info-gtk.lisp --eval '(ogr-info-demo:main)'
 
-(ql:quickload :cffi)
-(ql:quickload :cl-ogr)
-(ql:quickload :cl-cffi-gtk)
-(ql:quickload :cl-cffi-gtk-gobject)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (ql:quickload :cffi)
+  (ql:quickload :cl-ogr)
+  (ql:quickload :cl-cffi-gtk)
+  (ql:quickload :cl-cffi-gtk-gobject))
 
 (defpackage :ogr-info-demo
   (:use :cl :gtk :gobject)
-  (:export #:main))
+  (:export :main))
 
 (in-package :ogr-info-demo)
 
