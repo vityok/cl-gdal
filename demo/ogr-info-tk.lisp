@@ -16,9 +16,10 @@
 
 ;; TODO
 ;;
-;; open selected file
-;; list layers
-;; draw features in selected area
+;; + open selected file
+;; * better error reporting
+;; * list layers
+;; * draw features in selected area
 ;;
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -37,7 +38,7 @@
   (format t "inspecting file: ~a~%" shp)
   (let ((hDS (ogr:ogr-open shp 0 (cffi:null-pointer))))
     (when (cffi:null-pointer-p hds)
-      (error "Failed to open file"))
+      (error "Failed to open geographic file"))
     (format t "it contains: ~a layers~%" (ogr:ogr-ds-get-layer-count hds))
 
     (loop for i from 0 below (ogr:ogr-ds-get-layer-count hds) do
