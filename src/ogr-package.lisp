@@ -3,9 +3,7 @@
 (in-package :cl-user)
 
 (cffi:define-foreign-library libgdal
-    (:unix (:or "libgdal.so.1" "libgdal.so"
-		"libgdal1.6.0.so.1"
-		"libgdal1.6.0.so.1.13.3"))
+    (:unix (:or "libgdal.so.1" "libgdal.so"))
   (t (:default "libgdal")))
 
 (cffi:use-foreign-library libgdal)
