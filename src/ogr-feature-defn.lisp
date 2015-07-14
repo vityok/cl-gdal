@@ -435,7 +435,7 @@ Since: OGR 1.9.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_FD_SetStyleIgnored" OGR_FD_SetStyleIgnored) :void
+(cffi:defcfun ("OGR_FD_SetStyleIgnored" ogr-fd-set-style-ignored) :void
   "Set whether the style can be omitted when fetching features.
 
  This function is the same as the C++ method
@@ -446,6 +446,6 @@ Since: OGR 1.9.0"
  @argument[bIgnore]{ignore state}"
   (hDefn ogr-feature-defn-h)
   (bIgnore :int))
-(export 'OGR_FD_SetStyleIgnored)
+(export 'ogr-fd-set-style-ignored)
 
 ;; EOF

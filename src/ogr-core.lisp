@@ -46,14 +46,14 @@
 
 ;; --------------------------------------------------------
 
-(defclass ogr-class ()
+(defclass <ogr-class> ()
   ((pointer
     :type (or null cffi:foreign-pointer)
     :initarg :pointer
     :accessor pointer
     :initform nil)))
 
-(defclass data-source (ogr-class)
+(defclass <data-source> (<ogr-class>)
   ;; original documentation at: http://www.gdal.org/ogr/classOGRDataSource.html
   ()
   (:documentation "This class represents a data source.
@@ -65,19 +65,25 @@
   When an OGRDataSource is destroyed, all it's associated OGRLayers
   objects are also destroyed."))
 
-(defclass layer (ogr-class)
+(defclass <layer> (<ogr-class>)
   ((data-source
-    :type (or null data-source)
+    :type (or null <data-source>)
     :initarg :data-source
     :accessor data-source
     :initform nil)))
 
-(defclass geometry (ogr-class)
+(defclass <feature> (<ogr-class>)
+  ())
+
+(defclass <geometry> (<ogr-class>)
   ((data-source
-    :type (or null data-source)
+    :type (or null <data-source>)
     :initarg :data-source
     :accessor data-source
     :initform nil)))
+
+(defclass <spatial-ref> (<ogr-class>)
+  ())
 
 ;; --------------------------------------------------------
 
@@ -85,62 +91,62 @@
   "List of feature field types. This list is likely to be extended in
 the future ... avoid coding applications based on the assumption that
 all field types can be known. "
-  (:OFTInteger 0)		     ; Simple 32bit integer
-  (:OFTIntegerList 1)		     ; List of 32bit integers
-  (:OFTReal 2)			     ; Double Precision floating point
-  (:OFTRealList 3)		     ; List of doubles
-  (:OFTString 4)		     ; String of ASCII chars
-  (:OFTStringList 5)		     ; Array of strings
-  (:OFTWideString 6)		     ; deprecated
-  (:OFTWideStringList 7)	     ; deprecated
-  (:OFTBinary 8)		     ; Raw Binary data
-  (:OFTDate 9)			     ; Date
-  (:OFTTime 10)			     ; Time
-  (:OFTDateTime 11))		     ; Date and Time
+  (:oft-integer 0)		     ; Simple 32bit integer
+  (:oft-integer-list 1)		     ; List of 32bit integers
+  (:oft-real 2)			     ; Double Precision floating point
+  (:oft-real-list 3)		     ; List of doubles
+  (:oft-string 4)		     ; String of ASCII chars
+  (:oft-string-list 5)		     ; Array of strings
+  (:oft-wide-string 6)		     ; deprecated
+  (:oft-wide-string-list 7)	     ; deprecated
+  (:oft-binary 8)		     ; Raw Binary data
+  (:oft-date 9)			     ; Date
+  (:oft-time 10)		     ; Time
+  (:oft-date-time 11))		     ; Date and Time
 
 ;; --------------------------------------------------------
 
 (cffi:defcenum ogr-err
-    "Errors are defined as macro constants, but we define is an
+  "Errors are defined as macro constants, but we define is an
 enumeration with set constant values."
-  (:NONE                0)
-  (:NOT_ENOUGH_DATA     1)
-  (:NOT_ENOUGH_MEMORY   2)
-  (:UNSUPPORTED_GEOMETRY_TYPE 3)
-  (:UNSUPPORTED_OPERATION 4)
-  (:CORRUPT_DATA        5)
-  (:FAILURE             6)
-  (:UNSUPPORTED_SRS     7)
-  (:INVALID_HANDLE      8))
+  (:none                0)
+  (:not-enough-data     1)
+  (:not-enough-memory   2)
+  (:unsupported-geometry-type 3)
+  (:unsupported-operation 4)
+  (:corrupt-data        5)
+  (:failure             6)
+  (:unsupported-srs     7)
+  (:invalid-handle      8))
 
 ;; --------------------------------------------------------
 
 (cffi:defcenum ogr-wkb-geometry-type
-    "List of well known binary geometry types. These are used within the
+  "List of well known binary geometry types. These are used within the
 BLOBs but are also returned from OGRGeometry::getGeometryType() to
 identify the type of a geometry object."
-  (:wkbUnknown 0)	; unknown type, non-standard
-  (:wkbPoint 1)		; 0-dimensional geometric object, standard WKB
-  (:wkbLineString 2)	; 1-dimensional geometric object with linear
+  (:wkb-unknown 0)	; unknown type, non-standard
+  (:wkb-point 1)	; 0-dimensional geometric object, standard WKB
+  (:wkb-line-string 2)	; 1-dimensional geometric object with linear
 					; interpolation between Points, standard WKB
-  (:wkbPolygon 3) ; planar 2-dimensional geometric object defined by 1
+  (:wkb-polygon 3) ; planar 2-dimensional geometric object defined by 1
 					; exterior boundary and 0 or more interior
 					; boundaries, standard WKB
-  (:wkbMultiPoint 4)      ; GeometryCollection of Points, standard WKB
-  (:wkbMultiLineString 5) ; GeometryCollection of LineStrings, standard WKB
-  (:wkbMultiPolygon 6)	; GeometryCollection of Polygons, standard WKB
-  (:wkbGeometryCollection 7)   ; geometric object that is a collection
+  (:wkb-multi-point 4)	  ; GeometryCollection of Points, standard WKB
+  (:wkb-multi-line-string 5) ; GeometryCollection of LineStrings, standard WKB
+  (:wkb-multi-polygon 6) ; GeometryCollection of Polygons, standard WKB
+  (:wkb-geometry-collection 7) ; geometric object that is a collection
 					; of 1 or more geometric objects,
 					; standard WKB
-  (:wkbNone 100)	    ; non-standard, for pure attribute records
-  (:wkbLinearRing 101)	    ; non-standard, just for createGeometry()
-  (:wkbPoint25D #x80000001) ; 2.5D extension as per 99-402
-  (:wkbLineString25D #x80000002)	; 2.5D extension as per 99-402
-  (:wkbPolygon25D #x80000003)		; 2.5D extension as per 99-402
-  (:wkbMultiPoint25D #x80000004)	; 2.5D extension as per 99-402
-  (:wkbMultiLineString25D #x80000005)	; 2.5D extension as per 99-402
-  (:wkbMultiPolygon25D #x80000006)	; 2.5D extension as per 99-402
-  (:wkbGeometryCollection25D #x80000007)) ; 2.5D extension as per 99-402
+  (:wkb-none 100)	    ; non-standard, for pure attribute records
+  (:wkb-linear-ring 101)    ; non-standard, just for createGeometry()
+  (:wkb-point-25d #x80000001)		; 2.5D extension as per 99-402
+  (:wkb-line-string-25d #x80000002)	; 2.5D extension as per 99-402
+  (:wkb-polygon-25d #x80000003)		; 2.5D extension as per 99-402
+  (:wkb-multi-point-25d #x80000004)	; 2.5D extension as per 99-402
+  (:wkb-multi-line-string-25d #x80000005) ; 2.5D extension as per 99-402
+  (:wkb-multi-polygon-25d #x80000006)	; 2.5D extension as per 99-402
+  (:wkb-geometry-collection25d #x80000007)) ; 2.5D extension as per 99-402
 
 ;; --------------------------------------------------------
 
@@ -282,4 +288,8 @@ properly."
  CPLCleanupTLS()")
 
 ;; --------------------------------------------------------
+
+(defgeneric get-spatial-ref (g))
+(export 'get-spatial-ref)
+
 ;; EOF

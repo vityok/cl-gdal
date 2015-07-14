@@ -7,7 +7,7 @@
 ;; --------------------------------------------------------
 
 (cffi:defcfun ("OGR_G_GetX" ogr-g-getx) :double
-  (geom :pointer)
+  (geom ogr-geometry-h)
   (i :int))
 (export 'ogr-g-getx)
 
@@ -27,7 +27,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateFromWkb" OGR-G-Create-From-Wkb) ogr-err
+(cffi:defcfun ("OGR_G_CreateFromWkb" ogr-g-create-from-wkb) ogr-err
   "Create a geometry object of the appropriate type from it's well
  known binary representation.
 
@@ -57,14 +57,14 @@
  :NOT_ENOUGH_DATA, :UNSUPPORTED_GEOMETRY_TYPE, or
  :CORRUPT_DATA may be returned.}"
   (pabyData :string)
-  (hSRS :pointer)			; OGRSpatialReferenceH
-  (phGeometry :pointer)			; OGRGeometryH *
+  (hSRS ogr-spatial-reference-h)
+  (phGeometry (:pointer ogr-geometry-h))
   (nBytes :int))
-(export 'OGR-G-Create-From-Wkb)
+(export 'ogr-g-create-from-wkb)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_CreateFromWkt" OGR-G-Create-From-Wkt) ogr-err
+(cffi:defcfun ("OGR_G_CreateFromWkt" ogr-g-create-from-wkt) ogr-err
   "Create a geometry object of the appropriate type from it's well
  known text representation.
 
@@ -86,14 +86,14 @@
  @return{NONE if all goes well, otherwise any of
  NOT_ENOUGH_DATA, UNSUPPORTED_GEOMETRY_TYPE, or
  CORRUPT_DATA may be returned.}"
-  (ppszData :pointer)			; char **
-  (hSRS :pointer)			; OGRSpatialReferenceH
-  (phGeometry :pointer))		; OGRGeometryH *
+  (ppszData (:pointer :string))
+  (hSRS ogr-spatial-reference-h)
+  (phGeometry (:pointer ogr-geometry-h)))
 (export 'OGR-G-Create-From-Wkt)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_DestroyGeometry" OGR-G-Destroy-Geometry) :void
+(cffi:defcfun ("OGR_G_DestroyGeometry" ogr-g-destroy-geometry) :void
   "Destroy geometry object."
   (geom :pointer))
 
@@ -256,7 +256,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetCoordinateDimension" OGR-G-Get-Coordinate-Dimension) :int
+(cffi:defcfun ("OGR_G_GetCoordinateDimension" ogr-g-get-coordinate-dimension) :int
   "Get the dimension of the coordinates in this geometry.
 
  This function corresponds to the SFCOM IGeometry::GetDimension()
@@ -302,11 +302,12 @@ OGR 1.8.0"
 
  @return{an handle on the copy of the geometry with the spatial
  reference system as the original.}"
-  (hGeom :pointer))			; OGRGeometryH
+  (hGeom ogr-geometry-h))
+(export 'ogr-g-clone)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetEnvelope" OGR-G-Get-Envelope) :void
+(cffi:defcfun ("OGR_G_GetEnvelope" ogr-g-get-envelope) :void
   "Computes and returns the bounding envelope for this geometry in
  the passed psEnvelope structure.
 
@@ -316,8 +317,8 @@ OGR 1.8.0"
  @argument[psEnvelope]{the structure in which to place the results.}"
 
   (hGeom ogr-geometry-h)
-  (psEnvelope :pointer))		; OGREnvelope*
-
+  (psEnvelope (:pointer (:struct ogr-envelope))))
+(export 'ogr-g-get-envelope)
 
 ;; --------------------------------------------------------
 
@@ -463,10 +464,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetGeometryType" %OGR-G-Get-Geometry-Type) :int ; OGRwkbGeometryType
-  (hGeom :pointer))			; OGRGeometryH
-
-(defun OGR-G-Get-Geometry-Type (hGeom)
+(cffi:defcfun ("OGR_G_GetGeometryType" ogr-g-get-geometry-type) ogr-wkb-geometry-type
   "Fetch geometry type.
 
  Note that the geometry type may include the 2.5D flag. To get a 2D
@@ -479,13 +477,12 @@ OGR 1.8.0"
  @argument[hGeom]{handle on the geometry to get type from.}
 
  @return{the geometry type code.}"
-  (cffi:foreign-enum-keyword 'OGR-wkb-Geometry-Type
-			     (%OGR-G-Get-Geometry-Type hGeom)))
-(export 'OGR-G-Get-Geometry-Type)
+  (hGeom ogr-geometry-h))
+(export 'ogr-g-get-geometry-type)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetGeometryName" OGR-G-Get-Geometry-Name) :string ; const char*
+(cffi:defcfun ("OGR_G_GetGeometryName" ogr-g-get-geometry-name) :string ; const char*
   "Fetch WKT name for geometry type.
 
  There is no SFCOM analog to this function.
@@ -674,7 +671,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_AssignSpatialReference" OGR-G-Assign-Spatial-Reference) :void
+(cffi:defcfun ("OGR_G_AssignSpatialReference" ogr-g-assign-spatial-reference) :void
   "Assign spatial reference to this object.
 
  Any existing spatial reference is replaced, but under no
@@ -693,13 +690,13 @@ OGR 1.8.0"
  reference system.}
 
  @argument[hSRS]{handle on the new spatial reference system to apply.}"
-  (hGeom :pointer)			; OGRGeometryH
-  (hSRS :pointer))			; OGRSpatialReferenceH
-(export 'OGR-G-Assign-Spatial-Reference)
+  (hGeom ogr-geometry-h)
+  (hSRS ogr-spatial-reference-h))
+(export 'ogr-g-assign-spatial-reference)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetSpatialReference" OGR-G-Get-Spatial-Reference) :pointer ; OGRSpatialReferenceH
+(cffi:defcfun ("OGR_G_GetSpatialReference" ogr-g-get-spatial-reference) ogr-spatial-reference-h
   "Returns spatial reference system for geometry.
 
  This function relates to the SFCOM IGeometry::get_SpatialReference()
@@ -713,12 +710,12 @@ OGR 1.8.0"
 
  @return{a reference to the spatial reference geometry.}"
   (hGeom ogr-geometry-h))
-(export 'OGR-G-Get-Spatial-Reference)
+(export 'ogr-g-get-spatial-reference)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Transform" %OGR-G-Transform) :int ; OGRErr
-  (hGeom :pointer)			; OGRGeometryH
+(cffi:defcfun ("OGR_G_Transform" %ogr-g-transform) ogr-err
+  (hGeom ogr-geometry-h)
   (hTransform :pointer))		; OGRCoordinateTransformationH
 
 (defun OGR-G-Transform (hGeom hTransform)
@@ -747,7 +744,7 @@ OGR 1.8.0"
   (cffi:foreign-enum-keyword
    'ogr-err
    (%OGR-G-Transform hGeom hTransform)))
-(export 'OGR-G-Transform)
+(export 'ogr-g-transform)
 
 ;; --------------------------------------------------------
 
@@ -786,7 +783,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Simplify" OGR-G-Simplify) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_Simplify" ogr-g-simplify) ogr-geometry-h
   "Compute a simplified geometry.
 
  This function is the same as the C++ method OGRGeometry::Simplify().
@@ -803,13 +800,13 @@ OGR 1.8.0"
  @return{the simplified geometry or NULL if an error occurs.}
 
  Since: OGR 1.8.0"
-  (hThis :pointer)			; OGRGeometryH
+  (hThis ogr-geometry-h)
   (dTolerance :double))			; double
 (export 'OGR-G-Simplify)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_SimplifyPreserveTopology" OGR-G-Simplify-Preserve-Topology) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_SimplifyPreserveTopology" ogr-g-simplify-preserve-topology) ogr-geometry-h
   "Simplify the geometry while preserving topology.
 
  This function is the same as the C++ method
@@ -827,8 +824,8 @@ OGR 1.8.0"
  @return{the simplified geometry or NULL if an error occurs.}
 
  Since: OGR 1.9.0"
-  (hThis :pointer)			      ; OGRGeometryH
-  (dTolerance :double))			      ; double
+  (hThis ogr-geometry-h)
+  (dTolerance :double))
 (export 'OGR-G-Simplify-Preserve-Topology)
 
 ;; --------------------------------------------------------
@@ -1179,7 +1176,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_PointOnSurface" OGR-G-Point-On-Surface) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_PointOnSurface" ogr-g-point-on-surface) ogr-geometry-h
   "Returns a point guaranteed to lie on the surface.
 
  This method relates to the SFCOM ISurface::get_PointOnSurface()
@@ -1198,12 +1195,12 @@ OGR 1.8.0"
  occured.}
 
  Since: OGR 1.10"
-  (hGeom :pointer))			; OGRGeometryH
-(export 'OGR-G-Point-On-Surface)
+  (hGeom ogr-geometry-h))
+(export 'ogr-g-point-on-surface)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Difference" OGR-G-Difference) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_Difference" ogr-g-difference) ogr-geometry-h
   "Compute difference.
 
  Generates a new geometry which is the region of this geometry with
@@ -1223,13 +1220,13 @@ OGR 1.8.0"
 
  @return{a new geometry representing the difference or NULL if the
  difference is empty or an error occurs.}"
-  (hThis :pointer)			; OGRGeometryH
-  (hOther :pointer))			; OGRGeometryH
+  (hThis ogr-geometry-h)
+  (hOther ogr-geometry-h))
 (export 'OGR-G-Difference)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_SymDifference" OGR-G-Sym-Difference) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_SymDifference" ogr-g-sym-difference) ogr-geometry-h
   "Compute symmetric difference.
 
  Generates a new geometry which is the symmetric difference of this
@@ -1253,11 +1250,11 @@ OGR 1.8.0"
  Since: OGR 1.8.0"
   (hThis ogr-geometry-h)
   (hOther ogr-geometry-h))
-(export 'OGR-G-Sym-Difference)
+(export 'ogr-g-sym-difference)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Distance" OGR-G-Distance) :double
+(cffi:defcfun ("OGR_G_Distance" ogr-g-distance) :double
   "Compute distance between two geometries.
 
  Returns the shortest distance between the two geometries.
@@ -1281,7 +1278,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Length" OGR-G-Length) :double
+(cffi:defcfun ("OGR_G_Length" ogr-g-length) :double
   "Compute length of a geometry.
 
  Computes the area for OGRCurve or MultiCurve objects. Undefined for
@@ -1299,7 +1296,7 @@ OGR 1.8.0"
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Area" OGR-G-Area) :double
+(cffi:defcfun ("OGR_G_Area" ogr-g-area) :double
   "Compute geometry area.
 
  Computes the area for an OGRLinearRing, OGRPolygon or
@@ -1342,11 +1339,11 @@ OGR 1.8.0"
  @return{:NONE on success or :FAILURE on error.}"
   (hGeom ogr-geometry-h)
   (hCentroidPoint ogr-geometry-h))
-(export 'OGR-G-Centroid)
+(export 'ogr-g-centroid)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_Empty" OGR-G-Empty) :void
+(cffi:defcfun ("OGR_G_Empty" ogr-g-empty) :void
   "Clear geometry information. This restores the geometry to it's
  initial state after construction, and before assignment of actual
  geometry.
@@ -1465,7 +1462,7 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetPointCount" OGR-G-Get-Point-Count) :int
+(cffi:defcfun ("OGR_G_GetPointCount" ogr-g-get-point-count) :int
   "Fetch number of points from a geometry.
 
  Only wkbPoint[25D] or wkbLineString[25D] may return a valid
@@ -1475,12 +1472,12 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
  of points.}
 
  @return{the number of points.}"
-  (hGeom :pointer))			; OGRGeometryH ;
-(export 'OGR-G-Get-Point-Count)
+  (hGeom ogr-geometry-h))
+(export 'ogr-g-get-point-count)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetPoints" OGR-G-Get-Points) :int
+(cffi:defcfun ("OGR_G_GetPoints" ogr-g-get-points) :int
   "Returns all points of line string.
 
  This method copies all points into user arrays. The user provides the
@@ -1510,18 +1507,18 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
  @return{the number of points}
 
  Since: OGR 1.9.0"
-  (hGeom :pointer)			; OGRGeometryH
+  (hGeom ogr-geometry-h)		; OGRGeometryH
   (pabyX :pointer)			; void *
   (nXStride :int)
   (pabyY :pointer)			; void *
   (nYStride :int)
   (pabyZ :pointer)			; void *
   (nZStride :int))
-(export 'OGR-G-Get-Points)
+(export 'ogr-g-get-points)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetPoint" OGR-G-Get-Point) :void
+(cffi:defcfun ("OGR_G_GetPoint" ogr-g-get-point) :void
   "Fetch a point in line string or a point geometry.
 
  @argument[hGeom]{handle to the geometry from which to get the
@@ -1531,12 +1528,12 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
  @argument[pdfX]{value of x coordinate.}
  @argument[pdfY]{value of y coordinate.}
  @argument[pdfZ]{value of z coordinate.}"
-  (hGeom :pointer)			; OGRGeometryH
+  (hGeom ogr-geometry-h)
   (i :int)
   (pdfX (:pointer :double))			   ; double *
   (pdfY (:pointer :double))			   ; double *
   (pdfZ (:pointer :double)))			   ; double *
-(export 'OGR-G-Get-Point)
+(export 'ogr-g-get-point)
 
 ;; --------------------------------------------------------
 
@@ -1618,7 +1615,7 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetGeometryCount" OGR-G-Get-Geometry-Count) :int
+(cffi:defcfun ("OGR_G_GetGeometryCount" ogr-g-get-geometry-count) :int
   "Fetch the number of elements in a geometry or number of geometries in
  container.
 
@@ -1634,12 +1631,12 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
  get the number of elements.}
 
  @return{the number of elements.}"
-  (hGeom :pointer))			; OGRGeometryH
-(export 'OGR-G-Get-Geometry-Count)
+  (hGeom ogr-geometry-h))
+(export 'ogr-g-get-geometry-count)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_GetGeometryRef" OGR-G-Get-Geometry-Ref) :pointer ; OGRGeometryH
+(cffi:defcfun ("OGR_G_GetGeometryRef" ogr-g-get-geometry-ref) ogr-geometry-h
   "Fetch geometry from a geometry container.
 
  This function returns an handle to a geometry within the
@@ -1663,13 +1660,13 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
  getNumGeometries() - 1.}
 
  @return{handle to the requested geometry.}"
-  (hGeom :pointer)			; OGRGeometryH
+  (hGeom ogr-geometry-h)
   (iSubGeom :int))
-(export 'OGR-G-Get-Geometry-Ref)
+(export 'ogr-g-get-geometry-ref)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_G_AddGeometry" OGR-G-Add-Geometry) ogr-err ; OGRErr
+(cffi:defcfun ("OGR_G_AddGeometry" ogr-g-add-geometry) ogr-err
   "Add a geometry to a geometry container.
 
  Some subclasses of OGRGeometryCollection restrict the types of
@@ -1774,4 +1771,127 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
   (peErr (:pointer ogr-err)))
 (export 'ogr-build-polygon-from-edges)
 
+;; --------------------------------------------------------
+;; CLOS
+;; --------------------------------------------------------
+
+(defgeneric get-point-count (g)
+  (:documentation "")
+  (:method ((geom <geometry>))
+    (ogr-g-get-point-count (pointer geom))))
+(export 'get-point-count)
+
+;; --------------------------------------------------------
+
+(defgeneric get-points (g)
+  (:documentation "")
+  (:method ((geom <geometry>))
+    (let* ((count (get-point-count geom))
+	   (dim (ogr-g-get-coordinate-dimension (pointer geom)))
+	   (padxy (cffi:foreign-alloc :double :count (* 2 count)))
+	   (in-3d (= dim 3))
+	   (padz (if in-3d
+		     (cffi:foreign-alloc :double :count count)
+		     (cffi:null-pointer)))
+	   (sizeof-double (cffi:foreign-type-size :double))
+	   (ret (make-array `(,count ,count ,(if in-3d count 0))
+			    :element-type 'double-float)))
+
+      ;; instead of allocating three arrays, we allocate only two. The
+      ;; PADXY array will contain coordinates for both X and Y
+      ;; direction one after another, and the PADZ array is used only
+      ;; when we are dealing in a 3-dimensional space
+      (ogr-g-get-points
+       (pointer geom)
+       padxy (* 2 sizeof-double)
+       (cffi:inc-pointer padxy sizeof-double) (* 2 sizeof-double)
+       padz sizeof-double)
+      (loop for i from 0 below count
+	 do (setf (aref ret i 0) (cffi:mem-aref padxy :double (* i 2))
+		  (aref ret i 1) (cffi:mem-aref padxy :double (+ (* i 2) 1))
+		  (aref ret i 2) (if in-3d (cffi:mem-aref padz :double i) 0.0d0)))
+      ret)))
+(export 'get-points)
+
+;; --------------------------------------------------------
+
+(defgeneric get-x (g idx)
+  (:documentation "")
+  (:method ((geom <geometry>) (idx integer))
+    (ogr-g-getx (pointer geom) idx)))
+(export 'get-x)
+
+(defgeneric get-y (g idx)
+  (:documentation "")
+  (:method ((geom <geometry>) (idx integer))
+    (ogr-g-gety (pointer geom) idx)))
+(export 'get-y)
+
+(defgeneric get-z (g idx)
+  (:documentation "")
+  (:method ((geom <geometry>) (idx integer))
+    (ogr-g-getz (pointer geom) idx)))
+(export 'get-z)
+
+;; --------------------------------------------------------
+
+(defgeneric get-point (g idx)
+  (:documentation "")
+  (:method ((geom <geometry>) (idx integer))
+    (values (ogr-g-getx (pointer geom) idx)
+	    (ogr-g-gety (pointer geom) idx)
+	    (ogr-g-getz (pointer geom) idx)
+	    )
+    #+ignore
+    (cffi:with-foreign-objects ((fnx :double)
+				(fny :double)
+				(fnz :double))
+      (ogr-g-get-point (pointer geom) idx fnx fny fnz)
+      (values (cffi:mem-ref fnx :double)
+	      (cffi:mem-ref fny :double)
+	      (cffi:mem-ref fnz :double)))))
+(export 'get-point)
+
+;; --------------------------------------------------------
+
+(defgeneric get-type (g)
+  (:documentation "")
+  (:method ((geom <geometry>))
+    (ogr-g-get-geometry-type (pointer geom))))
+(export 'get-type)
+
+;; --------------------------------------------------------
+
+(defgeneric get-geometry-count (g)
+  (:documentation "")
+  (:method ((geom <geometry>))
+    (ogr-g-get-geometry-count (pointer geom))))
+(export 'get-geometry-count)
+
+;; --------------------------------------------------------
+
+(defmethod get-geometry ((geom <geometry>) &optional idx)
+  (check-type idx integer)
+  (make-instance '<geometry>'
+		 :pointer (ogr-g-get-geometry-ref (pointer geom)
+						  (if idx idx 0))))
+
+;; --------------------------------------------------------
+
+(defgeneric get-geometry-ref (g idx)
+  (:documentation "")
+  (:method ((geom <geometry>) (idx integer))
+    (make-instance '<geometry-ref>
+		   :pointer (ogr-g-get-geometry-ref
+			     (pointer geom)
+			     idx))))
+(export 'get-geometry-ref)
+
+;; --------------------------------------------------------
+
+(defmethod get-spatial-ref ((geom <geometry>))
+  (make-instance '<spatial-ref> 
+		 :pointer (ogr-g-get-spatial-reference (pointer geom))))
+
+    
 ;; EOF

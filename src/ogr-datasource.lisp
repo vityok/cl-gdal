@@ -124,7 +124,7 @@
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_GetDriver" OGR-DS-Get-Driver) :pointer ; OGRSFDriverH
+(cffi:defcfun ("OGR_DS_GetDriver" ogr-ds-get-driver) :pointer ; OGRSFDriverH
   "Returns the driver that the dataset was opened with.
 
  This method is the same as the C++ method OGRDataSource::GetDriver()
@@ -134,11 +134,11 @@
  @return{NULL if driver info is not available, or pointer to a driver
  owned by the OGRSFDriverManager.}"
   (hDS :pointer))			; OGRDataSourceH
-(export 'OGR-DS-Get-Driver)
+(export 'ogr-ds-get-driver)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGR_DS_CreateLayer" OGR-DS-Create-Layer) :pointer ; OGRLayerH
+(cffi:defcfun ("OGR_DS_CreateLayer" ogr-ds-create-layer) ogr-layer-h
   "This function attempts to create a new layer on the data source with
  the indicated name, coordinate system, geometry type.
 
@@ -344,7 +344,7 @@ Example:
 (cffi:defcfun ("OGRReleaseDataSource" %OGR-Release-Data-Source) :int ; OGRErr
   (hDS :pointer))			; OGRDataSourceH
 
-(defun OGR-Release-Data-Source (hDS)
+(defun ogr-release-data-source (hDS)
   "Drop a reference to this datasource, and if the reference count
  drops to zero close (destroy) the datasource.
 
@@ -360,7 +360,7 @@ Example:
   (cffi:foreign-enum-keyword
    'ogr-err
    (%OGR-Release-Data-Source hDS)))
-(export 'OGR-Release-Data-Source)
+(export 'ogr-release-data-source)
 
 ;; --------------------------------------------------------
 
@@ -394,18 +394,18 @@ Example:
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGRGetDriverCount" OGR-Get-Driver-Count) :int
+(cffi:defcfun ("OGRGetDriverCount" ogr-get-driver-count) :int
   "Fetch the number of registered drivers.
 
  This function is the same as the C++ method
  OGRSFDriverRegistrar::GetDriverCount().
 
  @return{the drivers count.}")
-(export 'OGR-Get-Driver-Count)
+(export 'ogr-get-driver-count)
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGRGetDriver" OGR-Get-Driver) :pointer ; OGRSFDriverH
+(cffi:defcfun ("OGRGetDriver" ogr-get-driver) ogr-sf-driver-h
   "Fetch the indicated driver.
 
  This function is the same as the C++ method
@@ -419,7 +419,7 @@ Example:
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGRGetDriverByName" OGR-Get-Driver-By-Name) :pointer ; OGRSFDriverH
+(cffi:defcfun ("OGRGetDriverByName" ogr-get-driver-by-name) ogr-sf-driver-h
   "Fetch the indicated driver.
 
  This function is the same as the C++ method
@@ -429,7 +429,7 @@ Example:
 
  @return{the driver, or NULL if no driver with that name is found}"
   (pszName :string))			; const char *
-(export 'OGR-Get-Driver-By-Name)
+(export 'ogr-get-driver-by-name)
 
 ;; --------------------------------------------------------
 
@@ -444,7 +444,7 @@ Example:
 
 ;; --------------------------------------------------------
 
-(cffi:defcfun ("OGRGetOpenDS" ogr-get-open-ds) :pointer ; OGRDataSourceH
+(cffi:defcfun ("OGRGetOpenDS" ogr-get-open-ds) ogr-data-source-h
   "Return the iDS th datasource opened.
 
  This function is the same as the C++ method
@@ -469,26 +469,42 @@ Example:
   "Returns DATA-SOURCE instance in case of success, NIL otherwise."
   (let ((ds-pointer (ogr-open name update drivers)))
     (unless (cffi:null-pointer-p ds-pointer)
-      (make-instance 'data-source
+      (make-instance '<data-source>
 		     :pointer ds-pointer))))
 (export 'open-data-source)
 
 ;; --------------------------------------------------------
 
+(defgeneric destroy (ds)
+  (:documentation "")
+  (:method ((ds <data-source>))
+    (ogr-ds-destroy (pointer ds))))
+(export 'destroy)
+
+;; --------------------------------------------------------
+
+(defgeneric release (ds)
+  (:documentation "")
+  (:method ((ds <data-source>))
+    (ogr-release-data-source (pointer ds))))
+(export 'release)
+
+;; --------------------------------------------------------
+
 (defgeneric get-layer-count (ds)
   (:documentation "")
-  (:method ((ds data-source))
-    (OGR-DS-Get-Layer-Count (pointer ds))))
+  (:method ((ds <data-source>))
+    (ogr-ds-get-layer-count (pointer ds))))
 (export 'get-layer-count)
 
 ;; --------------------------------------------------------
 
 (defgeneric get-layer-by-name (ds name)
-  (:method ((ds data-source) (name string))
+  (:method ((ds <data-source>) (name string))
     (let ((layer-pointer (ogr-ds-get-layer-by-name (pointer ds)
 						   name)))
       (unless (cffi:null-pointer-p layer-pointer)
-	(make-instance 'layer
+	(make-instance '<layer>
 		       :pointer layer-pointer
 		       :data-source ds)))))
 (export 'get-layer-by-name)
@@ -496,11 +512,11 @@ Example:
 ;; --------------------------------------------------------
 
 (defgeneric get-layer (ds idx)
-  (:method ((ds data-source) (idx fixnum))
+  (:method ((ds <data-source>) (idx fixnum))
     (let ((layer-pointer (ogr-ds-get-layer (pointer ds)
 					   idx)))
       (unless (cffi:null-pointer-p layer-pointer)
-	(make-instance 'layer
+	(make-instance '<layer>
 		       :pointer layer-pointer
 		       :data-source ds)))))
 (export 'get-layer)
@@ -508,14 +524,14 @@ Example:
 ;; --------------------------------------------------------
 
 (defgeneric get-name (ds)
-  (:method ((ds data-source))
+  (:method ((ds <data-source>))
     (ogr-ds-get-name (pointer ds))))
 (export 'get-name)
 
 ;; --------------------------------------------------------
 
 (defgeneric delete-layer (ds iLayer)
-  (:method ((ds data-source) (iLayer fixnum))
+  (:method ((ds <data-source>) (iLayer fixnum))
     (ogr-ds-delete-layer ds iLayer)))
 (export 'delete-layer)
 
