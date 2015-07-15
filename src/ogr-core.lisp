@@ -83,6 +83,25 @@
     :accessor data-source
     :initform nil)))
 
+;; different geometry types have different classes for developer
+;; convenience
+
+(defclass <point> (<geometry>) ())
+(defclass <line-string> (<geometry>) ())
+(defclass <polygon> (<geometry>) ())
+(defclass <multi-point> (<geometry>) ())
+(defclass <multi-line-string> (<geometry>) ())
+(defclass <multi-polygon> (<geometry>) ())
+(defclass <geometry-collection> (<geometry>) ())
+(defclass <linear-ring> (<geometry>) ())
+(defclass <point-25d> (<geometry>) ())
+(defclass <line-string-25d> (<geometry>) ())
+(defclass <polygon-25d> (<geometry>) ())
+(defclass <multi-point-25d> (<geometry>) ())
+(defclass <multi-line-string-25d> (<geometry>) ())
+(defclass <multi-polygon-25d> (<geometry>) ())
+(defclass <geometry-collection-25d> (<geometry>) ())
+
 (defclass <spatial-ref> (<ogr-class>)
   ())
 
@@ -147,7 +166,7 @@ identify the type of a geometry object."
   (:wkb-multi-point-25d #x80000004)	; 2.5D extension as per 99-402
   (:wkb-multi-line-string-25d #x80000005) ; 2.5D extension as per 99-402
   (:wkb-multi-polygon-25d #x80000006)	; 2.5D extension as per 99-402
-  (:wkb-geometry-collection25d #x80000007)) ; 2.5D extension as per 99-402
+  (:wkb-geometry-collection-25d #x80000007)) ; 2.5D extension as per 99-402
 
 ;; --------------------------------------------------------
 
@@ -299,4 +318,6 @@ properly."
 (defgeneric get-spatial-ref (g))
 (export 'get-spatial-ref)
 
+(defgeneric get-geometry (f &optional idx))
+(export 'get-geometry)
 ;; EOF

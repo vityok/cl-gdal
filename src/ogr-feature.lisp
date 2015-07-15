@@ -905,14 +905,46 @@ This function is the same as the C++ OGRFeature::SetGeomField().
 ;; CLOS
 ;; --------------------------------------------------------
 
-(defgeneric get-geometry (f &optional idx)
-  (:documentation "")
-  (:method ((feature <feature>) &optional idx)
-    (declare (ignore idx))
-    (make-instance '<geometry>
-		   :pointer (ogr-f-get-geometry-ref (pointer feature)))))
-(export 'get-geometry)
+(defmethod get-geometry ((feature <feature>) &optional idx)
+  (declare (ignore idx))
+  ;; todo!
+  (let ((geom-type (ogr:get-geom-type layer))
+	(ref (ogr-f-get-geometry-ref (pointer feature))))
 
-
+    (case geom-type
+      (:wkb-unknown
+       (error "unknown geometry type"))
+      (:wkb-point
+       (make-instance '<point> :pointer ref))
+      (:wkb-line-string
+       (make-instance '<line-string> :pointer ref))
+      (:wkb-polygon
+       (make-instance '<polygon> :pointer ref))
+      (:wkb-multi-point
+       (make-instance '<multi-point> :pointer ref))
+      (:wkb-multi-line-string
+       (make-instance '<multi-line-string> :pointer ref))
+      (:wkb-multi-polygon
+       (make-instance '<multi-polygon> :pointer ref))
+      (:wkb-geometry-collection
+       (make-instance '<geometry-collection> :pointer ref))
+      (:wkb-none
+       (error "none geometry type"))
+      (:wkb-linear-ring
+       (make-instance '<linear-ring> :pointer ref))
+      (:wkb-point-25d
+       (make-instance '<point-25d> :pointer ref))
+      (:wkb-line-string-25d
+       (make-instance '<line-string-25d> :pointer ref))
+      (:wkb-polygon-25d
+       (make-instance '<polygon-25d> :pointer ref))
+      (:wkb-multi-point-25d
+       (make-instance '<multi-point-25d> :pointer ref))
+      (:wkb-multi-line-string-25d
+       (make-instance '<multi-line-string-25d> :pointer ref))
+      (:wkb-multi-polygon-25d
+       (make-instance '<multi-polygon-25d> :pointer ref))
+      (:wkb-geometry-collection-25d
+       (make-instance '<geometry-collection-25d> :pointer ref)))))
 
 ;; EOF
