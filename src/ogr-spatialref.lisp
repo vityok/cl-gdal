@@ -22,7 +22,7 @@
 
 (cffi:defcfun ("OSRExportToProj4" osr-export-to-proj4) ogr-err
   (ref ogr-spatial-reference-h)
-  (buf (:pointer :string)))
+  (buf :pointer)) ; char**
 (export 'osr-export-to-proj4)
 
 ;; --------------------------------------------------------
@@ -86,10 +86,12 @@
 (defgeneric get-proj4 (s)
   (:documentation "")
   (:method ((s-ref <spatial-ref>))
-    (cffi:with-foreign-pointer-as-string (buf 256 :encoding :ascii)
-      (osr-export-to-proj4 (pointer s-ref) buf)
-      (let ((ret buf))
-	ret))))
+    (cffi:with-foreign-object (*buf :pointer)
+      (osr-export-to-proj4 (pointer s-ref) *buf)
+      (let ((str (cffi:mem-ref *buf :pointer)))
+	(unwind-protect (cffi:foreign-string-to-lisp str)
+	  #+ignore
+	  (cpl-free str))))))
 
 (export 'get-proj4)
 

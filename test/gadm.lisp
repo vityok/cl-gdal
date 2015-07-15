@@ -9,7 +9,9 @@
 ;; wget http://biogeo.ucdavis.edu/data/gadm2.5/shp/UKR_adm.zip
 
 ;; Running the tests:
+;;
 ;; sbcl --load 'gadm.lisp' --eval '(ogr-gadm-test:run)' --quit
+;; lx86cl --load 'gadm.lisp' --eval '(ogr-gadm-test:run)' --eval '(quit)'
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (ql:quickload :cl-ogr)

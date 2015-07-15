@@ -25,28 +25,31 @@
 
 (defun inspect-ogr-file (shp)
   (format t "inspecting file: ~a~%" shp)
-  (let ((hDS (ogr:ogr-open shp 0 (cffi:null-pointer))))
-    (when (cffi:null-pointer-p hds)
+  (let ((ds (ogr:open-data-source shp)))
+    (unless ds
       (error "Failed to open file"))
-    (format t "it contains: ~a layers~%" (ogr:ogr-ds-get-layer-count hds))
+    (format t "it contains: ~a layers~%" (ogr:get-layer-count ds))
 
-    (loop for i from 0 below (ogr:ogr-ds-get-layer-count hds) do
-         (let ((layer (ogr:ogr-ds-get-layer hds i)))
-	   (cffi:with-foreign-object (envelope '(:struct ogr:ogr-envelope)) 
-	     (ogr:ogr-l-get-extent layer envelope 0)
+    (loop for i from 0 below (ogr:get-layer-count ds) do
+         (let ((layer (ogr:get-layer ds i)))
+	   (cffi:with-foreign-object (envelope '(:struct ogr:ogr-envelope))
+	     (ogr:ogr-l-get-extent (ogr:pointer layer) envelope 0)
 	     (cffi:with-foreign-slots ((ogr:minx ogr:maxx ogr:miny ogr:maxy) envelope (:struct ogr:ogr-envelope))
-	       (format t "layer[~a]: name=\"~a\", type=(~a), extents=[~a,~a,~a,~a]~%"
+	       (format t "LAYER[~a]:
+  name=\"~a\",
+  type=(~a),
+  extents=[~,2F, ~,2F, ~,2F, ~,2F]~%"
 		       i
-		       (ogr:ogr-l-get-name layer)
-		       (ogr:ogr-l-get-geom-type layer)
+		       (ogr:get-name layer)
+		       (ogr:get-geom-type layer)
 		       ogr:minx ogr:miny ogr:maxx ogr:maxy))
+	     (format t "  spatial ref: ~a~%" (ogr:get-proj4 (ogr:get-spatial-ref layer)))
 
 	     (format t "has ~a features~%"
 		     (loop
-			for feature = (ogr:ogr-l-get-next-feature layer) then (ogr:ogr-l-get-next-feature layer)
-			while (not (cffi:null-pointer-p feature))
-			count feature
-			do (ogr:ogr-f-destroy feature))))))))
+			for feature = (ogr:get-next-feature layer)
+			while feature
+			count feature)))))))
 
 ;; --------------------------------------------------------
 

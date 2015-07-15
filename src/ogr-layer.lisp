@@ -1392,8 +1392,9 @@ The recognized list of options is :
 (defgeneric get-next-feature (l)
   (:documentation "")
   (:method ((layer <layer>))
-    (make-instance '<feature>' :pointer
-		   (ogr-l-get-next-feature (pointer layer)))))
+    (let ((feature-h (ogr-l-get-next-feature (pointer layer))))
+      (unless (cffi:null-pointer-p feature-h) 
+	(make-instance '<feature>' :pointer feature-h)))))
 (export 'get-next-feature)
 
 ;; --------------------------------------------------------

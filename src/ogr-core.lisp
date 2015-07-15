@@ -52,6 +52,7 @@
     :initarg :pointer
     :accessor pointer
     :initform nil)))
+(export 'pointer)
 
 (defclass <data-source> (<ogr-class>)
   ;; original documentation at: http://www.gdal.org/ogr/classOGRDataSource.html
@@ -265,6 +266,12 @@ properly."
     (cffi:foreign-enum-keyword 'OGR-wkb-Geometry-Type
 			       (logand %x (lognot +wkb25DBit+)))))
 (export 'wkb-flatten)
+
+;; --------------------------------------------------------
+
+(cffi:defcfun ("CPLFree" cpl-free) :void
+  (ref :pointer))
+(export 'cpl-free)
 
 ;; --------------------------------------------------------
 
