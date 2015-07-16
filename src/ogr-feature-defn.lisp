@@ -448,4 +448,12 @@ Since: OGR 1.9.0"
   (bIgnore :int))
 (export 'ogr-fd-set-style-ignored)
 
+;; --------------------------------------------------------
+;; CLOS
+;; --------------------------------------------------------
+
+#+todo
+(defmethod get-type ((fd <feature-defn>))
+  (ogr-l-get-geom-type (pointer layer)))
+
 ;; EOF

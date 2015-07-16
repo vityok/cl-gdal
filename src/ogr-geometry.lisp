@@ -1854,11 +1854,8 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
 
 ;; --------------------------------------------------------
 
-(defgeneric get-type (g)
-  (:documentation "")
-  (:method ((geom <geometry>))
-    (ogr-g-get-geometry-type (pointer geom))))
-(export 'get-type)
+(defmethod get-type ((geom <geometry>))
+    (ogr-g-get-geometry-type (pointer geom)))
 
 ;; --------------------------------------------------------
 

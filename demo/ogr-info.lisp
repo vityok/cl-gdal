@@ -31,25 +31,26 @@
     (format t "it contains: ~a layers~%" (ogr:get-layer-count ds))
 
     (loop for i from 0 below (ogr:get-layer-count ds) do
-         (let ((layer (ogr:get-layer ds i)))
-	   (cffi:with-foreign-object (envelope '(:struct ogr:ogr-envelope))
-	     (ogr:ogr-l-get-extent (ogr:pointer layer) envelope 0)
-	     (cffi:with-foreign-slots ((ogr:minx ogr:maxx ogr:miny ogr:maxy) envelope (:struct ogr:ogr-envelope))
-	       (format t "LAYER[~a]:
+         (let* ((layer (ogr:get-layer ds i))
+		(extent (ogr:get-extent layer)))
+	   (format t "LAYER[~a]:
   name=\"~a\",
   type=(~a),
   extents=[~,2F, ~,2F, ~,2F, ~,2F]~%"
-		       i
-		       (ogr:get-name layer)
-		       (ogr:get-geom-type layer)
-		       ogr:minx ogr:miny ogr:maxx ogr:maxy))
-	     (format t "  spatial ref: ~a~%" (ogr:get-proj4 (ogr:get-spatial-ref layer)))
+		   i
+		   (ogr:get-name layer)
+		   (ogr:get-geom-type layer)
+		   (ogr:min-x extent)
+		   (ogr:min-y extent)
+		   (ogr:max-x extent)
+		   (ogr:max-y extent))
+	   (format t "  spatial ref: ~a~%" (ogr:get-proj4 (ogr:get-spatial-ref layer)))
 
-	     (format t "has ~a features~%"
-		     (loop
-			for feature = (ogr:get-next-feature layer)
-			while feature
-			count feature)))))))
+	   (format t "  has ~a features~%"
+		   (loop
+		      for feature = (ogr:get-next-feature layer)
+		      while feature
+		      count feature))))))
 
 ;; --------------------------------------------------------
 

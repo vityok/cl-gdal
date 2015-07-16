@@ -12,3 +12,4 @@ This library will offer two levels of access to the native library:
 
 Also you might be interested in the [`cl-proj`](http://cl-proj.sourceforge.net/): a Common Lisp wrapper for the Proj.4 library.
 
+This library is tested on SBCL, Clozure CL, and Embedded CL.
