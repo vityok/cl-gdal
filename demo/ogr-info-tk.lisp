@@ -10,8 +10,8 @@
 ;;
 ;; Load:
 ;;
-;; sbcl --load ogr-info-tk.lisp --eval '(ogr-info-demo:main)'
-;; lx86cl --load ogr-info-tk.lisp --eval '(ogr-info-demo:main)'
+;; sbcl --load ogr-info-tk.lisp --eval '(ogr-tk-demo:main)'
+;; lx86cl --load ogr-info-tk.lisp --eval '(ogr-tk-demo:main)'
 
 
 ;; TODO
@@ -28,11 +28,11 @@
   (ql:quickload :cl-ogr)
   (ql:quickload :cl-proj))
 
-(defpackage :ogr-info-demo
+(defpackage :ogr-tk-demo
   (:use :cl :iterate)
   (:export :main))
 
-(in-package :ogr-info-demo)
+(in-package :ogr-tk-demo)
 
 ;; --------------------------------------------------------
 
@@ -41,6 +41,9 @@
   "This is a datasource handle opened by the INSPECT-OGR-FILE.")
 (defvar *cnv* nil
   "Canvas where all the drawing is performed.")
+
+(defvar *screen-x* 800)
+(defvar *screen-y* 600)
 
 ;; --------------------------------------------------------
 
@@ -82,33 +85,60 @@ layers from it."
 
 (defun gui-paint-layer (id)
   (let* ((layer (ogr:get-layer *ds* id))
-	 (geom-type (ogr:get-geom-type layer)))
-    (format t "painting layer ~a with spatial-ref: ~a~%" (ogr:get-name layer)
-	    (ogr:get-proj4 (ogr:get-spatial-ref layer)))
+	 (extent (ogr:get-extent layer))
+	 (extent-x (- (ogr:max-x extent) (ogr:min-x extent)))
+	 (extent-y (- (ogr:max-y extent) (ogr:min-y extent)))
+	 (scale-x (/ *screen-x* extent-x))
+	 (scale-y (/ *screen-y* extent-y )))
 
-    (case geom-type
-      (:wkb-multi-point
-       (format t "paint MULTI-POINT with ~a features~%" (ogr:get-feature-count layer))
-       (iter (for i from 0 below (ogr:get-feature-count layer))
-	     (for feature = (ogr:get-feature layer i))
-	     (for geom = (ogr:get-geometry feature))
-	     (for point = (ogr:get-geometry geom 0))
-	     (format t "geom(~a)[~a] has ~a geometric items~%"
-		     (ogr:get-type geom) i (ogr:get-geometry-count geom))
-	     (multiple-value-bind (x y z)
-		 (ogr:get-point point 0)
-	       (format t "point[~a](~,2f, ~,2f, ~,2f)~%" i x y z)
-	       (ltk:make-oval *cnv* x y (+ x 1.0) (+ y 1.0)))
-	     (for sr = (ogr:get-spatial-ref point))
-	     (format t "spatial-ref: ~a~%" (ogr:get-proj4 sr))
-	     ))
+    (labels
+	((tx (x)		 ; transform x coord to fit the screen
+	   (* scale-x (- x (ogr:min-x extent))))
 
-      (:wkb-polygon
-       (format t "paint POLYGON with ~a features~%" (ogr:get-feature-count layer))
-       ;; (format t "feature ~a has ~a points~%" i (ogr:get-point-count geom))
-       )
-      (t
-       (format t "unknown feature type ~a~%" geom-type)))))
+	 (ty (y)		 ; transform y coord to fit the screen
+	   (* scale-y (- y (ogr:min-y extent))))
+
+	 (paint (geom)
+	   (let ((geom-type (ogr:get-type geom)))
+	     (case geom-type
+	       (:WKB-MULTI-POINT
+		(format t "paint MULTI-POINT~%")
+		;; fix this cycle
+		(iter (for point = (ogr:get-geometry geom 0))
+		      (format t "geom(~a) has ~a geometric items~%"
+			      (ogr:get-type geom) (ogr:get-geometry-count geom))
+		      (multiple-value-bind (x y z)
+			  (ogr:get-point point 0)
+			(format t "point[~a](~,2f, ~,2f, ~,2f)~%" 0 x y z)
+			(ltk:make-oval *cnv* (tx x) (ty y) (+ (tx x) 1.0) (+ (ty y) 1.0)))))
+
+	       (:WKB-POLYGON
+		(format t "paint POLYGON~%")
+		(iter (for point = (ogr:get-geometry geom 0))
+		      (format t "geom(~a) has ~a geometry objects: ~a~%"
+			      (ogr:get-type geom) (ogr:get-geometry-count geom)
+			      (iter (for j from 0 below (ogr:get-geometry-count geom))
+				    (collect (ogr:get-type (ogr:get-geometry geom j)))))
+
+		      (iter (for j from 0 below (ogr:get-geometry-count geom))
+			    (paint (ogr:get-geometry geom j)))))
+
+	       (:WKB-LINE-STRING
+		(format t "paint LINE-STRING~%"))
+
+	       (t
+		(format t "unknown feature type ~a~%" geom-type))))))
+
+      (format t "painting layer ~a with spatial-ref: ~a~%"
+	      (ogr:get-name layer)
+	      (ogr:get-proj4 (ogr:get-spatial-ref layer)))
+
+      (iter (for i from 0 below (ogr:get-feature-count layer))
+	    (for feature = (ogr:get-feature layer i))
+	    (for geom = (ogr:get-geometry feature))
+	    (paint geom))
+
+      )))
 
 ;; --------------------------------------------------------
 
@@ -128,7 +158,10 @@ IDX is a list of selected layers."
     (let* ((lbl-main (make-instance 'ltk:label :text
 				    "This application demonstrates basic features of the OGR library bindings"))
 	   (lst-layers (make-instance 'ltk:listbox))
-	   (cnv-layer (make-instance 'ltk:canvas :relief :sunken))
+	   (cnv-layer (make-instance 'ltk:canvas
+				     :relief :sunken
+				     :width *screen-x*
+				     :height *screen-y*))
 	   (btn-load
 	    (make-instance 'ltk:button
 			   :master nil

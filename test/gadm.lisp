@@ -12,6 +12,7 @@
 ;;
 ;; sbcl --load 'gadm.lisp' --eval '(ogr-gadm-test:run)' --quit
 ;; lx86cl --load 'gadm.lisp' --eval '(ogr-gadm-test:run)' --eval '(quit)'
+;; ecl -load 'gadm.lisp' -eval '(ogr-gadm-test:run)' -eval '(quit)'
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (ql:quickload :cl-ogr)
@@ -28,10 +29,21 @@
 (defvar *ds* nil)
 (defparameter *gadm-0* "data/UKR_adm0.shp")
 
-(define-test basic-test
-   (setf *ds* (ogr:open-data-source *gadm-0*))
+;; --------------------------------------------------------
 
-  (assert-equal 1 (ogr:get-layer-count *ds*)))
+(define-test basic-test
+    (setf *ds* (ogr:open-data-source *gadm-0*))
+
+  (assert-equal 1 (ogr:get-layer-count *ds*))
+
+  (let ((layer (ogr:get-layer *ds* 0)))
+    (assert-equal "UKR_adm0" (ogr:get-name layer))
+    (assert-equal :wkb-polygon (ogr:get-geom-type layer))
+    (assert-equal "+proj=longlat +datum=WGS84 +no_defs "
+		  (ogr:get-proj4 (ogr:get-spatial-ref layer)))
+    (assert-equal 1 (ogr:get-feature-count layer))))
+
+  ;; extents=[22.14, 44.39, 40.22, 52.38]
 
 ;; --------------------------------------------------------
 

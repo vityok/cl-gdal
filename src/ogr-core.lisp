@@ -32,7 +32,8 @@
 (cffi:defctype ogr-sf-driver-h :pointer "OGRSFDriverH")
 
 (cffi:defcstruct ogr-envelope
-  "OGREnvelope is declared either as a class or a plain struct depending on the language."
+  "OGREnvelope is declared either as a class or a plain struct
+depending on the language."
   (MinX :double)
   (MaxX :double)
   (MinY :double)
@@ -44,6 +45,8 @@
 (export 'MinY)
 (export 'MaxY)
 
+;; --------------------------------------------------------
+;; CLASSES
 ;; --------------------------------------------------------
 
 (defclass <ogr-class> ()
@@ -105,6 +108,15 @@
 (defclass <spatial-ref> (<ogr-class>)
   ())
 
+(defclass <envelope> ()
+  ((min-x :reader min-x :initarg :min-x :type :double-float)
+   (max-x :reader max-x :initarg :max-x :type :double-float)
+   (min-y :reader min-y :initarg :min-y :type :double-float)
+   (max-y :reader max-y :initarg :max-y :type :double-float))
+  (:documentation "OGREnvelope is declared either as a class or a plain struct
+depending on the language."))
+(export '(min-x max-x min-y max-y))
+
 ;; --------------------------------------------------------
 
 (cffi:defcenum ogr-field-type
@@ -138,6 +150,11 @@ enumeration with set constant values."
   (:failure             6)
   (:unsupported-srs     7)
   (:invalid-handle      8))
+
+(define-condition <ogr-error> ()
+  ((error-code :initarg :error-code :reader error-code))
+  (:documentation "Conditions to report failures based on OGR-ERR
+  return from the native functions."))
 
 ;; --------------------------------------------------------
 
@@ -175,24 +192,24 @@ identify the type of a geometry object."
 ;; --------------------------------------------------------
 
 (cffi:defcenum ogr-st-class-id
-    "ogr_style_tool_class_id: OGRSTClassId;"
-  (:OGRSTCNone    0)
-  (:OGRSTCPen     1)
-  (:OGRSTCBrush   2)
-  (:OGRSTCSymbol  3)
-  (:OGRSTCLabel   4)
-  (:OGRSTCVector  5))
+  "ogr_style_tool_class_id: OGRSTClassId;"
+  (:OGR-STC-None    0)
+  (:OGR-STC-Pen     1)
+  (:OGR-STC-Brush   2)
+  (:OGR-STC-Symbol  3)
+  (:OGR-STC-Label   4)
+  (:OGR-STC-Vector  5))
 
 ;; --------------------------------------------------------
 
 (cffi:defcenum OGR-ST-Unit-Id
     "ogr_style_tool_units_id: OGRSTUnitId"
-  (:OGRSTUGround  0)
-  (:OGRSTUPixel   1)
-  (:OGRSTUPoints  2)
-  (:OGRSTUMM      3)
-  (:OGRSTUCM      4)
-  (:OGRSTUInches  5))
+  (:OGR-STU-Ground  0)
+  (:OGR-STU-Pixel   1)
+  (:OGR-STU-Points  2)
+  (:OGR-STU-MM      3)
+  (:OGR-STU-CM      4)
+  (:OGR-STU-Inches  5))
 
 ;; --------------------------------------------------------
 
@@ -315,8 +332,15 @@ properly."
 
 ;; --------------------------------------------------------
 
+;; Some methods are defined in several source files, declare them here
+;; to avoid confusing warnings.
+
 (defgeneric get-spatial-ref (g))
 (export 'get-spatial-ref)
+(defgeneric get-extent (l))
+(export 'get-extent)
+(defgeneric get-type (l))
+(export 'get-type)
 
 (defgeneric get-geometry (f &optional idx))
 (export 'get-geometry)

@@ -1381,11 +1381,8 @@ The recognized list of options is :
 
 ;; --------------------------------------------------------
 
-(defgeneric get-geom-type (l)
-  (:documentation "")
-  (:method ((layer <layer>))
-    (ogr-l-get-geom-type (pointer layer))))
-(export 'get-geom-type)
+(defmethod get-type ((layer <layer>))
+  (ogr-l-get-geom-type (pointer layer)))
 
 ;; --------------------------------------------------------
 
@@ -1393,7 +1390,7 @@ The recognized list of options is :
   (:documentation "")
   (:method ((layer <layer>))
     (let ((feature-h (ogr-l-get-next-feature (pointer layer))))
-      (unless (cffi:null-pointer-p feature-h) 
+      (unless (cffi:null-pointer-p feature-h)
 	(make-instance '<feature>' :pointer feature-h)))))
 (export 'get-next-feature)
 
@@ -1410,7 +1407,7 @@ The recognized list of options is :
 ;; --------------------------------------------------------
 
 (defgeneric get-feature-count (l &optional bf)
-  (:documentation "")
+  (:documentation "BF is for brute-force.")
   (:method ((layer <layer>) &optional bf)
     (let ((count (ogr-l-get-feature-count (pointer layer)
 					  (if bf 1 0))))
@@ -1431,5 +1428,21 @@ The recognized list of options is :
 (defmethod get-spatial-ref ((l <layer>))
   (make-instance '<spatial-ref>
 		 :pointer (ogr-l-get-spatial-ref (pointer l))))
+
+;; --------------------------------------------------------
+
+(defmethod get-extent ((l <layer>))
+  (cffi:with-foreign-object (envelope '(:struct ogr-envelope))
+    (let ((ret (ogr-l-get-extent (ogr:pointer l) envelope 0)))
+      (unless (eql ret :none)
+	(error (make-condition '<ogr-error> :error-code ret))))
+    (cffi:with-foreign-slots ((minx maxx miny maxy)
+			      envelope
+			      (:struct ogr-envelope))
+      (make-instance '<envelope>
+		     :min-x minx
+		     :min-y miny
+		     :max-x maxx
+		     :max-y maxy))))
 
 ;; EOF
