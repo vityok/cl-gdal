@@ -12,6 +12,7 @@
 ;;
 ;; sbcl --load ogr-info-tk.lisp --eval '(ogr-tk-demo:main)'
 ;; lx86cl --load ogr-info-tk.lisp --eval '(ogr-tk-demo:main)'
+;; ecl -load ogr-info-tk.lisp -eval '(ogr-tk-demo:main)'
 
 
 ;; TODO
@@ -44,6 +45,101 @@
 
 (defvar *screen-x* 800)
 (defvar *screen-y* 600)
+
+(defclass <paint-ctx> ()
+  ((width :accessor width :initarg :width :type fixnum)
+   (height :accessor height :initarg :height :type fixnum)
+   (min-x :accessor min-x :initarg :min-x)
+   (min-y :accessor min-y :initarg :min-y)
+   (extent-x :accessor extent-x :initarg :extent-x)
+   (extent-y :accessor extent-y :initarg :extent-y)
+   (scale-x :accessor scale-x)
+   (scale-y :accessor scale-y)
+   (canvas :accessor canvas :initarg :canvas :type ltk:canvas)))
+
+;; --------------------------------------------------------
+
+(defmethod initialize-instance :after ((ctx <paint-ctx>) &key)
+  (let ((extent-x (slot-value ctx 'extent-x))
+	(extent-y (slot-value ctx 'extent-y))
+	(width (slot-value ctx 'width))
+	(height (slot-value ctx 'height)))
+
+    (setf (slot-value ctx 'scale-x)
+          (/ width extent-x)
+	  (slot-value ctx 'scale-y)
+	  (/ height extent-y))))
+
+(defgeneric tx (ctx x)
+  (:method ((ctx <paint-ctx>) x)
+    ;; transform x coord to fit the screen
+    (* (scale-x ctx) (- x (min-x ctx)))))
+
+(defgeneric ty (ctx y)
+  (:method ((ctx <paint-ctx>) y)
+    ;; transform y coord to fit the screen
+    (- (height ctx)
+       (* (scale-y ctx)
+	  (- y (min-y ctx))))))
+
+;; --------------------------------------------------------
+
+(defgeneric paint (ctx geom)
+  (:method ((ctx <paint-ctx>) (geom ogr:<POINT>))
+    (format t "paint POINT~%")
+    (multiple-value-bind (x y z)
+	(ogr:get-point geom 0)
+      (format t "  point[~a](~,2f, ~,2f, ~,2f)~%" 0 x y z)
+      (ltk:make-oval (canvas ctx)
+		     (tx ctx x) (ty ctx y)
+		     (+ (tx ctx x) 1.0)
+		     (+ (ty ctx y) 1.0))))
+
+  (:method ((ctx <paint-ctx>) (geom ogr:<LINE-STRING>))
+    (format t "paint LINE-STRING with ~a points~%" (ogr:get-point-count geom))
+    (let* ((points (iter
+		     (for i from 0 below (ogr:get-point-count geom))
+		     (appending (list (tx ctx (ogr:get-x geom i)) 
+				      (ty ctx (ogr:get-y geom i)))))))
+      (ltk:create-line (canvas ctx) points)))
+
+  (:method ((ctx <paint-ctx>) (geom ogr:<POLYGON>))
+    (format t "paint POLYGON with ~a points~%" (ogr:get-point-count geom))
+    (iter (for i from 0 below (ogr:get-geometry-count geom))
+	  (for poly = (ogr:get-geometry geom i))
+	  (format t "  geom(~a) has ~a geometry objects: ~a~%"
+		  (ogr:get-type poly) (ogr:get-geometry-count poly)
+		  (iter (for j from 0 below (ogr:get-geometry-count poly))
+			(collect (ogr:get-type (ogr:get-geometry poly j)))))
+	  (paint ctx poly)
+
+	  #+ignore
+	  (iter (for j from 0 below (ogr:get-geometry-count geom))
+		(paint (ogr:get-geometry geom j))))
+    )
+
+  (:method ((ctx <paint-ctx>) (geom ogr:<multi-point>))
+    (format t "paint MULTI-POINT~%")
+    ;; fix this cycle
+    (iter (for i from 0 below (ogr:get-geometry-count geom))
+	  (for point = (ogr:get-geometry geom i))
+	  (format t "  geom(~a) has ~a geometric items~%"
+		  (ogr:get-type geom) (ogr:get-geometry-count geom))
+	  (paint ctx point)))
+
+  (:method ((ctx <paint-ctx>) (geom ogr:<multi-line-string>))
+    (format t "MULTI-LINE-STRING with ~a points~%" (ogr:get-point-count geom))
+    )
+
+  (:method ((ctx <paint-ctx>) (geom ogr:<multi-polygon>))
+    (format t "paint MULTI-POLYGON~%")
+    (iter (for i from 0 below (ogr:get-geometry-count geom))
+	  (for poly = (ogr:get-geometry geom i))
+	  (format t "  geom(~a) has ~a geometry objects: ~a~%"
+		  (ogr:get-type poly) (ogr:get-geometry-count poly)
+		  (iter (for j from 0 below (ogr:get-geometry-count poly))
+			(collect (ogr:get-type (ogr:get-geometry poly j)))))
+	  (paint ctx poly))))
 
 ;; --------------------------------------------------------
 
@@ -88,57 +184,23 @@ layers from it."
 	 (extent (ogr:get-extent layer))
 	 (extent-x (- (ogr:max-x extent) (ogr:min-x extent)))
 	 (extent-y (- (ogr:max-y extent) (ogr:min-y extent)))
-	 (scale-x (/ *screen-x* extent-x))
-	 (scale-y (/ *screen-y* extent-y )))
+	 (ctx (make-instance '<paint-ctx>
+			     :width *screen-x*
+			     :height *screen-y*
+			     :min-x (ogr:min-x extent)
+			     :min-y (ogr:min-y extent)
+			     :extent-x extent-x
+			     :extent-y extent-y
+			     :canvas *cnv*)))
 
-    (labels
-	((tx (x)		 ; transform x coord to fit the screen
-	   (* scale-x (- x (ogr:min-x extent))))
+    (format t "painting layer ~a with spatial-ref: ~a~%"
+	    (ogr:get-name layer)
+	    (ogr:get-proj4 (ogr:get-spatial-ref layer)))
 
-	 (ty (y)		 ; transform y coord to fit the screen
-	   (* scale-y (- y (ogr:min-y extent))))
-
-	 (paint (geom)
-	   (let ((geom-type (ogr:get-type geom)))
-	     (case geom-type
-	       (:WKB-MULTI-POINT
-		(format t "paint MULTI-POINT~%")
-		;; fix this cycle
-		(iter (for point = (ogr:get-geometry geom 0))
-		      (format t "geom(~a) has ~a geometric items~%"
-			      (ogr:get-type geom) (ogr:get-geometry-count geom))
-		      (multiple-value-bind (x y z)
-			  (ogr:get-point point 0)
-			(format t "point[~a](~,2f, ~,2f, ~,2f)~%" 0 x y z)
-			(ltk:make-oval *cnv* (tx x) (ty y) (+ (tx x) 1.0) (+ (ty y) 1.0)))))
-
-	       (:WKB-POLYGON
-		(format t "paint POLYGON~%")
-		(iter (for point = (ogr:get-geometry geom 0))
-		      (format t "geom(~a) has ~a geometry objects: ~a~%"
-			      (ogr:get-type geom) (ogr:get-geometry-count geom)
-			      (iter (for j from 0 below (ogr:get-geometry-count geom))
-				    (collect (ogr:get-type (ogr:get-geometry geom j)))))
-
-		      (iter (for j from 0 below (ogr:get-geometry-count geom))
-			    (paint (ogr:get-geometry geom j)))))
-
-	       (:WKB-LINE-STRING
-		(format t "paint LINE-STRING~%"))
-
-	       (t
-		(format t "unknown feature type ~a~%" geom-type))))))
-
-      (format t "painting layer ~a with spatial-ref: ~a~%"
-	      (ogr:get-name layer)
-	      (ogr:get-proj4 (ogr:get-spatial-ref layer)))
-
-      (iter (for i from 0 below (ogr:get-feature-count layer))
-	    (for feature = (ogr:get-feature layer i))
-	    (for geom = (ogr:get-geometry feature))
-	    (paint geom))
-
-      )))
+    (iter (for i from 0 below (ogr:get-feature-count layer))
+	  (for feature = (ogr:get-feature layer i))
+	  (for geom = (ogr:get-geometry feature))
+	  (paint ctx geom))))
 
 ;; --------------------------------------------------------
 

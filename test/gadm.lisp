@@ -38,7 +38,7 @@
 
   (let ((layer (ogr:get-layer *ds* 0)))
     (assert-equal "UKR_adm0" (ogr:get-name layer))
-    (assert-equal :wkb-polygon (ogr:get-geom-type layer))
+    (assert-equal :wkb-polygon (ogr:get-type layer))
     (assert-equal "+proj=longlat +datum=WGS84 +no_defs "
 		  (ogr:get-proj4 (ogr:get-spatial-ref layer)))
     (assert-equal 1 (ogr:get-feature-count layer))))

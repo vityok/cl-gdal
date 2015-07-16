@@ -105,6 +105,23 @@ depending on the language."
 (defclass <multi-polygon-25d> (<geometry>) ())
 (defclass <geometry-collection-25d> (<geometry>) ())
 
+(export '(<point>
+	  <line-string>
+	  <polygon>
+	  <multi-point>
+	  <multi-line-string>
+	  <multi-polygon>
+	  <geometry-collection>
+	  <linear-ring>
+	  <point-25d>
+	  <line-string-25d>
+	  <polygon-25d>
+	  <multi-point-25d>
+	  <multi-line-string-25d>
+	  <multi-polygon-25d>
+	  <geometry-collection-25d>))
+
+
 (defclass <spatial-ref> (<ogr-class>)
   ())
 
@@ -329,6 +346,46 @@ properly."
  VSICleanupFileManager()
  CPLFreeConfig()
  CPLCleanupTLS()")
+
+;; --------------------------------------------------------
+
+(defmacro dispatch-geometry-construction (geom-type ref)
+  `(case ,geom-type
+     (:wkb-unknown
+      (make-instance '<geometry> :pointer ,ref))
+     (:wkb-point
+      (make-instance '<point> :pointer ,ref))
+     (:wkb-line-string
+      (make-instance '<line-string> :pointer ,ref))
+     (:wkb-polygon
+      (make-instance '<polygon> :pointer ,ref))
+     (:wkb-multi-point
+      (make-instance '<multi-point> :pointer ,ref))
+     (:wkb-multi-line-string
+      (make-instance '<multi-line-string> :pointer ,ref))
+     (:wkb-multi-polygon
+      (make-instance '<multi-polygon> :pointer ,ref))
+     (:wkb-geometry-collection
+      (make-instance '<geometry-collection> :pointer ,ref))
+     (:wkb-none
+      (make-instance '<geometry> :pointer ,ref))
+     (:wkb-linear-ring
+      (make-instance '<linear-ring> :pointer ,ref))
+     (:wkb-point-25d
+      (make-instance '<point-25d> :pointer ,ref))
+     (:wkb-line-string-25d
+      (make-instance '<line-string-25d> :pointer ,ref))
+     (:wkb-polygon-25d
+      (make-instance '<polygon-25d> :pointer ,ref))
+     (:wkb-multi-point-25d
+      (make-instance '<multi-point-25d> :pointer ,ref))
+     (:wkb-multi-line-string-25d
+      (make-instance '<multi-line-string-25d> :pointer ,ref))
+     (:wkb-multi-polygon-25d
+      (make-instance '<multi-polygon-25d> :pointer ,ref))
+     (:wkb-geometry-collection-25d
+      (make-instance '<geometry-collection-25d> :pointer ,ref)))
+  )
 
 ;; --------------------------------------------------------
 

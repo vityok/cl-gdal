@@ -1868,49 +1868,12 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
 ;; --------------------------------------------------------
 
 (defmethod get-geometry ((geom <geometry>) &optional idx)
-  (check-type idx integer)
+  (check-type idx (or null integer))
   ;; todo!
-  (let ((ref (ogr-g-get-geometry-ref (pointer geom)
-				     (if idx idx 0)))
-	(geom-type (ogr:get-geom-type layer)))
-    (case geom-type
-      (:wkb-unknown
-       (error "unknown geometry type"))
-      (:wkb-point
-       (make-instance '<point> :pointer ref))
-      (:wkb-line-string
-       (make-instance '<line-string> :pointer ref))
-      (:wkb-polygon
-       (make-instance '<polygon> :pointer ref))
-      (:wkb-multi-point
-       (make-instance '<multi-point> :pointer ref))
-      (:wkb-multi-line-string
-       (make-instance '<multi-line-string> :pointer ref))
-      (:wkb-multi-polygon
-       (make-instance '<multi-polygon> :pointer ref))
-      (:wkb-geometry-collection
-       (make-instance '<geometry-collection> :pointer ref))
-      (:wkb-none
-       (error "none geometry type"))
-      (:wkb-linear-ring
-       (make-instance '<linear-ring> :pointer ref))
-      (:wkb-point-25d
-       (make-instance '<point-25d> :pointer ref))
-      (:wkb-line-string-25d
-       (make-instance '<line-string-25d> :pointer ref))
-      (:wkb-polygon-25d
-       (make-instance '<polygon-25d> :pointer ref))
-      (:wkb-multi-point-25d
-       (make-instance '<multi-point-25d> :pointer ref))
-      (:wkb-multi-line-string-25d
-       (make-instance '<multi-line-string-25d> :pointer ref))
-      (:wkb-multi-polygon-25d
-       (make-instance '<multi-polygon-25d> :pointer ref))
-      (:wkb-geometry-collection-25d
-       (make-instance '<geometry-collection-25d> :pointer ref))))
-
-  (make-instance '<geometry>'
-		 :pointer ))
+  (let* ((ref (ogr-g-get-geometry-ref (pointer geom)
+				      (if idx idx 0)))
+	 (geom-type (ogr-g-get-geometry-type ref)))
+    (dispatch-geometry-construction geom-type ref)))
 
 ;; --------------------------------------------------------
 
