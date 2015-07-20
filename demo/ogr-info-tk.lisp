@@ -28,6 +28,7 @@
   (ql:quickload :cl-ogr)
   (ql:quickload :cl-proj)
   (ql:quickload :cl-cairo2)
+  (ql:quickload :cl-cairo2-xlib)
   (ql:quickload :external-program))
 
 (defpackage :ogr-tk-demo
@@ -241,7 +242,7 @@ layers from it."
 			     :extent-x extent-x
 			     :extent-y extent-y
 			     :canvas (cairo:create-image-surface :argb32 *screen-x* *screen-y*)))
-	 (cairo-ctx (cairo:create-context (canvas ctx))))
+	 (cairo-ctx (cairo:create-xlib-image-context *screen-x* *screen-y*)))
 
     (format t "painting layer ~a with spatial-ref: ~a~%"
 	    (ogr:get-name layer)
@@ -253,24 +254,10 @@ layers from it."
 	    (for feature = (ogr:get-feature layer i))
 	    (for geom = (ogr:get-geometry feature))
 	    (paint ctx geom))
-      (cairo:destroy cairo-ctx)
-      (cairo:surface-write-to-png (canvas ctx) "map-canvas.png") 
+      ;; (cairo:destroy cairo-ctx)
+      ;; (cairo:surface-write-to-png (canvas ctx) "map-canvas.png") 
       )
-    ;; a bit of a hack since default Tcl/Tk does not accept PNG files,
-    ;; we use ImageMagic to convert it to the GIF format
-    (external-program:run "/bin/rm"
-			  (list
-			   "map-canvas.gif")
-			  :error *standard-output*)
-    (external-program:run "/usr/bin/convert"
-			  (list
-			   "map-canvas.png"
-			   "map-canvas.gif")
-			  :error *standard-output*)
-
-    (let ((image (ltk:make-image)))
-      (ltk:image-load image "map-canvas.gif")
-      (ltk:create-image (canvas ctx) 0 0 :image image))))
+    (format t "painting layer ~a DONE" id)))
 
 ;; --------------------------------------------------------
 
@@ -290,6 +277,7 @@ IDX is a list of selected layers."
     (let* ((lbl-main (make-instance 'ltk:label :text
 				    "This application demonstrates basic features of the OGR library bindings"))
 	   (lst-layers (make-instance 'ltk:listbox))
+           #+ltk-mode
 	   (cnv-layer (make-instance 'ltk:canvas
 				     :relief :sunken
 				     :width *screen-x*
@@ -308,9 +296,11 @@ IDX is a list of selected layers."
 		  (gui-handle-select-layer (ltk:listbox-get-selection lst-layers))))
 
       (ltk:listbox-append lst-layers '("a"))
+      #+ltk-mode
       (setf *cnv* cnv-layer)
       (ltk:pack lbl-main :side :top)
       (ltk:pack lst-layers :side :left)
+      #+ltk-mode
       (ltk:pack cnv-layer :side :right)
       (ltk:pack btn-load :side :bottom))))
 
