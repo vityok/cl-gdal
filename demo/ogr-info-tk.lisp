@@ -27,7 +27,7 @@
   (ql:quickload :ltk)
   (ql:quickload :cl-ogr)
   (ql:quickload :cl-proj)
-  (ql:quickload :vecto)
+  (ql:quickload :cl-cairo2)
   (ql:quickload :external-program))
 
 (defpackage :ogr-tk-demo
@@ -103,9 +103,10 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
 (defgeneric ty (ctx y)
   (:method ((ctx <paint-ctx>) y)
     ;; transform y coord to fit the screen
+    #+vecto-mode
     (* (scale-y ctx)
        (- y (min-y ctx)))
-    #+ltk-mode
+    #-cairo-ltk-mode
     (- (height ctx)
        (* (scale-y ctx)
 	  (- y (min-y ctx))))))
@@ -118,9 +119,9 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
     (multiple-value-bind (x y z)
 	(ogr:get-point geom 0)
       (format t "  point[~a](~,2f, ~,2f, ~,2f)~%" 0 x y z)
-      (vecto:set-rgb-fill 1.0 1.0 1.0)
-      (vecto:centered-circle-path (tx ctx x) (ty ctx y) 1)
-      (vecto:fill-path)
+      (cairo:set-source-rgb 1.0 1.0 1.0)
+      (cairo:arc (tx ctx x) (ty ctx y) 2 0 (* 2 3.14))
+      (cairo:fill-preserve)
       #+ltk-mode
       (ltk:make-oval (canvas ctx)
 		     (tx ctx x) (ty ctx y)
@@ -132,17 +133,18 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
     (iter
       (with color = (elt *colors-brewer* (random (length *colors-brewer*) (seed ctx))))
       (initially
-       (vecto:set-line-width 1.1)
-       (apply #'vecto:set-rgb-stroke color)
-       (apply #'vecto:set-rgb-fill color)
-       (vecto:move-to (tx ctx (ogr:get-x geom 0))
+       (cairo:set-line-width 1.1)
+       (apply #'cairo:set-source-rgb color)
+       ;; (apply #'vecto:set-rgb-fill color)
+       (cairo:move-to (tx ctx (ogr:get-x geom 0))
 		      (ty ctx (ogr:get-y geom 0))))
       (for i from 1 below (ogr:get-point-count geom))
-      (vecto:line-to (tx ctx (ogr:get-x geom i))
+      (cairo:line-to (tx ctx (ogr:get-x geom i))
 		     (ty ctx (ogr:get-y geom i)))
       (finally
-       (vecto:close-subpath)
-       (vecto:fill-and-stroke)))
+       ;; (cairo:close-subpath)
+       (cairo:fill-preserve)
+       (cairo:stroke)))
 
     #+ltk-mode
     (let* ((points (iter
@@ -238,19 +240,22 @@ layers from it."
 			     :min-y (ogr:min-y extent)
 			     :extent-x extent-x
 			     :extent-y extent-y
-			     :canvas *cnv*)))
+			     :canvas (cairo:create-image-surface :argb32 *screen-x* *screen-y*)))
+	 (cairo-ctx (cairo:create-context (canvas ctx))))
 
     (format t "painting layer ~a with spatial-ref: ~a~%"
 	    (ogr:get-name layer)
 	    (ogr:get-proj4 (ogr:get-spatial-ref layer)))
 
-    (vecto:with-canvas (:width (width ctx) :height (height ctx))
+    ;;(vecto:with-canvas (:width (width ctx) :height (height ctx))
+    (cairo:with-context (cairo-ctx)
       (iter (for i from 0 below (ogr:get-feature-count layer))
 	    (for feature = (ogr:get-feature layer i))
 	    (for geom = (ogr:get-geometry feature))
 	    (paint ctx geom))
-
-      (vecto:save-png "map-canvas.png"))
+      (cairo:destroy cairo-ctx)
+      (cairo:surface-write-to-png (canvas ctx) "map-canvas.png") 
+      )
     ;; a bit of a hack since default Tcl/Tk does not accept PNG files,
     ;; we use ImageMagic to convert it to the GIF format
     (external-program:run "/bin/rm"
