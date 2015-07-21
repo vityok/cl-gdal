@@ -84,7 +84,8 @@
 ;; --------------------------------------------------------
 
 (defgeneric get-proj4 (s)
-  (:documentation "")
+  (:documentation "Proj.4 representation of the Spatial Reference
+System.")
   (:method ((s-ref <spatial-ref>))
     (cffi:with-foreign-object (*buf :pointer)
       (osr-export-to-proj4 (pointer s-ref) *buf)
@@ -92,7 +93,6 @@
 	(unwind-protect (cffi:foreign-string-to-lisp str)
 	  #+ignore
 	  (cpl-free str))))))
-
 (export 'get-proj4)
 
 ;; EOF

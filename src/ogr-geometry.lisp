@@ -1854,6 +1854,29 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
 
 ;; --------------------------------------------------------
 
+(defmacro with-points ((x y z count) geom &body body)
+  "Handles creation of native variables for coordinate arrays,
+extracts point information from the given geometry object and then
+frees allocated memory resources with cpl-free.
+
+X, Y, Z will be holding native CFFI arrays for the point coordinates
+and COUNT will be assigned the number returned by ogr-g-get-points."
+  (let ((point-count (gensym))
+        (sizeof-double (gensym)))
+    `(let ((,point-count (get-point-count ,geom))
+           (,sizeof-double (cffi:foreign-type-size :double)))
+       (cffi:with-foreign-objects ((,x :double ,point-count)
+                                   (,y :double ,point-count)
+                                   (,z :double ,point-count))
+         (let ((,count (ogr-g-get-points (pointer ,geom)
+                                         ,x ,sizeof-double
+                                         ,y ,sizeof-double
+                                         ,z ,sizeof-double)))
+           ,@body)))))
+(export 'with-points)
+
+;; --------------------------------------------------------
+
 (defmethod get-type ((geom <geometry>))
     (ogr-g-get-geometry-type (pointer geom)))
 
@@ -1889,8 +1912,8 @@ cffi:defcfun OGRGeometryH OGR_G_GetBoundary
 ;; --------------------------------------------------------
 
 (defmethod get-spatial-ref ((geom <geometry>))
-  (make-instance '<spatial-ref> 
+  (make-instance '<spatial-ref>
 		 :pointer (ogr-g-get-spatial-reference (pointer geom))))
 
-    
+
 ;; EOF

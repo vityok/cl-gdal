@@ -1426,14 +1426,18 @@ The recognized list of options is :
 ;; --------------------------------------------------------
 
 (defmethod get-spatial-ref ((l <layer>))
-  (make-instance '<spatial-ref>
-		 :pointer (ogr-l-get-spatial-ref (pointer l))))
+  ;; return NIL if there is no spatial-ref
+  (let ((ref (ogr-l-get-spatial-ref (pointer l))))
+    (unless (cffi:null-pointer-p ref)
+      (make-instance '<spatial-ref>
+                     :pointer ref))))
 
 ;; --------------------------------------------------------
 
 (defmethod get-extent ((l <layer>))
   (cffi:with-foreign-object (envelope '(:struct ogr-envelope))
     (let ((ret (ogr-l-get-extent (ogr:pointer l) envelope 0)))
+      ;; ogr-err checking
       (unless (eql ret :none)
 	(error (make-condition '<ogr-error> :error-code ret))))
     (cffi:with-foreign-slots ((minx maxx miny maxy)

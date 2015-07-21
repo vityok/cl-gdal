@@ -45,6 +45,10 @@
 (defvar *cnv* nil
   "Canvas where all the drawing is performed.")
 
+(defparameter *default-spatial-ref* "+proj=latlong +ellps=WGS84 +datum=WGS84"
+  "Proj.4 representation of the Spatial Reference System when it is
+not defined in the Layer.")
+
 ;; --------------------------------------------------------
 
 (defvar *screen-x* 640 "Default viewport or screen width.")
@@ -61,6 +65,8 @@
    (extent-y :accessor extent-y :initarg :extent-y)
    (scale-x :accessor scale-x)
    (scale-y :accessor scale-y)
+   (from-proj :accessor from-proj :initarg :from-proj)
+   (to-proj :accessor to-proj :initarg :to-proj)
    (canvas :accessor canvas :initarg :canvas :type ltk:canvas)
    (seed :accessor seed :initform (make-random-state))))
 
@@ -114,6 +120,24 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
 
 ;; --------------------------------------------------------
 
+(defun line-string-path (ctx geom)
+  "Create a path for the given line-string so that it can be later
+either striken or filled (or both) depending on the actual geometry
+type."
+  (format t "putting path for ~a with ~a points~%" geom (ogr:get-point-count geom))
+  (ogr:with-points (x y z count) geom
+    (format t "retrieved ~a points~%" count)
+
+    (iter
+      (initially
+       (cairo:move-to (tx ctx (cffi:mem-aref x :double 0))
+                      (ty ctx (cffi:mem-aref y :double 0))))
+      (for i from 1 below (ogr:get-point-count geom))
+      (cairo:line-to (tx ctx (cffi:mem-aref x :double i))
+                     (ty ctx (cffi:mem-aref y :double i))))))
+
+;; --------------------------------------------------------
+
 (defgeneric paint (ctx geom)
   (:method ((ctx <paint-ctx>) (geom ogr:<POINT>))
     (format t "paint POINT~%")
@@ -122,37 +146,17 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
       (format t "  point[~a](~,2f, ~,2f, ~,2f)~%" 0 x y z)
       (cairo:set-source-rgb 1.0 1.0 1.0)
       (cairo:arc (tx ctx x) (ty ctx y) 2 0 (* 2 3.14))
-      (cairo:fill-preserve)
-      #+ltk-mode
-      (ltk:make-oval (canvas ctx)
-		     (tx ctx x) (ty ctx y)
-		     (+ (tx ctx x) 1.0)
-		     (+ (ty ctx y) 1.0))))
+      (cairo:fill-preserve)))
 
   (:method ((ctx <paint-ctx>) (geom ogr:<LINE-STRING>))
     (format t "paint LINE-STRING with ~a points~%" (ogr:get-point-count geom))
-    (iter
-      (with color = (elt *colors-brewer* (random (length *colors-brewer*) (seed ctx))))
-      (initially
-       (cairo:set-line-width 1.1)
-       (apply #'cairo:set-source-rgb color)
-       ;; (apply #'vecto:set-rgb-fill color)
-       (cairo:move-to (tx ctx (ogr:get-x geom 0))
-		      (ty ctx (ogr:get-y geom 0))))
-      (for i from 1 below (ogr:get-point-count geom))
-      (cairo:line-to (tx ctx (ogr:get-x geom i))
-		     (ty ctx (ogr:get-y geom i)))
-      (finally
-       ;; (cairo:close-subpath)
-       (cairo:fill-preserve)
-       (cairo:stroke)))
-
-    #+ltk-mode
-    (let* ((points (iter
-		     (for i from 0 below (ogr:get-point-count geom))
-		     (appending (list (tx ctx (ogr:get-x geom i))
-				      (ty ctx (ogr:get-y geom i)))))))
-      (ltk:create-line (canvas ctx) points)))
+    (let ((color (elt *colors-brewer*
+                      (random (length *colors-brewer*)
+                              (seed ctx)))))
+      (cairo:set-line-width 1.1)
+      (apply #'cairo:set-source-rgb color)
+      (line-string-path ctx geom)
+      (cairo:stroke)))
 
   (:method ((ctx <paint-ctx>) (geom ogr:<POLYGON>))
     (format t "paint POLYGON with ~a points~%" (ogr:get-point-count geom))
@@ -162,11 +166,14 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
 		  (ogr:get-type poly) (ogr:get-geometry-count poly)
 		  (iter (for j from 0 below (ogr:get-geometry-count poly))
 			(collect (ogr:get-type (ogr:get-geometry poly j)))))
-	  (paint ctx poly)
-
-	  #+ignore
-	  (iter (for j from 0 below (ogr:get-geometry-count geom))
-		(paint (ogr:get-geometry geom j)))))
+          (let ((color (elt *colors-brewer*
+                            (random (length *colors-brewer*)
+                                    (seed ctx)))))
+            (cairo:set-line-width 1.1)
+            (apply #'cairo:set-source-rgb color)
+            (line-string-path ctx poly)
+            (cairo:fill-preserve)
+            (cairo:stroke))))
 
   (:method ((ctx <paint-ctx>) (geom ogr:<multi-point>))
     (format t "paint MULTI-POINT~%")
@@ -179,7 +186,7 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
 
   (:method ((ctx <paint-ctx>) (geom ogr:<multi-line-string>))
     (format t "MULTI-LINE-STRING with ~a points~%" (ogr:get-point-count geom))
-    )
+    (error "MULTI-LINE-STRING not implemented"))
 
   (:method ((ctx <paint-ctx>) (geom ogr:<multi-polygon>))
     (format t "paint MULTI-POLYGON~%")
@@ -216,7 +223,9 @@ layers from it."
       (for i from 0 below (ogr:get-layer-count ds))
       (for layer = (ogr:get-layer ds i))
       (format t "layer[~a]: ~a; spatial-ref: ~a~%" i (ogr:get-name layer)
-	      (ogr:get-proj4 (ogr:get-spatial-ref layer)))
+	      (if (ogr:get-spatial-ref layer)
+                  (ogr:get-proj4 (ogr:get-spatial-ref layer))
+                  *default-spatial-ref*))
       (push (ogr:get-name layer) *layers-list*))))
 
 ;; --------------------------------------------------------
@@ -231,6 +240,9 @@ layers from it."
 
 (defun gui-paint-layer (id)
   (let* ((layer (ogr:get-layer *ds* id))
+         (layer-spatial-ref (if (ogr:get-spatial-ref layer)
+                                (ogr:get-proj4 (ogr:get-spatial-ref layer))
+                                *default-spatial-ref*))
 	 (extent (ogr:get-extent layer))
 	 (extent-x (- (ogr:max-x extent) (ogr:min-x extent)))
 	 (extent-y (- (ogr:max-y extent) (ogr:min-y extent)))
@@ -241,23 +253,25 @@ layers from it."
 			     :min-y (ogr:min-y extent)
 			     :extent-x extent-x
 			     :extent-y extent-y
+                             :from-proj (pj:pj-init-plus layer-spatial-ref)
+                             :to-proj (pj:pj-init-plus "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
 			     :canvas (cairo:create-image-surface :argb32 *screen-x* *screen-y*)))
 	 (cairo-ctx (cairo:create-xlib-image-context *screen-x* *screen-y*)))
 
     (format t "painting layer ~a with spatial-ref: ~a~%"
 	    (ogr:get-name layer)
-	    (ogr:get-proj4 (ogr:get-spatial-ref layer)))
+	    layer-spatial-ref)
 
-    ;;(vecto:with-canvas (:width (width ctx) :height (height ctx))
+
     (cairo:with-context (cairo-ctx)
       (iter (for i from 0 below (ogr:get-feature-count layer))
 	    (for feature = (ogr:get-feature layer i))
 	    (for geom = (ogr:get-geometry feature))
 	    (paint ctx geom))
       ;; (cairo:destroy cairo-ctx)
-      ;; (cairo:surface-write-to-png (canvas ctx) "map-canvas.png") 
+      ;; (cairo:surface-write-to-png (canvas ctx) "map-canvas.png")
       )
-    (format t "painting layer ~a DONE" id)))
+    (format t "DONE painting layer ~a~%" id)))
 
 ;; --------------------------------------------------------
 
@@ -277,11 +291,6 @@ IDX is a list of selected layers."
     (let* ((lbl-main (make-instance 'ltk:label :text
 				    "This application demonstrates basic features of the OGR library bindings"))
 	   (lst-layers (make-instance 'ltk:listbox))
-           #+ltk-mode
-	   (cnv-layer (make-instance 'ltk:canvas
-				     :relief :sunken
-				     :width *screen-x*
-				     :height *screen-y*))
 	   (btn-load
 	    (make-instance 'ltk:button
 			   :master nil
@@ -295,13 +304,9 @@ IDX is a list of selected layers."
 		  (declare (ignore evt))
 		  (gui-handle-select-layer (ltk:listbox-get-selection lst-layers))))
 
-      (ltk:listbox-append lst-layers '("a"))
-      #+ltk-mode
-      (setf *cnv* cnv-layer)
+      (ltk:listbox-append lst-layers '())
       (ltk:pack lbl-main :side :top)
       (ltk:pack lst-layers :side :left)
-      #+ltk-mode
-      (ltk:pack cnv-layer :side :right)
       (ltk:pack btn-load :side :bottom))))
 
 ;; EOF
