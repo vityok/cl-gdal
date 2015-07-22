@@ -49,6 +49,17 @@
   "Proj.4 representation of the Spatial Reference System when it is
 not defined in the Layer.")
 
+(defparameter *target-spatial-ref*
+  ;; a very simple version of the Mercator projection configured for
+  ;; Ukraine (zone parameter)
+
+  #+ignore
+  "+proj=utm +zone=35 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+
+  ;; the so-called "web Mercator" projection as found on the internets
+  "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs"
+  )
+
 ;; --------------------------------------------------------
 
 (defvar *screen-x* 640 "Default viewport or screen width.")
@@ -102,39 +113,40 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
 	  (slot-value ctx 'scale-y)
 	  (/ height extent-y))))
 
-(defgeneric tx (ctx x)
-  (:method ((ctx <paint-ctx>) x)
-    ;; transform x coord to fit the screen
-    (* (scale-x ctx) (- x (min-x ctx)))))
-
-(defgeneric ty (ctx y)
-  (:method ((ctx <paint-ctx>) y)
-    ;; transform y coord to fit the screen
-    #+vecto-mode
-    (* (scale-y ctx)
-       (- y (min-y ctx)))
-    #-cairo-ltk-mode
-    (- (height ctx)
-       (* (scale-y ctx)
-	  (- y (min-y ctx))))))
-
 ;; --------------------------------------------------------
 
 (defun line-string-path (ctx geom)
   "Create a path for the given line-string so that it can be later
 either striken or filled (or both) depending on the actual geometry
 type."
+  (declare (optimize debug))
+
   (format t "putting path for ~a with ~a points~%" geom (ogr:get-point-count geom))
   (ogr:with-points (x y z count) geom
-    (format t "retrieved ~a points~%" count)
+    (format t "retrieved ~a points:~%" count)
+    (iter
+      (for i from 0 below (ogr:get-point-count geom))
+      (setf
+       (cffi:mem-aref x :double i) (pj:deg-to-rad (cffi:mem-aref x :double i))
+       (cffi:mem-aref y :double i) (pj:deg-to-rad (cffi:mem-aref y :double i))
+       (cffi:mem-aref z :double i) (pj:deg-to-rad (cffi:mem-aref z :double i))))
+
+    (let ((ret (pj:pj-transform (from-proj ctx)
+                                (to-proj ctx)
+                                count 1 x y z)))
+      (when (/= ret 0)
+        (format t "transformation failed with error code: ~a ~%" ret)))
+
+    (format t "transformed, starting to mark the path~%")
 
     (iter
       (initially
-       (cairo:move-to (tx ctx (cffi:mem-aref x :double 0))
-                      (ty ctx (cffi:mem-aref y :double 0))))
+       (format t "move-to: ~a ~a~%" (cffi:mem-aref x :double 0) (cffi:mem-aref y :double 0))
+       (cairo:move-to (cffi:mem-aref x :double 0)
+                      (cffi:mem-aref y :double 0)))
       (for i from 1 below (ogr:get-point-count geom))
-      (cairo:line-to (tx ctx (cffi:mem-aref x :double i))
-                     (ty ctx (cffi:mem-aref y :double i))))))
+      (cairo:line-to (cffi:mem-aref x :double i)
+                     (cffi:mem-aref y :double i)))))
 
 ;; --------------------------------------------------------
 
@@ -145,7 +157,7 @@ type."
 	(ogr:get-point geom 0)
       (format t "  point[~a](~,2f, ~,2f, ~,2f)~%" 0 x y z)
       (cairo:set-source-rgb 1.0 1.0 1.0)
-      (cairo:arc (tx ctx x) (ty ctx y) 2 0 (* 2 3.14))
+      (cairo:arc x y 2 0 (* 2 3.14))
       (cairo:fill-preserve)))
 
   (:method ((ctx <paint-ctx>) (geom ogr:<LINE-STRING>))
@@ -238,6 +250,45 @@ layers from it."
 
 ;; --------------------------------------------------------
 
+(defun adjust-canvas-transform (ctx)
+  "Setup affine transformation on the canvas to help with placing
+rendered points at appropriate locations."
+
+  ;; we have to calculate scale and shift based on the envelope. There
+  ;; is a problem though: if the geographic projection rotates a
+  ;; little bit, our top-right conner might be not the rightmost as
+  ;; the result.
+
+  (let* ((pe (pj:geo-transform (from-proj ctx)
+                               (to-proj ctx)
+                               ;; render min and max points at once
+                               `((,(min-x ctx) ,(min-y ctx) 0.0d0) ; left-bottom
+                                 (,(+ (min-x ctx) (extent-x ctx) 0.0d0) ; right-top
+                                   ,(+ (min-y ctx) (extent-y ctx)) 0.0d0)
+                                 (,(min-x ctx) ,(+ (min-y ctx) (extent-y ctx)) 0.0d0) ; left-top
+                                 (,(+ (min-x ctx) (extent-x ctx) 0.0d0) ; right-bottom
+                                   ,(min-y ctx) 0.0d0))
+                               :degs T))
+         (p.minx (iter (for p in pe) (minimize (first p))))
+         (p.miny (iter (for p in pe) (minimize (second p))))
+         (p.maxx (iter (for p in pe) (maximize (first p))))
+         (p.maxy (iter (for p in pe) (maximize (second p))))
+         (p.width (- p.maxx p.minx))   ; width of the projected extent
+         (p.height (- p.maxy p.miny))
+         (scale.x (/ (width ctx) p.width))
+         (scale.y (* -1.0d0 (/ (height ctx) p.height)))
+         (shift.x (* -1.0d0 p.minx scale.x))
+         ;; scale.y is negative by this time, negate again to get
+         ;; positive
+         (shift.y (+ (* -1.0d0 p.miny scale.y) (height ctx))))
+    ;; (format t "got pe: ([~a; ~a], [~,2f; ~,2f])~%" p.minx p.miny p.maxx p.maxy)
+    ;; (format t "scale[~,5f; ~,5f] shift[~,2f; ~,2f]~%" scale.x scale.y shift.x shift.y)
+    (cairo:translate shift.x shift.y)
+    (cairo:scale scale.x scale.y)
+    (format t "trans-matrix: ~a~%" (cairo:get-trans-matrix))))
+
+;; --------------------------------------------------------
+
 (defun gui-paint-layer (id)
   (let* ((layer (ogr:get-layer *ds* id))
          (layer-spatial-ref (if (ogr:get-spatial-ref layer)
@@ -254,7 +305,7 @@ layers from it."
 			     :extent-x extent-x
 			     :extent-y extent-y
                              :from-proj (pj:pj-init-plus layer-spatial-ref)
-                             :to-proj (pj:pj-init-plus "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
+                             :to-proj (pj:pj-init-plus *target-spatial-ref*)
 			     :canvas (cairo:create-image-surface :argb32 *screen-x* *screen-y*)))
 	 (cairo-ctx (cairo:create-xlib-image-context *screen-x* *screen-y*)))
 
@@ -262,8 +313,8 @@ layers from it."
 	    (ogr:get-name layer)
 	    layer-spatial-ref)
 
-
     (cairo:with-context (cairo-ctx)
+      (adjust-canvas-transform ctx)
       (iter (for i from 0 below (ogr:get-feature-count layer))
 	    (for feature = (ogr:get-feature layer i))
 	    (for geom = (ogr:get-geometry feature))
