@@ -105,7 +105,8 @@ depending on the language."
 (defclass <multi-polygon-25d> (<geometry>) ())
 (defclass <geometry-collection-25d> (<geometry>) ())
 
-(export '(<point>
+(export '(<geometry>
+          <point>
 	  <line-string>
 	  <polygon>
 	  <multi-point>

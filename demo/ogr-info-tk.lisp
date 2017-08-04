@@ -44,6 +44,10 @@
   "This is a datasource handle opened by the INSPECT-OGR-FILE.")
 (defvar *cnv* nil
   "Canvas where all the drawing is performed.")
+(defvar *bb-min-x* 0.0d0)
+(defvar *bb-min-y* 0.0d0)
+(defvar *bb-max-x* 0.0d0)
+(defvar *bb-max-y* 0.0d0)
 
 (defparameter *default-spatial-ref* "+proj=latlong +ellps=WGS84 +datum=WGS84"
   "Proj.4 representation of the Spatial Reference System when it is
@@ -103,15 +107,17 @@ Cynthia Brewer, Mark Harrower and The Pennsylvania State University.")
 ;; --------------------------------------------------------
 
 (defmethod initialize-instance :after ((ctx <paint-ctx>) &key)
-  (let ((extent-x (slot-value ctx 'extent-x))
-	(extent-y (slot-value ctx 'extent-y))
-	(width (slot-value ctx 'width))
+  (let ((width (slot-value ctx 'width))
 	(height (slot-value ctx 'height)))
 
+    ;; todo: what should be done when extent is 0?
+    (if (= (slot-value ctx 'extent-x) 0) (setf (slot-value ctx 'extent-x) 180))
+    (if (= (slot-value ctx 'extent-y) 0) (setf (slot-value ctx 'extent-y) 180))
+
     (setf (slot-value ctx 'scale-x)
-          (/ width extent-x)
+          (/ width (slot-value ctx 'extent-x))
 	  (slot-value ctx 'scale-y)
-	  (/ height extent-y))))
+	  (/ height (slot-value ctx 'extent-y)))))
 
 ;; --------------------------------------------------------
 
@@ -187,7 +193,7 @@ type."
             (cairo:fill-preserve)
             (cairo:stroke))))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<multi-point>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-POINT>))
     (format t "paint MULTI-POINT~%")
     ;; fix this cycle
     (iter (for i from 0 below (ogr:get-geometry-count geom))
@@ -196,11 +202,11 @@ type."
 		  (ogr:get-type geom) (ogr:get-geometry-count geom))
 	  (paint ctx point)))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<multi-line-string>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-LINE-STRING>))
     (format t "MULTI-LINE-STRING with ~a points~%" (ogr:get-point-count geom))
     (error "MULTI-LINE-STRING not implemented"))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<multi-polygon>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-POLYGON>))
     (format t "paint MULTI-POLYGON~%")
     (iter (for i from 0 below (ogr:get-geometry-count geom))
 	  (for poly = (ogr:get-geometry geom i))
@@ -208,7 +214,13 @@ type."
 		  (ogr:get-type poly) (ogr:get-geometry-count poly)
 		  (iter (for j from 0 below (ogr:get-geometry-count poly))
 			(collect (ogr:get-type (ogr:get-geometry poly j)))))
-	  (paint ctx poly))))
+	  (paint ctx poly)))
+
+  (:method ((ctx <paint-ctx>) (geom ogr:<GEOMETRY>))
+    (format t "fallback to GEOMETRY~%")
+    (iter (for i from 0 below (ogr:ogr-f-get-geom-field-count (ogr:pointer geom)))
+          (for geom-field = (ogr:ogr-f-get-geom-field-defn-ref (Ogr:pointer geom) i))
+          (ogr:ogr-gfld-get-spatial-ref geom-field))))
 
 ;; --------------------------------------------------------
 
@@ -234,11 +246,31 @@ layers from it."
     (iter
       (for i from 0 below (ogr:get-layer-count ds))
       (for layer = (ogr:get-layer ds i))
+      (for extent = (ogr:get-extent layer))
       (format t "layer[~a]: ~a; spatial-ref: ~a~%" i (ogr:get-name layer)
 	      (if (ogr:get-spatial-ref layer)
                   (ogr:get-proj4 (ogr:get-spatial-ref layer))
-                  *default-spatial-ref*))
-      (push (ogr:get-name layer) *layers-list*))))
+                  "N/A"))
+      (format t "within bounding box: [(~a, ~a), (~a, ~a)]~%"
+              (ogr:min-x extent) (ogr:min-y extent)
+              (ogr:max-x extent) (ogr:max-y extent))
+      (minimize (ogr:min-x extent) into bb-min-x)
+      (maximize (ogr:max-x extent) into bb-max-x)
+      (minimize (ogr:min-y extent) into bb-min-y)
+      (maximize (ogr:max-y extent) into bb-max-y)
+      (push (ogr:get-name layer) *layers-list*)
+      (finally
+       ;; if the datasource contains only single-point layers or there
+       ;; is a single-point layer, make sure that the bounding box
+       ;; extents will include all layers within this data source
+       (setf *bb-min-x* bb-min-x
+             *bb-min-y* bb-min-y
+             *bb-max-x* bb-max-x
+             *bb-max-y* bb-max-y)))
+    
+    (format t "SUMMARY BOUNDING BOX: [(~a, ~a), (~a, ~a)]~%"
+            *bb-min-x* *bb-min-y*
+            *bb-max-x* *bb-max-y*)))
 
 ;; --------------------------------------------------------
 
@@ -294,14 +326,14 @@ rendered points at appropriate locations."
          (layer-spatial-ref (if (ogr:get-spatial-ref layer)
                                 (ogr:get-proj4 (ogr:get-spatial-ref layer))
                                 *default-spatial-ref*))
-	 (extent (ogr:get-extent layer))
-	 (extent-x (- (ogr:max-x extent) (ogr:min-x extent)))
-	 (extent-y (- (ogr:max-y extent) (ogr:min-y extent)))
+	 ;; (extent (ogr:get-extent layer))
+	 (extent-x (- *bb-max-x* *bb-min-x*))
+	 (extent-y (- *bb-max-y* *bb-min-y*))
 	 (ctx (make-instance '<paint-ctx>
 			     :width *screen-x*
 			     :height *screen-y*
-			     :min-x (ogr:min-x extent)
-			     :min-y (ogr:min-y extent)
+			     :min-x *bb-min-x*
+			     :min-y *bb-min-y*
 			     :extent-x extent-x
 			     :extent-y extent-y
                              :from-proj (pj:pj-init-plus layer-spatial-ref)
