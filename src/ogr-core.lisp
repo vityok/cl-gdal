@@ -75,9 +75,11 @@ depending on the language."
     :initarg :data-source
     :accessor data-source
     :initform nil)))
+(export '(<layer>))
 
 (defclass <feature> (<ogr-class>)
   ())
+(export '(<feature>))
 
 (defclass <geometry> (<ogr-class>)
   ((data-source

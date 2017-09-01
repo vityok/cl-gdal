@@ -156,8 +156,13 @@ type."
 
 ;; --------------------------------------------------------
 
-(defgeneric paint (ctx geom)
-  (:method ((ctx <paint-ctx>) (geom ogr:<POINT>))
+(defun paint-feature (ctx feature)
+  (let ((geom (ogr:get-geometry feature)))
+    (paint-geom ctx geom feature)))
+
+(defgeneric paint-geom (ctx geom feature)
+  (:method ((ctx <paint-ctx>) (geom ogr:<POINT>) feature)
+    (declare (ignore feature))
     (format t "paint POINT~%")
     (multiple-value-bind (x y z)
 	(ogr:get-point geom 0)
@@ -166,7 +171,7 @@ type."
       (cairo:arc x y 2 0 (* 2 3.14))
       (cairo:fill-preserve)))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<LINE-STRING>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<LINE-STRING>) feature)
     (format t "paint LINE-STRING with ~a points~%" (ogr:get-point-count geom))
     (let ((color (elt *colors-brewer*
                       (random (length *colors-brewer*)
@@ -176,7 +181,7 @@ type."
       (line-string-path ctx geom)
       (cairo:stroke)))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<POLYGON>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<POLYGON>) feature)
     (format t "paint POLYGON with ~a points~%" (ogr:get-point-count geom))
     (iter (for i from 0 below (ogr:get-geometry-count geom))
 	  (for poly = (ogr:get-geometry geom i))
@@ -193,20 +198,20 @@ type."
             (cairo:fill-preserve)
             (cairo:stroke))))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-POINT>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-POINT>) feature)
     (format t "paint MULTI-POINT~%")
     ;; fix this cycle
     (iter (for i from 0 below (ogr:get-geometry-count geom))
 	  (for point = (ogr:get-geometry geom i))
 	  (format t "  geom(~a) has ~a geometric items~%"
 		  (ogr:get-type geom) (ogr:get-geometry-count geom))
-	  (paint ctx point)))
+	  (paint-geom ctx point feature)))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-LINE-STRING>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-LINE-STRING>) feature)
     (format t "MULTI-LINE-STRING with ~a points~%" (ogr:get-point-count geom))
     (error "MULTI-LINE-STRING not implemented"))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-POLYGON>))
+  (:method ((ctx <paint-ctx>) (geom ogr:<MULTI-POLYGON>) feature)
     (format t "paint MULTI-POLYGON~%")
     (iter (for i from 0 below (ogr:get-geometry-count geom))
 	  (for poly = (ogr:get-geometry geom i))
@@ -214,13 +219,14 @@ type."
 		  (ogr:get-type poly) (ogr:get-geometry-count poly)
 		  (iter (for j from 0 below (ogr:get-geometry-count poly))
 			(collect (ogr:get-type (ogr:get-geometry poly j)))))
-	  (paint ctx poly)))
+	  (paint-geom ctx poly feature)))
 
-  (:method ((ctx <paint-ctx>) (geom ogr:<GEOMETRY>))
-    (format t "fallback to GEOMETRY~%")
-    (iter (for i from 0 below (ogr:ogr-f-get-geom-field-count (ogr:pointer geom)))
-          (for geom-field = (ogr:ogr-f-get-geom-field-defn-ref (Ogr:pointer geom) i))
-          (ogr:ogr-gfld-get-spatial-ref geom-field))))
+  (:method ((ctx <paint-ctx>) (geom ogr:<GEOMETRY>) (feature ogr:<FEATURE>))
+    (format t "fallback to GEOMETRY with ~a geometry fields~%" (ogr:ogr-f-get-geom-field-count (ogr:pointer feature)))
+    (iter (for i from 0 below (ogr:ogr-f-get-geom-field-count (ogr:pointer feature)))
+          (for geom-field = (ogr:ogr-f-get-geom-field-defn-ref (ogr:pointer feature) i))
+          (format t "type: ~a~%" (ogr:ogr-gfld-get-type geom-field))
+          (format t "spatial ref: ~a~%" (ogr:ogr-gfld-get-spatial-ref geom-field)))))
 
 ;; --------------------------------------------------------
 
@@ -349,8 +355,10 @@ rendered points at appropriate locations."
       (adjust-canvas-transform ctx)
       (iter (for i from 0 below (ogr:get-feature-count layer))
 	    (for feature = (ogr:get-feature layer i))
-	    (for geom = (ogr:get-geometry feature))
-	    (paint ctx geom))
+            (paint-feature ctx feature))
+      
+      ;;    (for geom = (ogr:get-geometry feature))
+      ;;    (paint-geom ctx geom))
       ;; (cairo:destroy cairo-ctx)
       ;; (cairo:surface-write-to-png (canvas ctx) "map-canvas.png")
       )
